@@ -53,10 +53,11 @@ namespace SpaceCombat.Entities
         protected override void Awake()
         {
             base.Awake();
-            
+
             _rigidbody = GetComponent<Rigidbody2D>();
             _rigidbody.gravityScale = 0f;
             _rigidbody.linearDamping = 5f; // Higher = less drift, more responsive
+            _rigidbody.interpolation = RigidbodyInterpolation2D.Interpolate; // Smooth movement
 
             if (_weaponController == null)
                 _weaponController = GetComponent<Combat.WeaponController>();
@@ -269,12 +270,16 @@ namespace SpaceCombat.Entities
         private void MoveTowards(Vector2 position)
         {
             Vector2 direction = ((Vector2)position - (Vector2)transform.position).normalized;
-            _rigidbody.AddForce(direction * _moveSpeed * 10f);
 
-            if (_rigidbody.linearVelocity.magnitude > _moveSpeed)
-            {
-                _rigidbody.linearVelocity = _rigidbody.linearVelocity.normalized * _moveSpeed;
-            }
+            // Direct velocity control - strictly enforce max speed
+            Vector2 targetVelocity = direction * _moveSpeed;
+
+            float lerpSpeed = 5f;
+            _rigidbody.linearVelocity = Vector2.Lerp(
+                _rigidbody.linearVelocity,
+                targetVelocity,
+                lerpSpeed * Time.deltaTime
+            );
 
             RotateTowards(position);
         }
@@ -282,17 +287,22 @@ namespace SpaceCombat.Entities
         private void MoveAwayFrom(Vector2 position)
         {
             Vector2 direction = ((Vector2)transform.position - (Vector2)position).normalized;
-            _rigidbody.AddForce(direction * _moveSpeed * 10f);
 
-            if (_rigidbody.linearVelocity.magnitude > _moveSpeed)
-            {
-                _rigidbody.linearVelocity = _rigidbody.linearVelocity.normalized * _moveSpeed;
-            }
+            // Direct velocity control - strictly enforce max speed
+            Vector2 targetVelocity = direction * _moveSpeed;
+
+            float lerpSpeed = 5f;
+            _rigidbody.linearVelocity = Vector2.Lerp(
+                _rigidbody.linearVelocity,
+                targetVelocity,
+                lerpSpeed * Time.deltaTime
+            );
         }
 
         /// <summary>
         /// Strafe movement - move perpendicular to target while keeping distance
         /// Creates orbiting behavior around the player
+        /// Uses direct velocity control to strictly enforce speed limits
         /// </summary>
         private void StrafeAround(Vector2 targetPosition, float desiredDistance)
         {
@@ -310,36 +320,42 @@ namespace SpaceCombat.Entities
             Vector2 strafeDir = new Vector2(-toTargetDir.y, toTargetDir.x) * _strafeDirection;
 
             // Randomly flip direction occasionally for more variety
-            if (Random.value < 0.005f) // Small chance each frame to flip
+            if (Random.value < 0.005f)
             {
                 _strafeDirection *= -1;
             }
 
-            float strafeSpeed = 0.4f; // Reduce orbit speed (lower = slower orbit)
+            float speedModifier = 1f;
 
             if (currentDistance < desiredDistance * 0.8f)
             {
                 // Too close - back away with slight strafe
-                moveDirection = (-toTargetDir * 0.8f + strafeDir * 0.2f).normalized;
+                moveDirection = (-toTargetDir * 0.7f + strafeDir * 0.3f).normalized;
+                speedModifier = 0.8f; // Move slower when backing away
             }
             else if (currentDistance > desiredDistance * 1.2f)
             {
                 // Too far - move closer with slight strafe
-                moveDirection = (toTargetDir * 0.8f + strafeDir * 0.2f).normalized;
+                moveDirection = (toTargetDir * 0.7f + strafeDir * 0.3f).normalized;
+                speedModifier = 0.6f; // Move slower when chasing (can't outrun player)
             }
             else
             {
-                // At good distance - pure strafe/orbit at reduced speed
+                // At good distance - mostly strafe/orbit
                 moveDirection = strafeDir;
-                strafeSpeed = 0.5f; // Orbit speed when at distance
+                speedModifier = 0.5f; // Orbit speed
             }
 
-            Vector2 targetVelocity = moveDirection * _moveSpeed * strafeSpeed;
-            float responsiveness = 10f;
+            // Direct velocity control - strictly enforce max speed, no spikes
+            float targetSpeed = _moveSpeed * speedModifier;
+            Vector2 targetVelocity = moveDirection * targetSpeed;
+
+            // Smoothly interpolate to target velocity (prevents instant snapping)
+            float lerpSpeed = 5f;
             _rigidbody.linearVelocity = Vector2.Lerp(
                 _rigidbody.linearVelocity,
                 targetVelocity,
-                responsiveness * Time.deltaTime
+                lerpSpeed * Time.deltaTime
             );
         }
 
