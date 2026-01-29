@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 8272370351278946531}
   - component: {fileID: 4632643384639022553}
   - component: {fileID: 596049113606997257}
+  - component: {fileID: 8479908390722580308}
   m_Layer: 6
   m_Name: PlayerShip
   m_TagString: Player
@@ -225,6 +226,25 @@ MonoBehaviour:
   _weaponMountPoint: {fileID: 0}
   _engineTrail: {fileID: 0}
   _shieldVisual: {fileID: 0}
+--- !u!114 &8479908390722580308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1145839844609182422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67e30c9c731891a4697cd150e9f966b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.Combat.TargetSelector
+  _maxTargetRange: 50
+  _enemyLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  _autoFireWhenTargeted: 1
+  _weaponController: {fileID: 0}
+  _playerShip: {fileID: 0}
 --- !u!1 &6216708766474657427
 GameObject:
   m_ObjectHideFlags: 0
