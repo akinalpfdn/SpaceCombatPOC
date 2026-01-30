@@ -23,7 +23,7 @@ MonoBehaviour:
   projectilesPerShot: 1
   spreadAngle: 0
   muzzleFlashPrefab: {fileID: 0}
-  projectileColor: {r: 1, g: 0, b: 0, a: 1}
+  projectileColor: {r: 1, g: 1, b: 1, a: 1}
   projectileScale: 1
   fireSoundId: laser_fire
   hitSoundId: laser_hit

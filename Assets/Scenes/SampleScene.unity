@@ -493,7 +493,7 @@ MonoBehaviour:
   _musicVolume: 0.7
   _musicSource: {fileID: 0}
   _sfxPoolSize: 10
-  _soundLibrary: {fileID: 0}
+  _soundLibrary: {fileID: 11400000, guid: 8e23f80b004d62a4095ea0d9302e2b51, type: 2}
 --- !u!4 &572893510
 Transform:
   m_ObjectHideFlags: 0
