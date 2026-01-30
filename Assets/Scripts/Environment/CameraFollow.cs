@@ -9,8 +9,9 @@ namespace SpaceCombat.Environment
         [SerializeField] private bool _findPlayerOnStart = true;
 
         [Header("Follow Settings")]
-        [SerializeField] private float _smoothSpeed = 5f;
+        [SerializeField] private float _smoothSpeed = 20f;  // Increased for tighter follow
         [SerializeField] private Vector3 _offset = new Vector3(0, 0, -225);
+        [SerializeField] private bool _useDirectFollow = true;  // Direct follow for interpolated rigidbodies
 
         private Vector3 _velocity;
 
@@ -39,12 +40,22 @@ namespace SpaceCombat.Environment
             }
 
             Vector3 targetPosition = _target.position + _offset;
-            transform.position = Vector3.SmoothDamp(
-                transform.position,
-                targetPosition,
-                ref _velocity,
-                1f / _smoothSpeed
-            );
+
+            // When using interpolated rigidbodies, direct follow feels smoother
+            // SmoothDamp on top of interpolation causes staggering
+            if (_useDirectFollow)
+            {
+                transform.position = targetPosition;
+            }
+            else
+            {
+                transform.position = Vector3.SmoothDamp(
+                    transform.position,
+                    targetPosition,
+                    ref _velocity,
+                    1f / _smoothSpeed
+                );
+            }
         }
 
         public void SetTarget(Transform target)
