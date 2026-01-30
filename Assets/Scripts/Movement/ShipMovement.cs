@@ -35,6 +35,7 @@ namespace SpaceCombat.Movement
         private Vector2 _targetVelocity;
         private Vector2 _velocityRef;
         private float _currentSpeed;
+        private bool _autoRotateEnabled = true;
 
         // Properties
         public Vector2 Velocity => _rigidbody?.linearVelocity ?? Vector2.zero;
@@ -100,8 +101,8 @@ namespace SpaceCombat.Movement
             _rigidbody.linearVelocity = _currentVelocity;
             _currentSpeed = _currentVelocity.magnitude;
 
-            // Rotate to face movement direction
-            if (_rotateToMovement && _currentSpeed > _rotationThreshold)
+            // Rotate to face movement direction (only if auto-rotate is enabled)
+            if (_autoRotateEnabled && _rotateToMovement && _currentSpeed > _rotationThreshold)
             {
                 RotateTowards(_currentVelocity.normalized);
             }
@@ -195,6 +196,15 @@ namespace SpaceCombat.Movement
         public bool IsMoving()
         {
             return _currentSpeed > _rotationThreshold;
+        }
+
+        /// <summary>
+        /// Enable or disable automatic rotation to movement direction
+        /// When disabled, you can manually control rotation (e.g., for targeting)
+        /// </summary>
+        public void SetAutoRotate(bool enabled)
+        {
+            _autoRotateEnabled = enabled;
         }
 
 #if UNITY_EDITOR

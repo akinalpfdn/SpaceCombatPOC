@@ -239,13 +239,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67e30c9c731891a4697cd150e9f966b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.Combat.TargetSelector
-  _maxTargetRange: 50
+  _maxTargetRange: 20
   _enemyLayer:
     serializedVersion: 2
     m_Bits: 128
   _autoFireWhenTargeted: 1
+  _stopDistance: 0.5
+  _requireMouseHoldToMove: 1
   _weaponController: {fileID: 0}
-  _playerShip: {fileID: 0}
+  _shipMovement: {fileID: 0}
+  _mainCamera: {fileID: 0}
 --- !u!1 &6216708766474657427
 GameObject:
   m_ObjectHideFlags: 0

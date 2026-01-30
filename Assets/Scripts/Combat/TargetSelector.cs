@@ -82,6 +82,9 @@ namespace SpaceCombat.Combat
                 if (!IsValidTarget(_currentTarget))
                 {
                     _currentTarget = null;
+                    // Re-enable auto-rotation when clearing target
+                    if (_shipMovement != null)
+                        _shipMovement.SetAutoRotate(true);
                 }
             }
         }
@@ -113,12 +116,6 @@ namespace SpaceCombat.Combat
                 {
                     _shipMovement.Stop();
                 }
-
-                // Always face movement direction if no target
-                if (_currentTarget == null && distance > _stopDistance)
-                {
-                    _shipMovement.RotateTowards(toMouse.normalized);
-                }
             }
             else
             {
@@ -141,10 +138,16 @@ namespace SpaceCombat.Combat
                     if (_currentTarget == enemy.transform)
                     {
                         _currentTarget = null;
+                        // Re-enable auto-rotation when clearing target
+                        if (_shipMovement != null)
+                            _shipMovement.SetAutoRotate(true);
                     }
                     else
                     {
                         _currentTarget = enemy.transform;
+                        // Disable auto-rotation when targeting so we can face the target
+                        if (_shipMovement != null)
+                            _shipMovement.SetAutoRotate(false);
                     }
                 }
             }
@@ -187,6 +190,9 @@ namespace SpaceCombat.Combat
         public void ClearTarget()
         {
             _currentTarget = null;
+            // Re-enable auto-rotation when clearing target
+            if (_shipMovement != null)
+                _shipMovement.SetAutoRotate(true);
         }
 
 #if UNITY_EDITOR
