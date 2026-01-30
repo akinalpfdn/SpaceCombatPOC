@@ -371,11 +371,22 @@ namespace SpaceCombat.Entities
 
         private void TryFire()
         {
-            if (_weaponController != null)
+            if (_weaponController != null && _config != null)
             {
-                Vector2 aimDir = (_target.position - transform.position).normalized;
-                _weaponController.SetAimDirection(aimDir);
-                _weaponController.TryFire();
+                // Check enemy-specific fire rate multiplier
+                float weaponFireRate = _config.weapon?.fireRate ?? 0.2f;
+                float modifiedFireRate = weaponFireRate * _config.fireRateMultiplier;
+
+                if (Time.time >= _lastFireTime + modifiedFireRate)
+                {
+                    Vector2 aimDir = (_target.position - transform.position).normalized;
+                    _weaponController.SetAimDirection(aimDir);
+
+                    if (_weaponController.TryFire())
+                    {
+                        _lastFireTime = Time.time;
+                    }
+                }
             }
         }
 

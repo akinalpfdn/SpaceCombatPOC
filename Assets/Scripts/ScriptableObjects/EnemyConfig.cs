@@ -22,6 +22,7 @@ namespace SpaceCombat.ScriptableObjects
         public WeaponConfig weapon;
         public float attackRange = 8f;
         public float detectionRange = 12f;
+        public float fireRateMultiplier = 2f; // Higher = slower shooting (1 = normal, 2 = half speed)
 
         [Header("AI Behavior")]
         public float patrolRadius = 5f;

@@ -19,7 +19,7 @@ MonoBehaviour:
   projectileSpeed: 30
   range: 15
   accuracy: 0.95
-  projectilePrefab: {fileID: 0}
+  projectilePrefab: {fileID: 587130082223421870, guid: 237e92e04ff2cf64eb658f8436cbaffc, type: 3}
   projectilesPerShot: 1
   spreadAngle: 0
   muzzleFlashPrefab: {fileID: 0}
