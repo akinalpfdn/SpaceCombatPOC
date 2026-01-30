@@ -211,16 +211,13 @@ namespace SpaceCombat.Combat
         /// </summary>
         private void SpawnHitEffect(Vector2 position)
         {
-            // If custom prefab is assigned, use it
+            // We only spawn if a prefab is assigned.
+            // The old "Color" fallback is removed because HitEffect.cs no longer supports it.
             if (_hitEffectPrefab != null)
             {
-                var effect = Instantiate(_hitEffectPrefab, position, Quaternion.identity);
-                Destroy(effect, 1f);
-            }
-            else
-            {
-                // Otherwise use default hit effect
-                VFX.HitEffect.Spawn(position, _spriteRenderer != null ? _spriteRenderer.color : Color.red);
+                // Use the static Spawn method from your HitEffect script
+                // We pass Quaternion.identity for default rotation
+                VFX.HitEffect.Spawn(_hitEffectPrefab, position, Quaternion.identity);
             }
         }
 

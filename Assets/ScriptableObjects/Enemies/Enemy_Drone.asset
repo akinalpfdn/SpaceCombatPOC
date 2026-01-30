@@ -22,7 +22,7 @@ MonoBehaviour:
   weapon: {fileID: 11400000, guid: 849b5560bac627e4fae1a2d1d9930fc8, type: 2}
   attackRange: 8
   detectionRange: 12
-  fireRateMultiplier: 3
+  fireRateMultiplier: 10
   patrolRadius: 5
   idleTime: 2
   fleeHealthThreshold: 0.2
