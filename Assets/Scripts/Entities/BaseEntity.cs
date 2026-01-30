@@ -179,15 +179,16 @@ namespace SpaceCombat.Entities
         }
 
         /// <summary>
-        /// Show damage flash effect
+        /// Show damage flash effect (DISABLED - hit effects only)
         /// </summary>
         protected virtual void ShowDamageFlash()
         {
-            if (_spriteRenderer != null)
-            {
-                StopAllCoroutines();
-                StartCoroutine(DamageFlashCoroutine());
-            }
+            // Damage flash disabled - using hit effect prefab instead
+            // if (_spriteRenderer != null)
+            // {
+            //     StopAllCoroutines();
+            //     StartCoroutine(DamageFlashCoroutine());
+            // }
         }
 
         private System.Collections.IEnumerator DamageFlashCoroutine()
