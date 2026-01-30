@@ -285,5 +285,5 @@ MonoBehaviour:
   _damageType: 0
   _spriteRenderer: {fileID: 0}
   _trailRenderer: {fileID: 0}
-  _hitEffectPrefab: {fileID: 0}
+  _hitEffectPrefab: {fileID: 1468711841092775882, guid: 26dfa6f93b77d2048a2af9e425205c5d, type: 3}
   _hitSoundId: projectile_hit

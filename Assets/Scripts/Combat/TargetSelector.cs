@@ -39,6 +39,9 @@ namespace SpaceCombat.Combat
 
             if (_playerShip == null)
                 _playerShip = GetComponent<PlayerShip>();
+
+            // Set target layers so projectiles hit enemies
+            _weaponController.SetTargetLayers(_enemyLayer);
         }
 
         private void Update()

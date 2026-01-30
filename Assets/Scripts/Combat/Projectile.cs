@@ -81,6 +81,38 @@ namespace SpaceCombat.Combat
             {
                 // Move projectile
                 _rigidbody.linearVelocity = _direction * _speed;
+
+                // Raycast ahead for fast-moving projectiles to prevent pass-through
+                CheckRaycastCollision();
+            }
+        }
+
+        private void CheckRaycastCollision()
+        {
+            float distance = _speed * Time.fixedDeltaTime * 2f; // Check 2 frames ahead
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, _direction, distance, _targetLayers);
+
+            if (hit.collider != null)
+            {
+                // Don't hit owner
+                if (_owner != null && hit.collider.gameObject == _owner)
+                    return;
+
+                // Deal damage
+                var damageable = hit.collider.GetComponent<IDamageable>();
+                if (damageable != null)
+                {
+                    damageable.TakeDamage(_damage, _damageType);
+
+                    // Spawn hit effect
+                    SpawnHitEffect(hit.point);
+
+                    // Play hit sound
+                    EventBus.Publish(new PlaySFXEvent(_hitSoundId, transform.position));
+                }
+
+                // Despawn
+                Despawn();
             }
         }
 
@@ -179,10 +211,16 @@ namespace SpaceCombat.Combat
         /// </summary>
         private void SpawnHitEffect(Vector2 position)
         {
+            // If custom prefab is assigned, use it
             if (_hitEffectPrefab != null)
             {
                 var effect = Instantiate(_hitEffectPrefab, position, Quaternion.identity);
                 Destroy(effect, 1f);
+            }
+            else
+            {
+                // Otherwise use default hit effect
+                VFX.HitEffect.Spawn(position, _spriteRenderer != null ? _spriteRenderer.color : Color.red);
             }
         }
 
