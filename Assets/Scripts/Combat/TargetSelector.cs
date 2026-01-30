@@ -1,16 +1,19 @@
 // ============================================
 // TARGET SELECTION - Click to select enemies
 // Player auto-faces and shoots at selected target
+// DarkOrbit-style: mouse hold moves ship, click targets enemy
 // ============================================
 
 using UnityEngine;
 using SpaceCombat.Entities;
+using SpaceCombat.Movement;
 
 namespace SpaceCombat.Combat
 {
     /// <summary>
     /// Attach this to the Player ship.
-    /// Click on enemies to target them - ship auto-faces and shoots.
+    /// - Hold mouse button → ship moves toward cursor
+    /// - Click enemy → target and auto-attack
     /// </summary>
     public class TargetSelector : MonoBehaviour
     {
@@ -19,38 +22,50 @@ namespace SpaceCombat.Combat
         [SerializeField] private LayerMask _enemyLayer = -1;
         [SerializeField] private bool _autoFireWhenTargeted = true;
 
+        [Header("Movement Settings")]
+        [SerializeField] private float _stopDistance = 0.5f; // Stop moving when this close to cursor
+        [SerializeField] private bool _requireMouseHoldToMove = true; // Require holding mouse to move
+
         [Header("References")]
         [SerializeField] private WeaponController _weaponController;
-        [SerializeField] private PlayerShip _playerShip;
+        [SerializeField] private ShipMovement _shipMovement;
+        [SerializeField] private Camera _mainCamera;
 
         // State
         private Transform _currentTarget;
-        private Camera _mainCamera;
 
         // Properties
         public Transform CurrentTarget => _currentTarget;
+        public Vector2 MouseWorldPosition { get; private set; }
 
         private void Start()
         {
-            _mainCamera = Camera.main;
+            if (_mainCamera == null)
+                _mainCamera = Camera.main;
 
             if (_weaponController == null)
                 _weaponController = GetComponent<WeaponController>();
 
-            if (_playerShip == null)
-                _playerShip = GetComponent<PlayerShip>();
+            if (_shipMovement == null)
+                _shipMovement = GetComponent<ShipMovement>();
 
             // Set target layers so projectiles hit enemies
-            _weaponController.SetTargetLayers(_enemyLayer);
+            if (_weaponController != null)
+                _weaponController.SetTargetLayers(_enemyLayer);
         }
 
         private void Update()
         {
-            // Handle mouse click to select target
+            UpdateMousePosition();
+
+            // Handle mouse click to select target (only if clicking directly on enemy)
             if (UnityEngine.Input.GetMouseButtonDown(0))
             {
                 TrySelectTarget();
             }
+
+            // Handle movement toward mouse (when holding mouse button)
+            HandleMovement();
 
             // Update aim at target
             if (_currentTarget != null)
@@ -71,6 +86,46 @@ namespace SpaceCombat.Combat
             }
         }
 
+        private void UpdateMousePosition()
+        {
+            Vector3 mousePos = _mainCamera.ScreenToWorldPoint(UnityEngine.Input.mousePosition);
+            MouseWorldPosition = new Vector2(mousePos.x, mousePos.y);
+        }
+
+        private void HandleMovement()
+        {
+            if (_shipMovement == null) return;
+
+            // Only move if mouse is held (or always if disabled)
+            bool shouldMove = !_requireMouseHoldToMove || UnityEngine.Input.GetMouseButton(0);
+
+            if (shouldMove)
+            {
+                Vector2 toMouse = MouseWorldPosition - (Vector2)transform.position;
+                float distance = toMouse.magnitude;
+
+                // Stop if close enough to cursor
+                if (distance > _stopDistance)
+                {
+                    _shipMovement.Move(toMouse.normalized);
+                }
+                else
+                {
+                    _shipMovement.Stop();
+                }
+
+                // Always face movement direction if no target
+                if (_currentTarget == null && distance > _stopDistance)
+                {
+                    _shipMovement.RotateTowards(toMouse.normalized);
+                }
+            }
+            else
+            {
+                _shipMovement.Stop();
+            }
+        }
+
         private void TrySelectTarget()
         {
             // Raycast from mouse position
@@ -82,7 +137,15 @@ namespace SpaceCombat.Combat
                 var enemy = hit.collider.GetComponent<Enemy>();
                 if (enemy != null && IsInRange(enemy.transform))
                 {
-                    _currentTarget = enemy.transform;
+                    // Toggle target: if already targeting this enemy, clear it
+                    if (_currentTarget == enemy.transform)
+                    {
+                        _currentTarget = null;
+                    }
+                    else
+                    {
+                        _currentTarget = enemy.transform;
+                    }
                 }
             }
         }
@@ -98,13 +161,10 @@ namespace SpaceCombat.Combat
             _weaponController.SetAimDirection(direction);
 
             // Also rotate ship to face target
-            float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
-            Quaternion targetRotation = Quaternion.Euler(0, 0, targetAngle);
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                targetRotation,
-                20f * Time.deltaTime
-            );
+            if (_shipMovement != null)
+            {
+                _shipMovement.RotateTowards(direction);
+            }
         }
 
         private bool IsInRange(Transform target)

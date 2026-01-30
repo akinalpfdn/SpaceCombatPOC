@@ -171,17 +171,18 @@ namespace SpaceCombat.Entities
         {
             if (_inputProvider == null) return;
 
-            // Update aim direction
+            // Update aim direction (for visual feedback, not firing)
             if (_weaponController != null)
             {
                 _weaponController.SetAimDirection(_inputProvider.AimDirection);
             }
 
-            // Handle continuous fire
-            if (_isFiring && _weaponController != null)
-            {
-                _weaponController.TryFire();
-            }
+            // Firing is now handled by TargetSelector (click to target, not hold to fire)
+            // This old input-based firing is disabled
+            // if (_isFiring && _weaponController != null)
+            // {
+            //     _weaponController.TryFire();
+            // }
 
             // Update engine trail
             UpdateEngineTrail();
