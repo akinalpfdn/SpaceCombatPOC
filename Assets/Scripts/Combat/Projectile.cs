@@ -154,6 +154,17 @@ namespace SpaceCombat.Combat
         }
 
         /// <summary>
+        /// Set projectile sprite
+        /// </summary>
+        public void SetSprite(Sprite sprite)
+        {
+            if (_spriteRenderer != null && sprite != null)
+            {
+                _spriteRenderer.sprite = sprite;
+            }
+        }
+
+        /// <summary>
         /// Set projectile scale
         /// </summary>
         public void SetScale(float scale)

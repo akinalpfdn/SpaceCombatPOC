@@ -197,6 +197,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   _isPlayerWeapon: 1
+  _projectileSprite: {fileID: -2388059793313371099, guid: 14497f697050b9f4a8d0a63c9c673aa6, type: 3}
   _lastFireTime: 0
   _aimDirection: {x: 0, y: 1}
 --- !u!114 &596049113606997257

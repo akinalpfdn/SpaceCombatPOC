@@ -24,6 +24,9 @@ namespace SpaceCombat.Combat
         [SerializeField] private LayerMask _targetLayers;
         [SerializeField] private bool _isPlayerWeapon = true;
 
+        [Header("Projectile Appearance Override")]
+        [SerializeField] private Sprite _projectileSprite; // Assign blue sprite for player, red for enemy
+
         [Header("State")]
         [SerializeField] private float _lastFireTime;
         [SerializeField] private Vector2 _aimDirection = Vector2.up;
@@ -192,6 +195,8 @@ namespace SpaceCombat.Combat
                 );
 
                 // Set visual properties
+                if (_projectileSprite != null)
+                    projectile.SetSprite(_projectileSprite);
                 projectile.SetColor(_currentWeaponConfig.projectileColor);
                 projectile.SetScale(_currentWeaponConfig.projectileScale);
                 projectile.SetDamageType(_currentWeaponConfig.damageType);
