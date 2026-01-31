@@ -1,0 +1,665 @@
+fileFormatVersion: 2
+guid: b15f50fbb6f74b14589b814985a3a59f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2698933559168560081
+    second: dead_explosion_0
+  - first:
+      213: 1856995345386498108
+    second: dead_explosion_1
+  - first:
+      213: -881955906897126659
+    second: dead_explosion_2
+  - first:
+      213: -6348427139013219267
+    second: dead_explosion_3
+  - first:
+      213: -7532086323081909661
+    second: dead_explosion_4
+  - first:
+      213: -6908318240844614204
+    second: dead_explosion_5
+  - first:
+      213: 1383016115405514968
+    second: dead_explosion_6
+  - first:
+      213: 6678363040814833619
+    second: dead_explosion_7
+  - first:
+      213: 7317333787393484169
+    second: dead_explosion_8
+  - first:
+      213: -2004498145093821159
+    second: dead_explosion_9
+  - first:
+      213: 4507030411241930205
+    second: dead_explosion_10
+  - first:
+      213: 3598816374486318873
+    second: dead_explosion_11
+  - first:
+      213: -1030604922806424916
+    second: dead_explosion_12
+  - first:
+      213: -4563769604268897433
+    second: dead_explosion_13
+  - first:
+      213: -562398419518736360
+    second: dead_explosion_14
+  - first:
+      213: -331216293861644165
+    second: dead_explosion_15
+  - first:
+      213: 8138222810431809509
+    second: dead_explosion_16
+  - first:
+      213: -8657672013045062732
+    second: dead_explosion_17
+  - first:
+      213: -4581091250498760188
+    second: dead_explosion_18
+  - first:
+      213: -1511300382110891714
+    second: dead_explosion_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: dead_explosion_0
+      rect:
+        serializedVersion: 2
+        x: 46
+        y: 1197
+        width: 172
+        height: 159
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1db6f92c5c9847520800000000000000
+      internalID: 2698933559168560081
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dead_explosion_1
+      rect:
+        serializedVersion: 2
+        x: 280
+        y: 1198
+        width: 204
+        height: 165
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c38e0578d6f55c910800000000000000
+      internalID: 1856995345386498108
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dead_explosion_2
+      rect:
+        serializedVersion: 2
+        x: 520
+        y: 1179
+        width: 209
+        height: 201
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dfad6d586c9a2c3f0800000000000000
+      internalID: -881955906897126659
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dead_explosion_3
+      rect:
+        serializedVersion: 2
+        x: 764
+        y: 1180
+        width: 227
+        height: 195
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3ceaa8072bd5e7a0800000000000000
+      internalID: -6348427139013219267
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dead_explosion_4
+      rect:
+        serializedVersion: 2
+        x: 31
+        y: 948
+        width: 201
+        height: 164
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 36aef175567a87790800000000000000
+      internalID: -7532086323081909661
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dead_explosion_5
+      rect:
+        serializedVersion: 2
+        x: 278
+        y: 934
+        width: 203
+        height: 190
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c5fa1b6929b020a0800000000000000
+      internalID: -6908318240844614204
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dead_explosion_6
+      rect:
+        serializedVersion: 2
+        x: 511
+        y: 936
+        width: 227
+        height: 194
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8d8e26554d5713310800000000000000
+      internalID: 1383016115405514968
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dead_explosion_7
+      rect:
+        serializedVersion: 2
+        x: 762
+        y: 930
+        width: 231
+        height: 202
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3df9dd85dcf4eac50800000000000000
+      internalID: 6678363040814833619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dead_explosion_8
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 672
+        width: 217
+        height: 206
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9856d8c8f446c8560800000000000000
+      internalID: 7317333787393484169
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dead_explosion_9
+      rect:
+        serializedVersion: 2
+        x: 268
+        y: 678
+        width: 221
+        height: 211
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 91dd0ccae879e24e0800000000000000
+      internalID: -2004498145093821159
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dead_explosion_10
+      rect:
+        serializedVersion: 2
+        x: 511
+        y: 668
+        width: 228
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ddd35fd97403c8e30800000000000000
+      internalID: 4507030411241930205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dead_explosion_11
+      rect:
+        serializedVersion: 2
+        x: 764
+        y: 666
+        width: 230
+        height: 209
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 91fbd1ddc6091f130800000000000000
+      internalID: 3598816374486318873
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dead_explosion_12
+      rect:
+        serializedVersion: 2
+        x: 27
+        y: 407
+        width: 215
+        height: 187
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: caaaa58784e82b1f0800000000000000
+      internalID: -1030604922806424916
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dead_explosion_13
+      rect:
+        serializedVersion: 2
+        x: 263
+        y: 405
+        width: 218
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 76bc3dc89bb3aa0c0800000000000000
+      internalID: -4563769604268897433
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dead_explosion_14
+      rect:
+        serializedVersion: 2
+        x: 526
+        y: 404
+        width: 204
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 818385efd95f138f0800000000000000
+      internalID: -562398419518736360
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dead_explosion_15
+      rect:
+        serializedVersion: 2
+        x: 773
+        y: 409
+        width: 224
+        height: 179
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b782e8c1988476bf0800000000000000
+      internalID: -331216293861644165
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dead_explosion_16
+      rect:
+        serializedVersion: 2
+        x: 27
+        y: 148
+        width: 220
+        height: 150
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e7e4c62786c0f070800000000000000
+      internalID: 8138222810431809509
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dead_explosion_17
+      rect:
+        serializedVersion: 2
+        x: 286
+        y: 149
+        width: 198
+        height: 154
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b3ab98ac25c9d780800000000000000
+      internalID: -8657672013045062732
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dead_explosion_18
+      rect:
+        serializedVersion: 2
+        x: 536
+        y: 148
+        width: 197
+        height: 143
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4021f5287c1bc60c0800000000000000
+      internalID: -4581091250498760188
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dead_explosion_19
+      rect:
+        serializedVersion: 2
+        x: 818
+        y: 168
+        width: 162
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e314e574f48c60be0800000000000000
+      internalID: -1511300382110891714
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: d56a2f0cd3bda644bb746054a766964c
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
+    nameFileIdTable:
+      dead_explosion_0: 2698933559168560081
+      dead_explosion_1: 1856995345386498108
+      dead_explosion_10: 4507030411241930205
+      dead_explosion_11: 3598816374486318873
+      dead_explosion_12: -1030604922806424916
+      dead_explosion_13: -4563769604268897433
+      dead_explosion_14: -562398419518736360
+      dead_explosion_15: -331216293861644165
+      dead_explosion_16: 8138222810431809509
+      dead_explosion_17: -8657672013045062732
+      dead_explosion_18: -4581091250498760188
+      dead_explosion_19: -1511300382110891714
+      dead_explosion_2: -881955906897126659
+      dead_explosion_3: -6348427139013219267
+      dead_explosion_4: -7532086323081909661
+      dead_explosion_5: -6908318240844614204
+      dead_explosion_6: 1383016115405514968
+      dead_explosion_7: 6678363040814833619
+      dead_explosion_8: 7317333787393484169
+      dead_explosion_9: -2004498145093821159
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
