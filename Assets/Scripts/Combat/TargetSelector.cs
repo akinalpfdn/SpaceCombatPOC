@@ -1,7 +1,10 @@
 // ============================================
 // TARGET SELECTION - Click to select enemies
-// Player auto-faces and shoots at selected target
+// Player auto-faces selected target, SPACE to toggle attack
 // DarkOrbit-style: mouse hold moves ship, click targets enemy
+// SPACE once: start attacking selected target
+// SPACE again: stop attacking
+// Auto-stops when target dies or out of range
 // ============================================
 
 using UnityEngine;
@@ -14,14 +17,15 @@ namespace SpaceCombat.Combat
     /// <summary>
     /// Attach this to the Player ship.
     /// - Hold mouse button → ship moves toward cursor
-    /// - Click enemy → target and auto-attack
+    /// - Click enemy → select target (shows indicator)
+    /// - Hold SPACE → attack selected target
     /// </summary>
     public class TargetSelector : MonoBehaviour
     {
         [Header("Settings")]
         [SerializeField] private float _maxTargetRange = 20f;
         [SerializeField] private LayerMask _enemyLayer = -1;
-        [SerializeField] private bool _autoFireWhenTargeted = true;
+        [SerializeField] private KeyCode _fireToggleKey = KeyCode.Space;
 
         [Header("Movement Settings")]
         [SerializeField] private float _stopDistance = 0.5f; // Stop moving when this close to cursor
@@ -40,6 +44,8 @@ namespace SpaceCombat.Combat
         private Transform _currentTarget;
         private TargetIndicator _currentIndicator;
         private HealthBar _targetHealthBar;
+        private bool _isFiringEnabled = false;
+        private bool _wasSpacePressed = false;
 
         // Properties
         public Transform CurrentTarget => _currentTarget;
@@ -74,13 +80,21 @@ namespace SpaceCombat.Combat
             // Handle movement toward mouse (when holding mouse button)
             HandleMovement();
 
-            // Update aim at target
+            // Handle SPACE key toggle for firing
+            bool isSpacePressed = UnityEngine.Input.GetKey(_fireToggleKey);
+            if (isSpacePressed && !_wasSpacePressed && _currentTarget != null)
+            {
+                _isFiringEnabled = !_isFiringEnabled; // Toggle state
+            }
+            _wasSpacePressed = isSpacePressed;
+
+            // Update aim at target and handle firing
             if (_currentTarget != null)
             {
                 UpdateAimAtTarget();
 
-                // Auto-fire if targeting
-                if (_autoFireWhenTargeted && _weaponController != null)
+                // Fire continuously if toggle is enabled
+                if (_isFiringEnabled && _weaponController != null)
                 {
                     _weaponController.TryFire();
                 }
@@ -89,7 +103,13 @@ namespace SpaceCombat.Combat
                 if (!IsValidTarget(_currentTarget))
                 {
                     ClearTarget();
+                    _isFiringEnabled = false;
                 }
+            }
+            else
+            {
+                // No target, stop firing
+                _isFiringEnabled = false;
             }
         }
 
@@ -203,6 +223,7 @@ namespace SpaceCombat.Combat
         public void ClearTarget()
         {
             _currentTarget = null;
+            _isFiringEnabled = false;
             ClearIndicator();
             // Re-enable auto-rotation when clearing target
             if (_shipMovement != null)
