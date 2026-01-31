@@ -91,18 +91,15 @@ namespace SpaceCombat.UI
 
         private Sprite CreateBoxSprite()
         {
-            // Create a simple white box texture
-            int width = 32;
-            int height = 32;
-            Texture2D texture = new Texture2D(width, height);
-            Color[] colors = new Color[width * height];
-            for (int i = 0; i < colors.Length; i++)
-            {
-                colors[i] = Color.white;
-            }
-            texture.SetPixels(colors);
+            // Create a simple white box texture - use 1x1 pixel for proper scaling
+            Texture2D texture = new Texture2D(1, 1);
+            texture.SetPixel(0, 0, Color.white);
             texture.Apply();
-            return Sprite.Create(texture, new Rect(0, 0, width, height), Vector2.one * 0.5f);
+            // No wrap, filter mode for crisp scaling
+            texture.filterMode = FilterMode.Bilinear;
+            texture.wrapMode = TextureWrapMode.Clamp;
+            // Set pixelsPerUnit to 1 so scale directly matches world units
+            return Sprite.Create(texture, new Rect(0, 0, 1, 1), Vector2.one * 0.5f, 1f);
         }
 
         private void LateUpdate()
