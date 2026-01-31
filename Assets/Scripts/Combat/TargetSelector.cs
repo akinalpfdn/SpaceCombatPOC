@@ -100,7 +100,13 @@ namespace SpaceCombat.Combat
                 SelectClosestEnemy();
             }
 
-            // Update aim at target and handle firing
+            // First check if current target is still valid, clear if not
+            if (_currentTarget != null && !IsValidTarget(_currentTarget))
+            {
+                ClearTarget();
+            }
+
+            // Then handle aiming and firing (only if target is still valid)
             if (_currentTarget != null)
             {
                 UpdateAimAtTarget();
@@ -109,13 +115,6 @@ namespace SpaceCombat.Combat
                 if (_isFiringEnabled && _weaponController != null)
                 {
                     _weaponController.TryFire();
-                }
-
-                // Clear target if dead or too far
-                if (!IsValidTarget(_currentTarget))
-                {
-                    ClearTarget();
-                    _isFiringEnabled = false;
                 }
             }
             else
@@ -264,6 +263,9 @@ namespace SpaceCombat.Combat
         private bool IsValidTarget(Transform target)
         {
             if (target == null) return false;
+
+            // Check if target GameObject is still active (not pooled/destroyed)
+            if (!target.gameObject.activeInHierarchy) return false;
 
             var enemy = target.GetComponent<Enemy>();
             if (enemy == null) return false;
