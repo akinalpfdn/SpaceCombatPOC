@@ -46,11 +46,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.UI.HealthBar
   _config:
     Offset: {x: 0, y: -1}
-    Size: {x: 2, y: 0.3}
-    BorderPadding: 0.05
-    BackgroundColor: {r: 1, g: 1, b: 1, a: 0.9}
+    Size: {x: 2, y: 0.2}
+    BorderPadding: 0.03
+    BackgroundColor: {r: 1, g: 1, b: 1, a: 0.3764706}
     BorderColor: {r: 0.3, g: 0.3, b: 0.3, a: 1}
-    HealthyColor: {r: 0.2, g: 0.6898815, b: 0.8, a: 1}
+    HealthyColor: {r: 0.2, g: 0.8, b: 0.22363292, a: 1}
     WarningColor: {r: 0.9, g: 0.7, b: 0.1, a: 1}
     CriticalColor: {r: 0.9, g: 0.1, b: 0.1, a: 1}
     WarningThreshold: 0.5

@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 4632643384639022553}
   - component: {fileID: 596049113606997257}
   - component: {fileID: 8479908390722580308}
-  - component: {fileID: 9002808455726502169}
+  - component: {fileID: 362525359733449936}
   m_Layer: 6
   m_Name: PlayerShip
   m_TagString: Player
@@ -215,16 +215,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5d1b2ecb983e4e46a332f1129f3c88a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.Entities.PlayerShip
-  _maxHealth: 100
+  _maxHealth: 0
   _currentHealth: 0
   _maxShield: 0
   _currentShield: 0
-  _shieldRegenRate: 5
-  _shieldRegenDelay: 3
+  _shieldRegenRate: 0
+  _shieldRegenDelay: 0
   _spriteRenderer: {fileID: 0}
   _flashDuration: 0.1
   _damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
   _config: {fileID: 11400000, guid: cf4e7a5aa0988264e81b24fa21954303, type: 2}
+  _useConfigSettings: 1
   _movement: {fileID: 0}
   _weaponController: {fileID: 0}
   _weaponMountPoint: {fileID: 0}
@@ -254,7 +255,7 @@ MonoBehaviour:
   _mainCamera: {fileID: 0}
   _targetIndicatorPrefab: {fileID: 3787043342725239422, guid: 3632ac2bf675ef94e805a43e7b9ee1b6, type: 3}
   _healthBarPrefab: {fileID: 4674260991152052681, guid: a908d1210d1c54c4ab61070c37258f08, type: 3}
---- !u!114 &9002808455726502169
+--- !u!114 &362525359733449936
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -263,25 +264,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 1145839844609182422}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67bac4855bb67464d998a908e3e282ce, type: 3}
+  m_Script: {fileID: 11500000, guid: d497c93634b0f9b409bf397d25979c7c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.UI.HealthBar
-  _config:
-    Offset: {x: 0, y: -1}
-    Size: {x: 2, y: 0.3}
-    BorderPadding: 0.05
-    BackgroundColor: {r: 0.1, g: 0.1, b: 0.1, a: 0.9}
-    BorderColor: {r: 0.3, g: 0.3, b: 0.3, a: 1}
-    HealthyColor: {r: 0.2, g: 0.8, b: 0.2, a: 1}
-    WarningColor: {r: 0.9, g: 0.7, b: 0.1, a: 1}
-    CriticalColor: {r: 0.9, g: 0.1, b: 0.1, a: 1}
-    WarningThreshold: 0.5
-    CriticalThreshold: 0.25
-    BaseSortingOrder: 100
-    SortingLayerName: UI
-  _alwaysShow: 1
-  _hideWhenFull: 1
-  _externalTarget: {fileID: 0}
+  m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.UI.PlayerStatusDisplay
+  _target: {fileID: 0}
+  _showHealth: 1
+  _showShield: 1
+  _offset: {x: 0, y: -1.5}
+  _lineSpacing: 0.5
+  _fontScale: 0.6
+  _healthColor: {r: 0.2, g: 0.8, b: 0.2, a: 1}
+  _shieldColor: {r: 0.3, g: 0.5, b: 1, a: 1}
+  _sortingOrder: 200
+  _sortingLayerName: UI
 --- !u!1 &6216708766474657427
 GameObject:
   m_ObjectHideFlags: 0

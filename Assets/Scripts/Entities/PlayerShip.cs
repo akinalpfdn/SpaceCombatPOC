@@ -23,6 +23,7 @@ namespace SpaceCombat.Entities
     {
         [Header("Configuration")]
         [SerializeField] private ShipConfig _config;
+        [SerializeField] private bool _useConfigSettings = true;
 
         [Header("Components")]
         [SerializeField] private ShipMovement _movement;
@@ -62,13 +63,14 @@ namespace SpaceCombat.Entities
                 SetInputProvider(inputProvider);
             }
 
-            // Apply config
-            if (_config != null)
+            // Apply config if enabled, otherwise use inspector values
+            if (_useConfigSettings && _config != null)
             {
                 Initialize(_config.maxHealth, _config.maxShield);
                 _shieldRegenRate = _config.shieldRegenRate;
                 _shieldRegenDelay = _config.shieldRegenDelay;
             }
+            // If disabled, inspector values (from BaseEntity Awake) are used
 
             // Subscribe to events
             SubscribeToEvents();
@@ -111,9 +113,9 @@ namespace SpaceCombat.Entities
                 }
             }
 
-            if (_config != null)
+            if (_useConfigSettings && _config != null)
             {
-                _movement.Initialize(_config.maxSpeed, _config.acceleration, 
+                _movement.Initialize(_config.maxSpeed, _config.acceleration,
                     _config.deceleration, _config.rotationSpeed);
             }
         }
@@ -129,7 +131,7 @@ namespace SpaceCombat.Entities
                 }
             }
 
-            if (_config != null && _config.availableWeapons.Length > 0)
+            if (_useConfigSettings && _config != null && _config.availableWeapons.Length > 0)
             {
                 _weaponController.Initialize(_config.availableWeapons[0], _weaponMountPoint);
             }
@@ -137,7 +139,7 @@ namespace SpaceCombat.Entities
 
         private void SetupVisuals()
         {
-            if (_config != null && _spriteRenderer != null)
+            if (_useConfigSettings && _config != null && _spriteRenderer != null)
             {
                 if (_config.shipSprite != null)
                     _spriteRenderer.sprite = _config.shipSprite;
