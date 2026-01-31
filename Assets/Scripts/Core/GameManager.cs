@@ -13,7 +13,7 @@ namespace SpaceCombat.Core
 {
     /// <summary>
     /// Main game manager - Facade for all subsystems
-    /// Handles game state, spawning, and wave management
+    /// Handles game state, spawning, and enemy management
     /// </summary>
     public class GameManager : MonoBehaviour
     {
@@ -24,24 +24,29 @@ namespace SpaceCombat.Core
 
         [Header("References")]
         [SerializeField] private Transform _playerSpawnPoint;
-        [SerializeField] private Transform[] _enemySpawnPoints;
         [SerializeField] private Entities.PlayerShip _playerPrefab;
         [SerializeField] private Entities.Enemy _enemyPrefab;
+        [SerializeField] private Environment.MapBounds _mapBounds;
+
+        [Header("Enemy Spawning")]
+        [SerializeField] private int _enemyCount = 10;
+        [SerializeField] private float _minDistanceFromPlayer = 20f;
+        [SerializeField] private float _spawnDelayAfterDeath = 2f;
 
         [Header("State")]
         [SerializeField] private GameState _currentState = GameState.Loading;
-        [SerializeField] private int _currentWave = 0;
         [SerializeField] private int _score = 0;
-        [SerializeField] private int _enemiesRemaining = 0;
 
         // Runtime references
         private Entities.PlayerShip _player;
         private ObjectPool<Entities.Enemy> _enemyPool;
+        private int _enemiesAlive;
+        private Coroutine _respawnCoroutine;
 
         public GameState CurrentState => _currentState;
-        public int CurrentWave => _currentWave;
         public int Score => _score;
         public Entities.PlayerShip Player => _player;
+        public int EnemiesAlive => _enemiesAlive;
 
         private void Awake()
         {
@@ -119,12 +124,11 @@ namespace SpaceCombat.Core
             // Spawn player
             SpawnPlayer();
 
+            // Spawn all enemies at once
+            SpawnAllEnemiesAtStart();
+
             // Start playing
             SetState(GameState.Playing);
-
-            // Start first wave after delay
-            yield return new WaitForSeconds(1f);
-            StartWave(_currentWave + 1);
         }
 
         public void SetState(GameState newState)
@@ -172,11 +176,10 @@ namespace SpaceCombat.Core
         public void RestartGame()
         {
             _score = 0;
-            _currentWave = 0;
-            _enemiesRemaining = 0;
 
             // Reset enemies
             _enemyPool?.ReturnAll();
+            _enemiesAlive = 0;
 
             // Reset player
             if (_player != null)
@@ -189,7 +192,7 @@ namespace SpaceCombat.Core
             }
 
             SetState(GameState.Playing);
-            StartCoroutine(StartWaveDelayed(1f));
+            SpawnAllEnemiesAtStart();
         }
 
         // ============================================
@@ -233,64 +236,64 @@ namespace SpaceCombat.Core
         }
 
         // ============================================
-        // WAVE MANAGEMENT
+        // SPAWN MANAGEMENT
         // ============================================
 
-        public void StartWave(int waveNumber)
+        private void SpawnAllEnemiesAtStart()
         {
-            _currentWave = waveNumber;
-            
-            int enemyCount = CalculateEnemiesForWave(waveNumber);
-            _enemiesRemaining = enemyCount;
-
-            EventBus.Publish(new WaveStartedEvent(waveNumber, enemyCount));
-
-            StartCoroutine(SpawnWaveEnemies(enemyCount));
-        }
-
-        private IEnumerator SpawnWaveEnemies(int count)
-        {
-            float spawnDelay = _balanceConfig?.timeBetweenSpawns ?? 1f;
-
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < _enemyCount; i++)
             {
-                if (_currentState != GameState.Playing) yield break;
-
                 Vector2 spawnPos = GetRandomSpawnPosition();
                 SpawnEnemy(spawnPos);
-
-                yield return new WaitForSeconds(spawnDelay);
+                _enemiesAlive++;
             }
-        }
-
-        private IEnumerator StartWaveDelayed(float delay)
-        {
-            yield return new WaitForSeconds(delay);
-            StartWave(_currentWave + 1);
-        }
-
-        private int CalculateEnemiesForWave(int wave)
-        {
-            if (_balanceConfig != null)
-            {
-                return _balanceConfig.baseEnemiesPerWave + 
-                       (_balanceConfig.additionalEnemiesPerWave * (wave - 1));
-            }
-            return 5 + (wave - 1) * 2;
         }
 
         private Vector2 GetRandomSpawnPosition()
         {
-            if (_enemySpawnPoints != null && _enemySpawnPoints.Length > 0)
+            if (_mapBounds == null)
             {
-                int index = Random.Range(0, _enemySpawnPoints.Length);
-                return _enemySpawnPoints[index].position;
+                // Fallback: Random position around circle
+                float angle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
+                float distance = 15f;
+                return new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * distance;
             }
 
-            // Random position around edges of screen
-            float angle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
-            float distance = 15f;
-            return new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * distance;
+            Rect bounds = _mapBounds.Bounds;
+            Vector2 playerPos = _player != null ? (Vector2)_player.transform.position : Vector2.zero;
+
+            // Try to find a valid spawn position
+            for (int attempt = 0; attempt < 50; attempt++)
+            {
+                float x = Random.Range(bounds.xMin, bounds.xMax);
+                float y = Random.Range(bounds.yMin, bounds.yMax);
+                Vector2 candidatePos = new Vector2(x, y);
+
+                // Check minimum distance from player
+                float distanceFromPlayer = Vector2.Distance(candidatePos, playerPos);
+                if (distanceFromPlayer >= _minDistanceFromPlayer)
+                {
+                    return candidatePos;
+                }
+            }
+
+            // Fallback: Return position at map bounds edge with minimum distance
+            Vector2 dir = (Random.insideUnitCircle).normalized;
+            return playerPos + dir * _minDistanceFromPlayer;
+        }
+
+        private IEnumerator RespawnEnemyAfterDelay()
+        {
+            yield return new WaitForSeconds(_spawnDelayAfterDeath);
+
+            if (_currentState == GameState.Playing)
+            {
+                Vector2 spawnPos = GetRandomSpawnPosition();
+                SpawnEnemy(spawnPos);
+                _enemiesAlive++;
+            }
+
+            _respawnCoroutine = null;
         }
 
         // ============================================
@@ -317,7 +320,7 @@ namespace SpaceCombat.Core
 
         private void OnEnemyDeath(EntityDeathEvent evt)
         {
-            _enemiesRemaining--;
+            _enemiesAlive--;
 
             // Return enemy to pool
             var enemy = evt.Entity.GetComponent<Entities.Enemy>();
@@ -326,25 +329,20 @@ namespace SpaceCombat.Core
                 _enemyPool.Return(enemy);
             }
 
-            // Check if wave complete
-            if (_enemiesRemaining <= 0 && _currentState == GameState.Playing)
+            // Schedule respawn to maintain enemy count
+            if (_currentState == GameState.Playing)
             {
-                OnWaveComplete();
+                if (_respawnCoroutine != null)
+                {
+                    StopCoroutine(_respawnCoroutine);
+                }
+                _respawnCoroutine = StartCoroutine(RespawnEnemyAfterDelay());
             }
         }
 
         private void OnScoreChanged(ScoreChangedEvent evt)
         {
             _score = evt.NewScore;
-        }
-
-        private void OnWaveComplete()
-        {
-            EventBus.Publish(new WaveCompletedEvent(_currentWave, Time.time));
-
-            // Start next wave after delay
-            float delay = _balanceConfig?.timeBetweenWaves ?? 3f;
-            StartCoroutine(StartWaveDelayed(delay));
         }
 
         private void OnGameOver()

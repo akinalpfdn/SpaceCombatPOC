@@ -30,9 +30,9 @@ namespace SpaceCombat.UI
         [SerializeField] private TextMeshProUGUI _scoreText;
         [SerializeField] private string _scoreFormat = "Score: {0:N0}";
 
-        [Header("Wave Display")]
-        [SerializeField] private TextMeshProUGUI _waveText;
-        [SerializeField] private string _waveFormat = "Wave {0}";
+        [Header("Enemy Count Display")]
+        [SerializeField] private TextMeshProUGUI _enemyCountText;
+        [SerializeField] private string _enemyCountFormat = "Enemies: {0}";
 
         [Header("Game Over")]
         [SerializeField] private GameObject _gameOverPanel;
@@ -56,7 +56,6 @@ namespace SpaceCombat.UI
             EventBus.Subscribe<PlayerHealthChangedEvent>(OnHealthChanged);
             EventBus.Subscribe<PlayerShieldChangedEvent>(OnShieldChanged);
             EventBus.Subscribe<ScoreChangedEvent>(OnScoreChanged);
-            EventBus.Subscribe<WaveStartedEvent>(OnWaveStarted);
             EventBus.Subscribe<GameStateChangedEvent>(OnGameStateChanged);
         }
 
@@ -65,7 +64,6 @@ namespace SpaceCombat.UI
             EventBus.Unsubscribe<PlayerHealthChangedEvent>(OnHealthChanged);
             EventBus.Unsubscribe<PlayerShieldChangedEvent>(OnShieldChanged);
             EventBus.Unsubscribe<ScoreChangedEvent>(OnScoreChanged);
-            EventBus.Unsubscribe<WaveStartedEvent>(OnWaveStarted);
             EventBus.Unsubscribe<GameStateChangedEvent>(OnGameStateChanged);
         }
 
@@ -104,14 +102,6 @@ namespace SpaceCombat.UI
             }
         }
 
-        private void OnWaveStarted(WaveStartedEvent evt)
-        {
-            if (_waveText != null)
-            {
-                _waveText.text = string.Format(_waveFormat, evt.WaveNumber);
-            }
-        }
-
         private void OnGameStateChanged(GameStateChangedEvent evt)
         {
             if (evt.NewState == GameState.GameOver)
@@ -143,6 +133,19 @@ namespace SpaceCombat.UI
             if (_gameOverPanel != null)
             {
                 _gameOverPanel.SetActive(false);
+            }
+        }
+
+        private void Update()
+        {
+            // Update enemy count display
+            if (_enemyCountText != null)
+            {
+                var gm = Core.GameManager.Instance;
+                if (gm != null)
+                {
+                    _enemyCountText.text = string.Format(_enemyCountFormat, gm.EnemiesAlive);
+                }
             }
         }
 
