@@ -27,6 +27,9 @@ namespace SpaceCombat.Combat
         [Header("Projectile Appearance Override")]
         [SerializeField] private Sprite _projectileSprite; // Assign blue sprite for player, red for enemy
 
+        [Header("Audio Override")]
+        [SerializeField] private string _fireSoundId; // Override fire sound (e.g., "enemy_laser" for enemies)
+
         [Header("State")]
         [SerializeField] private float _lastFireTime;
         [SerializeField] private Vector2 _aimDirection = Vector2.up;
@@ -248,10 +251,15 @@ namespace SpaceCombat.Combat
         /// </summary>
         private void PlayFireSound()
         {
-            if (!string.IsNullOrEmpty(_currentWeaponConfig?.fireSoundId))
+            // Use override sound if set, otherwise use config default
+            string soundId = !string.IsNullOrEmpty(_fireSoundId)
+                ? _fireSoundId
+                : _currentWeaponConfig?.fireSoundId;
+
+            if (!string.IsNullOrEmpty(soundId))
             {
                 EventBus.Publish(new PlaySFXEvent(
-                    _currentWeaponConfig.fireSoundId, 
+                    soundId,
                     _firePoint.position
                 ));
             }
