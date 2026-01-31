@@ -39,6 +39,7 @@ namespace SpaceCombat.Entities
         public float MaxShield => _maxShield;
         public bool IsAlive => _currentHealth > 0;
         public bool HasShield => _maxShield > 0;
+        public bool IsAtFullHealth => _currentHealth >= _maxHealth;
 
         // Events
         public event Action<float, float> OnHealthChanged;

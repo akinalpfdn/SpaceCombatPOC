@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 4632643384639022553}
   - component: {fileID: 596049113606997257}
   - component: {fileID: 8479908390722580308}
+  - component: {fileID: 9002808455726502169}
   m_Layer: 6
   m_Name: PlayerShip
   m_TagString: Player
@@ -86,12 +87,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 16ad5ccbb89cb0e4a877065685ca7e4c, type: 3}
-  m_Color: {r: 0.990566, g: 0.990566, b: 0.990566, a: 0.7882353}
+  m_Sprite: {fileID: 5307185714078801750, guid: a8ff6c56f13b7704aac7c8432d1c2b22, type: 3}
+  m_Color: {r: 0.990566, g: 0.990566, b: 0.990566, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 10.22, y: 15.02}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -179,6 +180,7 @@ MonoBehaviour:
   _velocitySmoothing: 0.1
   _rotateToMovement: 1
   _rotationThreshold: 0.1
+  _respectMapBounds: 1
 --- !u!114 &4632643384639022553
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -251,6 +253,29 @@ MonoBehaviour:
   _shipMovement: {fileID: 0}
   _mainCamera: {fileID: 0}
   _targetIndicatorPrefab: {fileID: 3787043342725239422, guid: 3632ac2bf675ef94e805a43e7b9ee1b6, type: 3}
+--- !u!114 &9002808455726502169
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1145839844609182422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67bac4855bb67464d998a908e3e282ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.UI.HealthBar
+  _background: {fileID: 0}
+  _fill: {fileID: 0}
+  _offset: {x: 0, y: -1}
+  _size: {x: 2, y: 0.3}
+  _backgroundColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.8}
+  _healthyColor: {r: 0, g: 1, b: 0, a: 1}
+  _criticalColor: {r: 1, g: 0, b: 0, a: 1}
+  _criticalPercent: 0.3
+  _alwaysShow: 0
+  _hideWhenFull: 1
+  _externalTarget: {fileID: 0}
 --- !u!1 &6216708766474657427
 GameObject:
   m_ObjectHideFlags: 0

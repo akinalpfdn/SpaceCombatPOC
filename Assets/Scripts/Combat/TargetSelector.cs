@@ -7,6 +7,7 @@
 using UnityEngine;
 using SpaceCombat.Entities;
 using SpaceCombat.Movement;
+using SpaceCombat.UI;
 
 namespace SpaceCombat.Combat
 {
@@ -37,6 +38,7 @@ namespace SpaceCombat.Combat
         // State
         private Transform _currentTarget;
         private TargetIndicator _currentIndicator;
+        private HealthBar _targetHealthBar;
 
         // Properties
         public Transform CurrentTarget => _currentTarget;
@@ -217,6 +219,18 @@ namespace SpaceCombat.Combat
             {
                 _currentIndicator.SetTarget(target);
             }
+
+            // Add health bar to show target's health
+            _targetHealthBar = indicatorObj.AddComponent<HealthBar>();
+            _targetHealthBar.SetOffset(new Vector2(0, -1.5f)); // Position below the indicator
+            _targetHealthBar.SetAlwaysShow(true); // Always show for targets
+
+            // Link the health bar to the target entity
+            var targetEntity = target.GetComponent<BaseEntity>();
+            if (targetEntity != null)
+            {
+                _targetHealthBar.SetTarget(targetEntity);
+            }
         }
 
         private void ClearIndicator()
@@ -226,6 +240,7 @@ namespace SpaceCombat.Combat
                 Destroy(_currentIndicator.gameObject);
                 _currentIndicator = null;
             }
+            _targetHealthBar = null;
         }
 
 #if UNITY_EDITOR
