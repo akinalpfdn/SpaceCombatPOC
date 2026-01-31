@@ -2,8 +2,12 @@
 // TARGET SELECTION - Click to select enemies
 // Player auto-faces selected target, SPACE to toggle attack
 // DarkOrbit-style: mouse hold moves ship, click targets enemy
-// SPACE once: start attacking selected target
-// SPACE again: stop attacking
+//
+// Controls:
+// - Click enemy → Select target
+// - SPACE once → Start attacking selected target
+// - SPACE again → Stop attacking
+// - SHIFT → Select closest enemy in range & start attacking
 // Auto-stops when target dies or out of range
 // ============================================
 
@@ -18,7 +22,8 @@ namespace SpaceCombat.Combat
     /// Attach this to the Player ship.
     /// - Hold mouse button → ship moves toward cursor
     /// - Click enemy → select target (shows indicator)
-    /// - Hold SPACE → attack selected target
+    /// - SPACE → toggle attack on selected target
+    /// - SHIFT → select closest enemy and start attacking
     /// </summary>
     public class TargetSelector : MonoBehaviour
     {
@@ -26,6 +31,7 @@ namespace SpaceCombat.Combat
         [SerializeField] private float _maxTargetRange = 20f;
         [SerializeField] private LayerMask _enemyLayer = -1;
         [SerializeField] private KeyCode _fireToggleKey = KeyCode.Space;
+        [SerializeField] private KeyCode _selectClosestKey = KeyCode.LeftShift;
 
         [Header("Movement Settings")]
         [SerializeField] private float _stopDistance = 0.5f; // Stop moving when this close to cursor
@@ -87,6 +93,12 @@ namespace SpaceCombat.Combat
                 _isFiringEnabled = !_isFiringEnabled; // Toggle state
             }
             _wasSpacePressed = isSpacePressed;
+
+            // Handle SHIFT key - select closest enemy and start attacking
+            if (UnityEngine.Input.GetKeyDown(_selectClosestKey))
+            {
+                SelectClosestEnemy();
+            }
 
             // Update aim at target and handle firing
             if (_currentTarget != null)
@@ -183,6 +195,46 @@ namespace SpaceCombat.Combat
                         SpawnTargetIndicator(_currentTarget);
                     }
                 }
+            }
+        }
+
+        private void SelectClosestEnemy()
+        {
+            // Find all enemies within range
+            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, _maxTargetRange, _enemyLayer);
+
+            Transform closestEnemy = null;
+            float closestDistance = Mathf.Infinity;
+
+            foreach (var hit in hits)
+            {
+                var enemy = hit.GetComponent<Enemy>();
+                if (enemy != null && enemy.IsAlive)
+                {
+                    float distance = Vector2.Distance(transform.position, enemy.transform.position);
+                    if (distance < closestDistance)
+                    {
+                        closestDistance = distance;
+                        closestEnemy = enemy.transform;
+                    }
+                }
+            }
+
+            // If found closest enemy, select it and start firing
+            if (closestEnemy != null)
+            {
+                // Clear previous indicator
+                ClearIndicator();
+
+                _currentTarget = closestEnemy;
+                _isFiringEnabled = true; // Auto-start attacking
+
+                // Disable auto-rotation when targeting
+                if (_shipMovement != null)
+                    _shipMovement.SetAutoRotate(false);
+
+                // Spawn indicator on target
+                SpawnTargetIndicator(_currentTarget);
             }
         }
 
