@@ -253,6 +253,7 @@ MonoBehaviour:
   _shipMovement: {fileID: 0}
   _mainCamera: {fileID: 0}
   _targetIndicatorPrefab: {fileID: 3787043342725239422, guid: 3632ac2bf675ef94e805a43e7b9ee1b6, type: 3}
+  _healthBarPrefab: {fileID: 4674260991152052681, guid: a908d1210d1c54c4ab61070c37258f08, type: 3}
 --- !u!114 &9002808455726502169
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -265,14 +266,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67bac4855bb67464d998a908e3e282ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.UI.HealthBar
-  _background: {fileID: 0}
-  _fill: {fileID: 0}
-  _offset: {x: 0, y: -2}
-  _size: {x: 2, y: 0.7}
-  _backgroundColor: {r: 0.16789784, g: 0.6471447, b: 0.7264151, a: 1}
-  _healthyColor: {r: 0, g: 1, b: 0, a: 1}
-  _criticalColor: {r: 1, g: 0, b: 0, a: 1}
-  _criticalPercent: 0.3
+  _config:
+    Offset: {x: 0, y: -1}
+    Size: {x: 2, y: 0.3}
+    BorderPadding: 0.05
+    BackgroundColor: {r: 0.1, g: 0.1, b: 0.1, a: 0.9}
+    BorderColor: {r: 0.3, g: 0.3, b: 0.3, a: 1}
+    HealthyColor: {r: 0.2, g: 0.8, b: 0.2, a: 1}
+    WarningColor: {r: 0.9, g: 0.7, b: 0.1, a: 1}
+    CriticalColor: {r: 0.9, g: 0.1, b: 0.1, a: 1}
+    WarningThreshold: 0.5
+    CriticalThreshold: 0.25
+    BaseSortingOrder: 100
+    SortingLayerName: UI
   _alwaysShow: 1
   _hideWhenFull: 1
   _externalTarget: {fileID: 0}

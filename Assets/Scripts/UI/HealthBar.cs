@@ -102,7 +102,7 @@ namespace SpaceCombat.UI
             if (_entity == null || _barContainer == null) return;
             
             // Keep bar at world position (not affected by entity rotation)
-            _barContainer.position = (Vector2)transform.position + _config.Offset;
+            _barContainer.position = (Vector2)_entity.transform.position + _config.Offset;
             _barContainer.rotation = Quaternion.identity;
             
             // Only update visuals if health changed (optimization)

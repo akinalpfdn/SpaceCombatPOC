@@ -34,6 +34,7 @@ namespace SpaceCombat.Combat
 
         [Header("Target Indicator")]
         [SerializeField] private GameObject _targetIndicatorPrefab;
+        [SerializeField] private GameObject _healthBarPrefab;
 
         // State
         private Transform _currentTarget;
@@ -220,16 +221,27 @@ namespace SpaceCombat.Combat
                 _currentIndicator.SetTarget(target);
             }
 
-            // Add health bar to show target's health
-            _targetHealthBar = indicatorObj.AddComponent<HealthBar>();
-            _targetHealthBar.SetOffset(new Vector2(0, -1.5f)); // Position below the indicator
-            _targetHealthBar.SetAlwaysShow(true); // Always show for targets
-
-            // Link the health bar to the target entity
-            var targetEntity = target.GetComponent<BaseEntity>();
-            if (targetEntity != null)
+            // Spawn health bar - use prefab if assigned, otherwise fallback to AddComponent
+            if (_healthBarPrefab != null)
             {
-                _targetHealthBar.SetTarget(targetEntity);
+                var healthBarObj = Instantiate(_healthBarPrefab, target.position, Quaternion.identity);
+                _targetHealthBar = healthBarObj.GetComponent<HealthBar>();
+            }
+            else
+            {
+                _targetHealthBar = indicatorObj.AddComponent<HealthBar>();
+                _targetHealthBar.SetOffset(new Vector2(0, -1.5f));
+            }
+
+            if (_targetHealthBar != null)
+            {
+                _targetHealthBar.SetAlwaysShow(true);
+
+                var targetEntity = target.GetComponent<BaseEntity>();
+                if (targetEntity != null)
+                {
+                    _targetHealthBar.SetTarget(targetEntity);
+                }
             }
         }
 
@@ -239,6 +251,15 @@ namespace SpaceCombat.Combat
             {
                 Destroy(_currentIndicator.gameObject);
                 _currentIndicator = null;
+            }
+
+            // Clean up health bar if it's a separate prefab instance
+            if (_targetHealthBar != null && _healthBarPrefab != null)
+            {
+                if (_targetHealthBar.transform.parent == null)
+                {
+                    Destroy(_targetHealthBar.gameObject);
+                }
             }
             _targetHealthBar = null;
         }
