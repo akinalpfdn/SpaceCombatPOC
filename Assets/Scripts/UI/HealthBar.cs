@@ -16,10 +16,10 @@ namespace SpaceCombat.UI
 
         [Header("Settings")]
         [SerializeField] private Vector2 _offset = new Vector2(0, -1f); // Position below entity
-        [SerializeField] private Vector2 _size = new Vector2(2f, 0.3f);
-        [SerializeField] private Color _backgroundColor = new Color(0.2f, 0.2f, 0.2f, 0.8f);
-        [SerializeField] private Color _healthyColor = Color.green;
-        [SerializeField] private Color _criticalColor = Color.red;
+        [SerializeField] private Vector2 _size = new Vector2(2f, 0.5f); // Increased height
+        [SerializeField] private Color _backgroundColor = new Color(0.3f, 0.3f, 0.3f, 1f); // Dark gray background
+        [SerializeField] private Color _healthyColor = new Color(0.2f, 0.8f, 0.2f, 1f); // Green
+        [SerializeField] private Color _criticalColor = new Color(0.9f, 0.1f, 0.1f, 1f); // Red
         [SerializeField] private float _criticalPercent = 0.3f;
 
         [Header("Display")]
@@ -39,13 +39,13 @@ namespace SpaceCombat.UI
 
         private void CreateHealthBar()
         {
-            // Create background
+            // Create background (direct child, will be positioned in world space)
             var bgObj = new GameObject("HealthBar_BG");
             bgObj.transform.SetParent(transform, false);
             bgObj.transform.localPosition = _offset;
 
             _background = bgObj.AddComponent<SpriteRenderer>();
-            _background.drawMode = SpriteDrawMode.Sliced;
+            _background.drawMode = SpriteDrawMode.Simple;
             _background.color = _backgroundColor;
             _background.sortingOrder = 100;
 
@@ -54,7 +54,7 @@ namespace SpaceCombat.UI
             fillObj.transform.SetParent(bgObj.transform, false);
 
             _fill = fillObj.AddComponent<SpriteRenderer>();
-            _fill.drawMode = SpriteDrawMode.Sliced;
+            _fill.drawMode = SpriteDrawMode.Simple;
             _fill.color = _healthyColor;
             _fill.sortingOrder = 101;
 
@@ -105,8 +105,17 @@ namespace SpaceCombat.UI
             return Sprite.Create(texture, new Rect(0, 0, width, height), Vector2.one * 0.5f);
         }
 
-        private void Update()
+        private void LateUpdate()
         {
+            // Update position and rotation every frame
+            if (_background != null)
+            {
+                // Position at entity position + offset (in world space, not affected by rotation)
+                _background.transform.position = (Vector2)transform.position + _offset;
+                // Keep horizontal
+                _background.transform.rotation = Quaternion.identity;
+            }
+
             UpdateHealthBar();
         }
 
@@ -136,13 +145,14 @@ namespace SpaceCombat.UI
 
         private void UpdateSize(float backgroundWidth, float fillWidth)
         {
-            // Background size
+            // Background size (full width)
             _background.transform.localScale = new Vector3(backgroundWidth, _size.y, 1f);
 
-            // Fill size - position from left side
-            float fillWidthWorld = fillWidth;
-            _fill.transform.localScale = new Vector3(fillWidthWorld, _size.y, 1f);
-            _fill.transform.localPosition = new Vector3(-(backgroundWidth - fillWidthWorld) / 2f, 0, 0);
+            // Fill size (current health)
+            _fill.transform.localScale = new Vector3(fillWidth, _size.y, 1f);
+
+            // Position fill so it starts from left edge of background
+            _fill.transform.localPosition = new Vector3(-backgroundWidth / 2f + fillWidth / 2f, 0, 0);
         }
 
         private void SetVisible(bool visible)
@@ -156,10 +166,6 @@ namespace SpaceCombat.UI
         public void SetOffset(Vector2 offset)
         {
             _offset = offset;
-            if (_background != null)
-            {
-                _background.transform.localPosition = _offset;
-            }
         }
 
         public void SetAlwaysShow(bool alwaysShow)

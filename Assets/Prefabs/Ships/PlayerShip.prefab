@@ -267,13 +267,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.UI.HealthBar
   _background: {fileID: 0}
   _fill: {fileID: 0}
-  _offset: {x: 0, y: -1}
-  _size: {x: 2, y: 0.3}
-  _backgroundColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.8}
+  _offset: {x: 0, y: -2}
+  _size: {x: 2, y: 0.7}
+  _backgroundColor: {r: 0.16789784, g: 0.6471447, b: 0.7264151, a: 1}
   _healthyColor: {r: 0, g: 1, b: 0, a: 1}
   _criticalColor: {r: 1, g: 0, b: 0, a: 1}
   _criticalPercent: 0.3
-  _alwaysShow: 0
+  _alwaysShow: 1
   _hideWhenFull: 1
   _externalTarget: {fileID: 0}
 --- !u!1 &6216708766474657427
