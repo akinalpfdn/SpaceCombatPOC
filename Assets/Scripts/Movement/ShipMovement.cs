@@ -6,6 +6,7 @@
 
 using UnityEngine;
 using SpaceCombat.Interfaces;
+using SpaceCombat.Environment;
 
 namespace SpaceCombat.Movement
 {
@@ -27,8 +28,12 @@ namespace SpaceCombat.Movement
         [SerializeField] private bool _rotateToMovement = true;
         [SerializeField] private float _rotationThreshold = 0.1f;
 
+        [Header("Map Bounds")]
+        [SerializeField] private bool _respectMapBounds = true;
+
         // Components
         private Rigidbody2D _rigidbody;
+        private MapBounds _mapBounds;
 
         // State
         private Vector2 _currentVelocity;
@@ -54,6 +59,12 @@ namespace SpaceCombat.Movement
 
             // Smooth movement - interpolate between physics frames
             _rigidbody.interpolation = RigidbodyInterpolation2D.Interpolate;
+
+            // Find map bounds in scene
+            if (_respectMapBounds)
+            {
+                _mapBounds = FindObjectOfType<MapBounds>();
+            }
         }
 
         /// <summary>
@@ -100,6 +111,12 @@ namespace SpaceCombat.Movement
             // Apply velocity
             _rigidbody.linearVelocity = _currentVelocity;
             _currentSpeed = _currentVelocity.magnitude;
+
+            // Clamp position to map bounds
+            if (_respectMapBounds && _mapBounds != null)
+            {
+                _rigidbody.position = _mapBounds.ClampPosition(_rigidbody.position);
+            }
 
             // Rotate to face movement direction (only if auto-rotate is enabled)
             if (_autoRotateEnabled && _rotateToMovement && _currentSpeed > _rotationThreshold)
