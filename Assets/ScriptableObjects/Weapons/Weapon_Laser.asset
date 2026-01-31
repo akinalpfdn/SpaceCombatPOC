@@ -15,7 +15,7 @@ MonoBehaviour:
   weaponName: Laser
   damageType: 1
   damage: 10
-  fireRate: 0.2
+  fireRate: 0.4
   projectileSpeed: 30
   range: 15
   accuracy: 0.95

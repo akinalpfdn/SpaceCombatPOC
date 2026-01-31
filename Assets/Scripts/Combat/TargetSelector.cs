@@ -31,8 +31,12 @@ namespace SpaceCombat.Combat
         [SerializeField] private ShipMovement _shipMovement;
         [SerializeField] private Camera _mainCamera;
 
+        [Header("Target Indicator")]
+        [SerializeField] private GameObject _targetIndicatorPrefab;
+
         // State
         private Transform _currentTarget;
+        private TargetIndicator _currentIndicator;
 
         // Properties
         public Transform CurrentTarget => _currentTarget;
@@ -81,12 +85,15 @@ namespace SpaceCombat.Combat
                 // Clear target if dead or too far
                 if (!IsValidTarget(_currentTarget))
                 {
-                    _currentTarget = null;
-                    // Re-enable auto-rotation when clearing target
-                    if (_shipMovement != null)
-                        _shipMovement.SetAutoRotate(true);
+                    ClearTarget();
                 }
             }
+        }
+
+        private void OnDestroy()
+        {
+            // Clean up indicator when selector is destroyed
+            ClearIndicator();
         }
 
         private void UpdateMousePosition()
@@ -137,17 +144,20 @@ namespace SpaceCombat.Combat
                     // Toggle target: if already targeting this enemy, clear it
                     if (_currentTarget == enemy.transform)
                     {
-                        _currentTarget = null;
-                        // Re-enable auto-rotation when clearing target
-                        if (_shipMovement != null)
-                            _shipMovement.SetAutoRotate(true);
+                        ClearTarget();
                     }
                     else
                     {
+                        // Clear previous indicator
+                        ClearIndicator();
+
                         _currentTarget = enemy.transform;
                         // Disable auto-rotation when targeting so we can face the target
                         if (_shipMovement != null)
                             _shipMovement.SetAutoRotate(false);
+
+                        // Spawn indicator on target
+                        SpawnTargetIndicator(_currentTarget);
                     }
                 }
             }
@@ -190,9 +200,32 @@ namespace SpaceCombat.Combat
         public void ClearTarget()
         {
             _currentTarget = null;
+            ClearIndicator();
             // Re-enable auto-rotation when clearing target
             if (_shipMovement != null)
                 _shipMovement.SetAutoRotate(true);
+        }
+
+        private void SpawnTargetIndicator(Transform target)
+        {
+            if (_targetIndicatorPrefab == null) return;
+
+            var indicatorObj = Instantiate(_targetIndicatorPrefab, target.position, Quaternion.identity);
+            _currentIndicator = indicatorObj.GetComponent<TargetIndicator>();
+
+            if (_currentIndicator != null)
+            {
+                _currentIndicator.SetTarget(target);
+            }
+        }
+
+        private void ClearIndicator()
+        {
+            if (_currentIndicator != null)
+            {
+                Destroy(_currentIndicator.gameObject);
+                _currentIndicator = null;
+            }
         }
 
 #if UNITY_EDITOR

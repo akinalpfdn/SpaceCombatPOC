@@ -19,4 +19,10 @@ MonoBehaviour:
     pitch: 0
     randomizePitch: 0
     pitchVariation: 0
+  - id: enemy_laser
+    clip: {fileID: 8300000, guid: 9240f0a11f65b954f9392e7e34a0d28a, type: 3}
+    volume: 0
+    pitch: 0
+    randomizePitch: 0
+    pitchVariation: 0
   musicTracks: []

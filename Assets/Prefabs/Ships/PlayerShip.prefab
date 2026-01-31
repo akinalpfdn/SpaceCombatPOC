@@ -198,6 +198,7 @@ MonoBehaviour:
     m_Bits: 128
   _isPlayerWeapon: 1
   _projectileSprite: {fileID: -2388059793313371099, guid: 14497f697050b9f4a8d0a63c9c673aa6, type: 3}
+  _fireSoundId: 
   _lastFireTime: 0
   _aimDirection: {x: 0, y: 1}
 --- !u!114 &596049113606997257
@@ -249,6 +250,7 @@ MonoBehaviour:
   _weaponController: {fileID: 0}
   _shipMovement: {fileID: 0}
   _mainCamera: {fileID: 0}
+  _targetIndicatorPrefab: {fileID: 3787043342725239422, guid: 3632ac2bf675ef94e805a43e7b9ee1b6, type: 3}
 --- !u!1 &6216708766474657427
 GameObject:
   m_ObjectHideFlags: 0

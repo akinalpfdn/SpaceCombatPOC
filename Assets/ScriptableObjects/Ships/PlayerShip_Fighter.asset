@@ -18,8 +18,8 @@ MonoBehaviour:
   maxShield: 50
   shieldRegenRate: 2
   shieldRegenDelay: 3
-  maxSpeed: 10
-  acceleration: 5
+  maxSpeed: 11
+  acceleration: 7
   deceleration: 3
   rotationSpeed: 180
   availableWeapons: []
