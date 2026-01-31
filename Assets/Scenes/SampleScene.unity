@@ -1004,7 +1004,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.VFX.VFXManager
   _explosionSmall: {fileID: 0}
-  _explosionMedium: {fileID: 0}
+  _explosionMedium: {fileID: 5642865197609561611, guid: 121a5cb37d67c414993487bbad028dae, type: 3}
   _explosionLarge: {fileID: 0}
   _hitEffectDefault: {fileID: 0}
   _shieldHitEffect: {fileID: 0}
