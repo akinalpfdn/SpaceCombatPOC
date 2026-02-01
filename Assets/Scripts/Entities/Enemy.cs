@@ -185,7 +185,7 @@ namespace SpaceCombat.Entities
 
             MoveTowards(_patrolPoint);
 
-            if (Vector2.Distance(transform.position, _patrolPoint) < 1f)
+            if (Vector3.Distance(transform.position, _patrolPoint) < 1f)
             {
                 SetState(EnemyState.Idle);
             }
@@ -203,7 +203,7 @@ namespace SpaceCombat.Entities
                 }
             }
 
-            float distance = Vector2.Distance(transform.position, _target.position);
+            float distance = Vector3.Distance(transform.position, _target.position);
 
             if (distance > _detectionRange * 1.5f)
             {
@@ -235,7 +235,7 @@ namespace SpaceCombat.Entities
                 return;
             }
 
-            float distance = Vector2.Distance(transform.position, _target.position);
+            float distance = Vector3.Distance(transform.position, _target.position);
 
             if (distance > _attackRange * 1.3f)
             {
@@ -266,16 +266,17 @@ namespace SpaceCombat.Entities
 
             MoveAwayFrom(_target.position);
 
-            float distance = Vector2.Distance(transform.position, _target.position);
+            float distance = Vector3.Distance(transform.position, _target.position);
             if (distance > _detectionRange * 2f || !ShouldFlee())
             {
                 SetState(EnemyState.Patrol);
             }
         }
 
-        private void MoveTowards(Vector2 position)
+        private void MoveTowards(Vector3 position)
         {
-            Vector3 targetPos = new Vector3(position.x, 0, position.y);
+            // 3D XZ plane: Target position is already Vector3, just flatten Y
+            Vector3 targetPos = new Vector3(position.x, 0, position.z);
             Vector3 direction = (targetPos - transform.position).normalized;
 
             // Direct velocity control - strictly enforce max speed
@@ -291,9 +292,10 @@ namespace SpaceCombat.Entities
             RotateTowards(position);
         }
 
-        private void MoveAwayFrom(Vector2 position)
+        private void MoveAwayFrom(Vector3 position)
         {
-            Vector3 targetPos = new Vector3(position.x, 0, position.y);
+            // 3D XZ plane: Target position is already Vector3, just flatten Y
+            Vector3 targetPos = new Vector3(position.x, 0, position.z);
             Vector3 direction = (transform.position - targetPos).normalized;
 
             // Direct velocity control - strictly enforce max speed
@@ -313,9 +315,10 @@ namespace SpaceCombat.Entities
         /// Uses direct velocity control to strictly enforce speed limits
         /// 3D Version on XZ plane
         /// </summary>
-        private void StrafeAround(Vector2 targetPosition, float desiredDistance)
+        private void StrafeAround(Vector3 targetPosition, float desiredDistance)
         {
-            Vector3 targetPos = new Vector3(targetPosition.x, 0, targetPosition.y);
+            // 3D XZ plane: Target position is already Vector3, just flatten Y
+            Vector3 targetPos = new Vector3(targetPosition.x, 0, targetPosition.z);
             Vector3 toTarget = targetPos - transform.position;
             float currentDistance = toTarget.magnitude;
             Vector3 toTargetDir = toTarget.normalized;
@@ -369,10 +372,10 @@ namespace SpaceCombat.Entities
             );
         }
 
-        private void RotateTowards(Vector2 position)
+        private void RotateTowards(Vector3 position)
         {
-            // For 3D XZ plane, we rotate around Y axis
-            Vector3 direction = new Vector3(position.x, 0, position.y) - transform.position;
+            // 3D XZ plane: Calculate direction on XZ plane
+            Vector3 direction = position - transform.position;
             direction.y = 0; // Keep flat on XZ plane
             direction.Normalize();
 
@@ -422,7 +425,7 @@ namespace SpaceCombat.Entities
         private bool IsTargetInRange(float range)
         {
             if (_target == null) return false;
-            return Vector2.Distance(transform.position, _target.position) <= range;
+            return Vector3.Distance(transform.position, _target.position) <= range;
         }
 
         private bool ShouldFlee()
