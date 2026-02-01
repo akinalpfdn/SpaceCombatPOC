@@ -541,17 +541,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.Core.GameManager
   _balanceConfig: {fileID: 11400000, guid: 12816a3e73a4d5b43bd520a8a74ba810, type: 2}
   _playerSpawnPoint: {fileID: 975207472}
-  _enemySpawnPoints:
-  - {fileID: 709163263}
-  - {fileID: 2000631609}
-  - {fileID: 1829471543}
-  - {fileID: 1289455101}
   _playerPrefab: {fileID: 596049113606997257, guid: 86a0b9ecf0dde204f9987d86c6070dbe, type: 3}
   _enemyPrefab: {fileID: 142680459996147334, guid: 4079a51bffb24744683c86ca9b69b63a, type: 3}
-  _currentState: 0
-  _currentWave: 0
+  _mapBounds: {fileID: 927220044}
+  _enemyCount: 90
+  _minDistanceFromPlayer: 20
+  _spawnDelayAfterDeath: 2
+  _currentState: 1
   _score: 0
-  _enemiesRemaining: 0
 --- !u!4 &595398651
 Transform:
   m_ObjectHideFlags: 0
