@@ -13,8 +13,9 @@ namespace SpaceCombat.Movement
     /// <summary>
     /// Handles ship movement with smooth acceleration/deceleration
     /// DarkOrbit-style movement with momentum
+    /// 3D Version - Movement on XZ plane
     /// </summary>
-    [RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(Rigidbody))]
     public class ShipMovement : MonoBehaviour, IMovable
     {
         [Header("Movement Settings")]
@@ -32,33 +33,36 @@ namespace SpaceCombat.Movement
         [SerializeField] private bool _respectMapBounds = true;
 
         // Components
-        private Rigidbody2D _rigidbody;
+        private Rigidbody _rigidbody;
         private MapBounds _mapBounds;
 
         // State
-        private Vector2 _currentVelocity;
-        private Vector2 _targetVelocity;
-        private Vector2 _velocityRef;
+        private Vector3 _currentVelocity;
+        private Vector3 _targetVelocity;
+        private Vector3 _velocityRef;
         private float _currentSpeed;
         private bool _autoRotateEnabled = true;
 
         // Properties
-        public Vector2 Velocity => _rigidbody?.linearVelocity ?? Vector2.zero;
+        public Vector2 Velocity => new Vector2(_rigidbody?.linearVelocity.x ?? 0, _rigidbody?.linearVelocity.z ?? 0);
         public float MaxSpeed => _maxSpeed;
         public float CurrentSpeedNormalized => _currentSpeed / _maxSpeed;
 
         private void Awake()
         {
-            _rigidbody = GetComponent<Rigidbody2D>();
+            _rigidbody = GetComponent<Rigidbody>();
 
-            // Configure rigidbody for top-down 2D
-            _rigidbody.gravityScale = 0f;
+            // Configure rigidbody for top-down 3D (XZ plane)
+            _rigidbody.useGravity = false;
             _rigidbody.angularDamping = 5f;
             _rigidbody.linearDamping = 0f;
-            _rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
+            // Lock Y position and X/Z rotation for 2.5D movement
+            _rigidbody.constraints = RigidbodyConstraints.FreezePositionY |
+                                     RigidbodyConstraints.FreezeRotationX |
+                                     RigidbodyConstraints.FreezeRotationZ;
 
             // Smooth movement - interpolate between physics frames
-            _rigidbody.interpolation = RigidbodyInterpolation2D.Interpolate;
+            _rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
 
             // Find map bounds in scene
             if (_respectMapBounds)
@@ -80,20 +84,24 @@ namespace SpaceCombat.Movement
 
         /// <summary>
         /// Apply movement input (call in FixedUpdate)
+        /// 3D Version - Converts XY input to XZ plane movement
         /// </summary>
         public void ApplyMovement(Vector2 input)
         {
+            // Convert 2D input to 3D XZ plane
+            Vector3 input3D = new Vector3(input.x, 0, input.y);
+
             // Calculate target velocity based on input
             if (input.magnitude > 0.1f)
             {
                 input = input.normalized;
-                _targetVelocity = input * _maxSpeed;
-                
+                _targetVelocity = new Vector3(input.x, 0, input.y) * _maxSpeed;
+
                 // Accelerate towards target
-                _currentVelocity = Vector2.SmoothDamp(
-                    _currentVelocity, 
-                    _targetVelocity, 
-                    ref _velocityRef, 
+                _currentVelocity = Vector3.SmoothDamp(
+                    _currentVelocity,
+                    _targetVelocity,
+                    ref _velocityRef,
                     _velocitySmoothing,
                     _acceleration * _maxSpeed
                 );
@@ -101,9 +109,9 @@ namespace SpaceCombat.Movement
             else
             {
                 // Decelerate when no input
-                _currentVelocity = Vector2.MoveTowards(
-                    _currentVelocity, 
-                    Vector2.zero, 
+                _currentVelocity = Vector3.MoveTowards(
+                    _currentVelocity,
+                    Vector3.zero,
                     _deceleration * Time.fixedDeltaTime
                 );
             }
@@ -115,13 +123,15 @@ namespace SpaceCombat.Movement
             // Clamp position to map bounds
             if (_respectMapBounds && _mapBounds != null)
             {
-                _rigidbody.position = _mapBounds.ClampPosition(_rigidbody.position);
+                Vector3 clampedPos = _mapBounds.ClampPosition3D(_rigidbody.position);
+                _rigidbody.position = clampedPos;
             }
 
             // Rotate to face movement direction (only if auto-rotate is enabled)
             if (_autoRotateEnabled && _rotateToMovement && _currentSpeed > _rotationThreshold)
             {
-                RotateTowards(_currentVelocity.normalized);
+                Vector3 moveDir = _currentVelocity.normalized;
+                RotateTowards(new Vector2(moveDir.x, moveDir.z));
             }
         }
 
@@ -154,29 +164,31 @@ namespace SpaceCombat.Movement
         /// </summary>
         public void Stop()
         {
-            _currentVelocity = Vector2.zero;
-            _targetVelocity = Vector2.zero;
-            _rigidbody.linearVelocity = Vector2.zero;
+            _currentVelocity = Vector3.zero;
+            _targetVelocity = Vector3.zero;
+            _rigidbody.linearVelocity = Vector3.zero;
             _currentSpeed = 0;
         }
 
         /// <summary>
         /// Rotate ship to face a direction
+        /// 3D Version - Rotates around Y axis to face direction on XZ plane
         /// </summary>
         public void RotateTowards(Vector2 direction)
         {
             if (direction.magnitude < 0.1f) return;
 
-            float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
-            float currentAngle = transform.eulerAngles.z;
-            
-            float newAngle = Mathf.MoveTowardsAngle(
-                currentAngle, 
-                targetAngle, 
-                _rotationSpeed * Time.fixedDeltaTime
-            );
-
-            transform.rotation = Quaternion.Euler(0, 0, newAngle);
+            // Convert 2D direction to 3D XZ plane
+            Vector3 targetDir = new Vector3(direction.x, 0, direction.y);
+            if (targetDir != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(targetDir);
+                transform.rotation = Quaternion.Slerp(
+                    transform.rotation,
+                    targetRotation,
+                    _rotationSpeed * Time.fixedDeltaTime
+                );
+            }
         }
 
         /// <summary>
@@ -186,8 +198,8 @@ namespace SpaceCombat.Movement
         {
             if (direction.magnitude < 0.1f) return;
 
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
-            transform.rotation = Quaternion.Euler(0, 0, angle);
+            Vector3 targetDir = new Vector3(direction.x, 0, direction.y);
+            transform.rotation = Quaternion.LookRotation(targetDir);
         }
 
         /// <summary>
@@ -195,7 +207,8 @@ namespace SpaceCombat.Movement
         /// </summary>
         public void AddImpulse(Vector2 force)
         {
-            _rigidbody.AddForce(force, ForceMode2D.Impulse);
+            Vector3 force3D = new Vector3(force.x, 0, force.y);
+            _rigidbody.AddForce(force3D, ForceMode.Impulse);
             _currentVelocity = _rigidbody.linearVelocity;
         }
 
@@ -204,7 +217,8 @@ namespace SpaceCombat.Movement
         /// </summary>
         public Vector2 GetForwardDirection()
         {
-            return transform.up;
+            // In 3D with Y-up, forward is -Z for top-down view
+            return new Vector2(transform.forward.x, transform.forward.z);
         }
 
         /// <summary>
@@ -241,37 +255,42 @@ namespace SpaceCombat.Movement
     /// <summary>
     /// Alternative movement strategy - more arcade-like instant response
     /// Demonstrates Strategy pattern - can swap movement behaviors
+    /// 3D Version - Movement on XZ plane
     /// </summary>
     public class ArcadeMovement : MonoBehaviour, IMovable
     {
         [SerializeField] private float _maxSpeed = 15f;
         [SerializeField] private float _rotationSpeed = 360f;
 
-        private Rigidbody2D _rigidbody;
+        private Rigidbody _rigidbody;
 
-        public Vector2 Velocity => _rigidbody?.linearVelocity ?? Vector2.zero;
+        public Vector2 Velocity => new Vector2(_rigidbody?.linearVelocity.x ?? 0, _rigidbody?.linearVelocity.z ?? 0);
         public float MaxSpeed => _maxSpeed;
 
         private void Awake()
         {
-            _rigidbody = GetComponent<Rigidbody2D>();
-            _rigidbody.gravityScale = 0f;
+            _rigidbody = GetComponent<Rigidbody>();
+            _rigidbody.useGravity = false;
+            _rigidbody.constraints = RigidbodyConstraints.FreezePositionY |
+                                     RigidbodyConstraints.FreezeRotationX |
+                                     RigidbodyConstraints.FreezeRotationZ;
         }
 
         public void Move(Vector2 direction)
         {
             if (direction.magnitude > 0.1f)
             {
-                // Instant velocity change
-                _rigidbody.linearVelocity = direction.normalized * _maxSpeed;
-                
+                // Instant velocity change on XZ plane
+                Vector3 velocity3D = new Vector3(direction.x, 0, direction.y).normalized * _maxSpeed;
+                _rigidbody.linearVelocity = velocity3D;
+
                 // Instant rotation
-                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
-                transform.rotation = Quaternion.Euler(0, 0, angle);
+                Vector3 targetDir = new Vector3(direction.x, 0, direction.y);
+                transform.rotation = Quaternion.LookRotation(targetDir);
             }
             else
             {
-                _rigidbody.linearVelocity = Vector2.zero;
+                _rigidbody.linearVelocity = Vector3.zero;
             }
         }
 
@@ -282,7 +301,7 @@ namespace SpaceCombat.Movement
 
         public void Stop()
         {
-            _rigidbody.linearVelocity = Vector2.zero;
+            _rigidbody.linearVelocity = Vector3.zero;
         }
     }
 }

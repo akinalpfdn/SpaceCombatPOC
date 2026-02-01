@@ -132,8 +132,16 @@ namespace SpaceCombat.Combat
 
         private void UpdateMousePosition()
         {
-            Vector3 mousePos = _mainCamera.ScreenToWorldPoint(UnityEngine.Input.mousePosition);
-            MouseWorldPosition = new Vector2(mousePos.x, mousePos.y);
+            // For 3D, raycast to find mouse position on XZ plane (Y=0)
+            Ray ray = _mainCamera.ScreenPointToRay(UnityEngine.Input.mousePosition);
+            Plane xzPlane = new Plane(Vector3.up, Vector3.zero);
+
+            float enterDistance;
+            if (xzPlane.Raycast(ray, out enterDistance))
+            {
+                Vector3 hitPoint = ray.GetPoint(enterDistance);
+                MouseWorldPosition = new Vector2(hitPoint.x, hitPoint.z);
+            }
         }
 
         private void HandleMovement()
@@ -145,13 +153,16 @@ namespace SpaceCombat.Combat
 
             if (shouldMove)
             {
-                Vector2 toMouse = MouseWorldPosition - (Vector2)transform.position;
+                Vector3 currentPos = transform.position;
+                Vector3 mousePos3D = new Vector3(MouseWorldPosition.x, 0, MouseWorldPosition.y);
+                Vector3 toMouse = mousePos3D - currentPos;
                 float distance = toMouse.magnitude;
 
                 // Stop if close enough to cursor
                 if (distance > _stopDistance)
                 {
-                    _shipMovement.Move(toMouse.normalized);
+                    Vector2 direction = new Vector2(toMouse.x, toMouse.z).normalized;
+                    _shipMovement.Move(direction);
                 }
                 else
                 {
@@ -166,11 +177,11 @@ namespace SpaceCombat.Combat
 
         private void TrySelectTarget()
         {
-            // Raycast from mouse position
+            // Raycast from mouse position for 3D
             Ray ray = _mainCamera.ScreenPointToRay(UnityEngine.Input.mousePosition);
-            RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Infinity, _enemyLayer);
+            RaycastHit hit;
 
-            if (hit.collider != null)
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, _enemyLayer))
             {
                 var enemy = hit.collider.GetComponent<Enemy>();
                 if (enemy != null && IsInRange(enemy.transform))
@@ -199,8 +210,8 @@ namespace SpaceCombat.Combat
 
         private void SelectClosestEnemy()
         {
-            // Find all enemies within range
-            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, _maxTargetRange, _enemyLayer);
+            // Find all enemies within range using 3D physics
+            Collider[] hits = Physics.OverlapSphere(transform.position, _maxTargetRange, _enemyLayer);
 
             Transform closestEnemy = null;
             float closestDistance = Mathf.Infinity;
@@ -210,7 +221,7 @@ namespace SpaceCombat.Combat
                 var enemy = hit.GetComponent<Enemy>();
                 if (enemy != null && enemy.IsAlive)
                 {
-                    float distance = Vector2.Distance(transform.position, enemy.transform.position);
+                    float distance = Vector3.Distance(transform.position, enemy.transform.position);
                     if (distance < closestDistance)
                     {
                         closestDistance = distance;
@@ -241,8 +252,9 @@ namespace SpaceCombat.Combat
         {
             if (_currentTarget == null || _weaponController == null) return;
 
-            // Calculate direction to target
-            Vector2 direction = (_currentTarget.position - transform.position).normalized;
+            // Calculate direction to target (3D to 2D conversion)
+            Vector3 direction3D = (_currentTarget.position - transform.position).normalized;
+            Vector2 direction = new Vector2(direction3D.x, direction3D.z);
 
             // Set weapon aim direction
             _weaponController.SetAimDirection(direction);
@@ -257,7 +269,7 @@ namespace SpaceCombat.Combat
         private bool IsInRange(Transform target)
         {
             if (target == null) return false;
-            return Vector2.Distance(transform.position, target.position) <= _maxTargetRange;
+            return Vector3.Distance(transform.position, target.position) <= _maxTargetRange;
         }
 
         private bool IsValidTarget(Transform target)
@@ -355,7 +367,7 @@ namespace SpaceCombat.Combat
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
-            // Draw targeting range
+            // Draw targeting range (3D sphere)
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, _maxTargetRange);
 

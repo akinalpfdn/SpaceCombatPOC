@@ -10,7 +10,7 @@ namespace SpaceCombat.Environment
 
         [Header("Follow Settings")]
         [SerializeField] private float _smoothSpeed = 20f;  // Increased for tighter follow
-        [SerializeField] private Vector3 _offset = new Vector3(0, 0, -225);
+        [SerializeField] private Vector3 _offset = new Vector3(0, 30, -20);  // 3D: Y=height above ground, Z=behind player
         [SerializeField] private bool _useDirectFollow = true;  // Direct follow for interpolated rigidbodies
 
         private Vector3 _velocity;

@@ -13,9 +13,10 @@ namespace SpaceCombat.Entities
     /// <summary>
     /// Base enemy class with state machine AI
     /// Implements IEnemy and IPoolable for performance
+    /// 3D Version - Movement locked to XZ plane
     /// </summary>
-    [RequireComponent(typeof(Rigidbody2D))]
-    [RequireComponent(typeof(Collider2D))]
+    [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(Collider))]
     public class Enemy : BaseEntity, IEnemy, IPoolable
     {
         [Header("Configuration")]
@@ -34,13 +35,13 @@ namespace SpaceCombat.Entities
         [SerializeField] private Combat.WeaponController _weaponController;
 
         // Components
-        private Rigidbody2D _rigidbody;
+        private Rigidbody _rigidbody;
 
         // State
         private EnemyState _currentState = EnemyState.Idle;
         private Transform _target;
-        private Vector2 _patrolPoint;
-        private Vector2 _spawnPosition;
+        private Vector3 _patrolPoint;
+        private Vector3 _spawnPosition;
         private float _stateTimer;
         private float _lastFireTime;
         private int _strafeDirection = 1; // 1 = clockwise, -1 = counter-clockwise
@@ -55,10 +56,14 @@ namespace SpaceCombat.Entities
         {
             base.Awake();
 
-            _rigidbody = GetComponent<Rigidbody2D>();
-            _rigidbody.gravityScale = 0f;
+            _rigidbody = GetComponent<Rigidbody>();
+            _rigidbody.useGravity = false;
             _rigidbody.linearDamping = 5f; // Higher = less drift, more responsive
-            _rigidbody.interpolation = RigidbodyInterpolation2D.Interpolate; // Smooth movement
+            _rigidbody.interpolation = RigidbodyInterpolation.Interpolate; // Smooth movement
+            // Lock Y axis and X/Z rotation for 2.5D movement on XZ plane
+            _rigidbody.constraints = RigidbodyConstraints.FreezePositionY |
+                                     RigidbodyConstraints.FreezeRotationX |
+                                     RigidbodyConstraints.FreezeRotationZ;
 
             if (_weaponController == null)
                 _weaponController = GetComponent<Combat.WeaponController>();
@@ -67,7 +72,7 @@ namespace SpaceCombat.Entities
         private void Start()
         {
             _spawnPosition = transform.position;
-            
+
             if (_config != null)
             {
                 ApplyConfig(_config);
@@ -270,13 +275,14 @@ namespace SpaceCombat.Entities
 
         private void MoveTowards(Vector2 position)
         {
-            Vector2 direction = ((Vector2)position - (Vector2)transform.position).normalized;
+            Vector3 targetPos = new Vector3(position.x, 0, position.y);
+            Vector3 direction = (targetPos - transform.position).normalized;
 
             // Direct velocity control - strictly enforce max speed
-            Vector2 targetVelocity = direction * _moveSpeed;
+            Vector3 targetVelocity = direction * _moveSpeed;
 
             float lerpSpeed = 5f;
-            _rigidbody.linearVelocity = Vector2.Lerp(
+            _rigidbody.linearVelocity = Vector3.Lerp(
                 _rigidbody.linearVelocity,
                 targetVelocity,
                 lerpSpeed * Time.deltaTime
@@ -287,13 +293,14 @@ namespace SpaceCombat.Entities
 
         private void MoveAwayFrom(Vector2 position)
         {
-            Vector2 direction = ((Vector2)transform.position - (Vector2)position).normalized;
+            Vector3 targetPos = new Vector3(position.x, 0, position.y);
+            Vector3 direction = (transform.position - targetPos).normalized;
 
             // Direct velocity control - strictly enforce max speed
-            Vector2 targetVelocity = direction * _moveSpeed;
+            Vector3 targetVelocity = direction * _moveSpeed;
 
             float lerpSpeed = 5f;
-            _rigidbody.linearVelocity = Vector2.Lerp(
+            _rigidbody.linearVelocity = Vector3.Lerp(
                 _rigidbody.linearVelocity,
                 targetVelocity,
                 lerpSpeed * Time.deltaTime
@@ -304,21 +311,23 @@ namespace SpaceCombat.Entities
         /// Strafe movement - move perpendicular to target while keeping distance
         /// Creates orbiting behavior around the player
         /// Uses direct velocity control to strictly enforce speed limits
+        /// 3D Version on XZ plane
         /// </summary>
         private void StrafeAround(Vector2 targetPosition, float desiredDistance)
         {
-            Vector2 toTarget = (Vector2)targetPosition - (Vector2)transform.position;
+            Vector3 targetPos = new Vector3(targetPosition.x, 0, targetPosition.y);
+            Vector3 toTarget = targetPos - transform.position;
             float currentDistance = toTarget.magnitude;
-            Vector2 toTargetDir = toTarget.normalized;
+            Vector3 toTargetDir = toTarget.normalized;
 
             // Always face the target first (important for shooting)
             RotateTowards(targetPosition);
 
-            Vector2 moveDirection = Vector2.zero;
+            Vector3 moveDirection = Vector3.zero;
 
-            // Perpendicular direction (for strafing/orbiting)
+            // Perpendicular direction (for strafing/orbiting) on XZ plane
             // Use _strafeDirection to alternate left/right
-            Vector2 strafeDir = new Vector2(-toTargetDir.y, toTargetDir.x) * _strafeDirection;
+            Vector3 strafeDir = new Vector3(-toTargetDir.z, 0, toTargetDir.x) * _strafeDirection;
 
             // Randomly flip direction occasionally for more variety
             if (Random.value < 0.005f)
@@ -349,11 +358,11 @@ namespace SpaceCombat.Entities
 
             // Direct velocity control - strictly enforce max speed, no spikes
             float targetSpeed = _moveSpeed * speedModifier;
-            Vector2 targetVelocity = moveDirection * targetSpeed;
+            Vector3 targetVelocity = moveDirection * targetSpeed;
 
             // Smoothly interpolate to target velocity (prevents instant snapping)
             float lerpSpeed = 5f;
-            _rigidbody.linearVelocity = Vector2.Lerp(
+            _rigidbody.linearVelocity = Vector3.Lerp(
                 _rigidbody.linearVelocity,
                 targetVelocity,
                 lerpSpeed * Time.deltaTime
@@ -362,12 +371,23 @@ namespace SpaceCombat.Entities
 
         private void RotateTowards(Vector2 position)
         {
-            Vector2 direction = ((Vector2)position - (Vector2)transform.position).normalized;
-            float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
-            float currentAngle = transform.eulerAngles.z;
-            
-            float newAngle = Mathf.MoveTowardsAngle(currentAngle, targetAngle, _rotationSpeed * Time.deltaTime);
-            transform.rotation = Quaternion.Euler(0, 0, newAngle);
+            // For 3D XZ plane, we rotate around Y axis
+            Vector3 direction = new Vector3(position.x, 0, position.y) - transform.position;
+            direction.y = 0; // Keep flat on XZ plane
+            direction.Normalize();
+
+            if (direction != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(direction);
+                Quaternion currentRotation = transform.rotation;
+
+                // Smoothly rotate towards target
+                transform.rotation = Quaternion.Slerp(
+                    currentRotation,
+                    targetRotation,
+                    _rotationSpeed * Time.deltaTime
+                );
+            }
         }
 
         private void TryFire()
@@ -380,8 +400,10 @@ namespace SpaceCombat.Entities
 
                 if (Time.time >= _lastFireTime + modifiedFireRate)
                 {
-                    Vector2 aimDir = (_target.position - transform.position).normalized;
-                    _weaponController.SetAimDirection(aimDir);
+                    Vector3 aimDir = (_target.position - transform.position).normalized;
+                    // Convert 3D direction to 2D for weapon controller (XZ -> XY)
+                    Vector2 aimDir2D = new Vector2(aimDir.x, aimDir.z);
+                    _weaponController.SetAimDirection(aimDir2D);
 
                     if (_weaponController.TryFire())
                     {
@@ -391,10 +413,10 @@ namespace SpaceCombat.Entities
             }
         }
 
-        private Vector2 GetRandomPatrolPoint()
+        private Vector3 GetRandomPatrolPoint()
         {
             Vector2 randomOffset = Random.insideUnitCircle * _patrolRadius;
-            return _spawnPosition + randomOffset;
+            return _spawnPosition + new Vector3(randomOffset.x, 0, randomOffset.y);
         }
 
         private bool IsTargetInRange(float range)
@@ -457,7 +479,7 @@ namespace SpaceCombat.Entities
 
         public void OnDespawn()
         {
-            _rigidbody.linearVelocity = Vector2.zero;
+            _rigidbody.linearVelocity = Vector3.zero;
         }
 
         public void ResetState()
@@ -478,7 +500,7 @@ namespace SpaceCombat.Entities
             Gizmos.DrawWireSphere(transform.position, _attackRange);
 
             Gizmos.color = Color.blue;
-            Vector2 spawnPos = Application.isPlaying ? _spawnPosition : (Vector2)transform.position;
+            Vector3 spawnPos = Application.isPlaying ? _spawnPosition : transform.position;
             Gizmos.DrawWireSphere(spawnPos, _patrolRadius);
         }
 #endif

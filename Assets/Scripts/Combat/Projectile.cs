@@ -12,9 +12,10 @@ namespace SpaceCombat.Combat
     /// <summary>
     /// Base projectile class - supports object pooling
     /// Handles movement, collision detection, and damage
+    /// 3D Version - Movement on XZ plane
     /// </summary>
-    [RequireComponent(typeof(Rigidbody2D))]
-    [RequireComponent(typeof(Collider2D))]
+    [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(Collider))]
     public class Projectile : MonoBehaviour, IProjectile
     {
         [Header("Configuration")]
@@ -32,11 +33,11 @@ namespace SpaceCombat.Combat
         [SerializeField] private string _hitSoundId = "projectile_hit";
 
         // Components
-        private Rigidbody2D _rigidbody;
-        private Collider2D _collider;
+        private Rigidbody _rigidbody;
+        private Collider _collider;
 
         // State
-        private Vector2 _direction;
+        private Vector3 _direction;
         private LayerMask _targetLayers;
         private float _spawnTime;
         private GameObject _owner;
@@ -52,16 +53,16 @@ namespace SpaceCombat.Combat
 
         private void Awake()
         {
-            _rigidbody = GetComponent<Rigidbody2D>();
-            _collider = GetComponent<Collider2D>();
-            
+            _rigidbody = GetComponent<Rigidbody>();
+            _collider = GetComponent<Collider>();
+
             if (_spriteRenderer == null)
                 _spriteRenderer = GetComponent<SpriteRenderer>();
 
-            // Configure rigidbody
-            _rigidbody.gravityScale = 0f;
-            _rigidbody.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-            
+            // Configure rigidbody for 3D
+            _rigidbody.useGravity = false;
+            _rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
             // Make collider a trigger
             _collider.isTrigger = true;
         }
@@ -90,9 +91,9 @@ namespace SpaceCombat.Combat
         private void CheckRaycastCollision()
         {
             float distance = _speed * Time.fixedDeltaTime * 2f; // Check 2 frames ahead
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, _direction, distance, _targetLayers);
+            RaycastHit hit;
 
-            if (hit.collider != null)
+            if (Physics.Raycast(transform.position, _direction, out hit, distance, _targetLayers))
             {
                 // Don't hit owner
                 if (_owner != null && hit.collider.gameObject == _owner)
@@ -118,19 +119,23 @@ namespace SpaceCombat.Combat
 
         /// <summary>
         /// Initialize projectile with direction and stats
+        /// 3D Version - Converts 2D direction to XZ plane
         /// </summary>
         public void Initialize(Vector2 direction, float damage, float speed, LayerMask targetLayers)
         {
-            _direction = direction.normalized;
+            // Convert 2D direction to 3D XZ plane
+            _direction = new Vector3(direction.x, 0, direction.y).normalized;
             _damage = damage;
             _speed = speed;
             _targetLayers = targetLayers;
             _spawnTime = Time.time;
             _isActive = true;
 
-            // Set rotation to face direction
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
-            transform.rotation = Quaternion.Euler(0, 0, angle);
+            // Set rotation to face direction (Y-axis rotation for XZ plane)
+            if (_direction != Vector3.zero)
+            {
+                transform.rotation = Quaternion.LookRotation(_direction);
+            }
 
             // Set initial velocity
             _rigidbody.linearVelocity = _direction * _speed;
@@ -188,7 +193,7 @@ namespace SpaceCombat.Combat
             _owner = owner;
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        private void OnTriggerEnter(Collider other)
         {
             if (!_isActive) return;
 
@@ -205,10 +210,10 @@ namespace SpaceCombat.Combat
             if (damageable != null)
             {
                 damageable.TakeDamage(_damage, _damageType);
-                
+
                 // Spawn hit effect
                 SpawnHitEffect(other.ClosestPoint(transform.position));
-                
+
                 // Play hit sound
                 EventBus.Publish(new PlaySFXEvent(_hitSoundId, transform.position));
             }
@@ -219,15 +224,15 @@ namespace SpaceCombat.Combat
 
         /// <summary>
         /// Spawn hit effect at position
+        /// 3D Version - Uses Vector3
         /// </summary>
-        private void SpawnHitEffect(Vector2 position)
+        private void SpawnHitEffect(Vector3 position)
         {
             // We only spawn if a prefab is assigned.
             // The old "Color" fallback is removed because HitEffect.cs no longer supports it.
             if (_hitEffectPrefab != null)
             {
                 // Use the static Spawn method from your HitEffect script
-                // We pass Quaternion.identity for default rotation
                 VFX.HitEffect.Spawn(_hitEffectPrefab, position, Quaternion.identity);
             }
         }
@@ -269,8 +274,8 @@ namespace SpaceCombat.Combat
         public void OnDespawn()
         {
             _isActive = false;
-            _rigidbody.linearVelocity = Vector2.zero;
-            
+            _rigidbody.linearVelocity = Vector3.zero;
+
             if (_collider != null)
                 _collider.enabled = false;
         }
@@ -279,7 +284,7 @@ namespace SpaceCombat.Combat
         {
             _damage = 10f;
             _speed = 20f;
-            _direction = Vector2.up;
+            _direction = Vector3.forward;
             _owner = null;
             _damageType = DamageType.Normal;
 
@@ -302,6 +307,7 @@ namespace SpaceCombat.Combat
     /// <summary>
     /// Homing projectile variant - follows target
     /// Demonstrates OCP - extends without modifying base
+    /// 3D Version - Works on XZ plane
     /// </summary>
     public class HomingProjectile : Projectile
     {
@@ -334,24 +340,25 @@ namespace SpaceCombat.Combat
             // Home towards target
             if (_target != null && Time.time >= _homingStartTime)
             {
-                Vector2 targetDir = ((Vector2)_target.position - (Vector2)transform.position).normalized;
-                Vector2 currentDir = transform.up;
+                Vector3 targetDir = (_target.position - transform.position).normalized;
+                targetDir.y = 0; // Keep on XZ plane
 
-                float angle = Vector2.SignedAngle(currentDir, targetDir);
-                float maxTurn = _turnSpeed * Time.fixedDeltaTime;
-                float actualTurn = Mathf.Clamp(angle, -maxTurn, maxTurn);
-
-                transform.Rotate(0, 0, actualTurn);
+                Quaternion targetRotation = Quaternion.LookRotation(targetDir);
+                transform.rotation = Quaternion.Slerp(
+                    transform.rotation,
+                    targetRotation,
+                    _turnSpeed * Time.fixedDeltaTime
+                );
             }
 
             // Apply velocity in forward direction
-            GetComponent<Rigidbody2D>().linearVelocity = transform.up * Speed;
+            GetComponent<Rigidbody>().linearVelocity = transform.forward * Speed;
         }
 
         private void FindTarget()
         {
-            // Find closest enemy in range
-            var colliders = Physics2D.OverlapCircleAll(transform.position, _homingRange);
+            // Find closest enemy in range using 3D physics
+            var colliders = Physics.OverlapSphere(transform.position, _homingRange);
             float closestDist = float.MaxValue;
 
             foreach (var col in colliders)
@@ -359,7 +366,7 @@ namespace SpaceCombat.Combat
                 // Skip if it's the owner or not damageable
                 if (col.GetComponent<IDamageable>() == null) continue;
 
-                float dist = Vector2.Distance(transform.position, col.transform.position);
+                float dist = Vector3.Distance(transform.position, col.transform.position);
                 if (dist < closestDist)
                 {
                     closestDist = dist;

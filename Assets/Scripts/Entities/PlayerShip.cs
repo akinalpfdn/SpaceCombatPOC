@@ -16,9 +16,10 @@ namespace SpaceCombat.Entities
     /// <summary>
     /// Player-controlled ship
     /// Coordinates input, movement, and combat systems
+    /// 3D Version - Movement on XZ plane
     /// </summary>
-    [RequireComponent(typeof(Rigidbody2D))]
-    [RequireComponent(typeof(Collider2D))]
+    [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(Collider))]
     public class PlayerShip : BaseEntity, IMovable
     {
         [Header("Configuration")]
@@ -313,7 +314,7 @@ namespace SpaceCombat.Entities
         /// <summary>
         /// Respawn the player
         /// </summary>
-        public void Respawn(Vector2 position)
+        public void Respawn(Vector3 position)
         {
             transform.position = position;
             

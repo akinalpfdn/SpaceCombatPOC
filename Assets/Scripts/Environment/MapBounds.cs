@@ -9,6 +9,7 @@ namespace SpaceCombat.Environment
     /// <summary>
     /// Defines map boundaries and clamps player position
     /// Attach to an empty GameObject or place in scene
+    /// 3D Version - XZ plane movement
     /// </summary>
     public class MapBounds : MonoBehaviour
     {
@@ -24,12 +25,12 @@ namespace SpaceCombat.Environment
         [Header("Padding")]
         [SerializeField] private float _padding = 2f; // Keep player slightly inside
 
-        private Vector2 _minBounds;
-        private Vector2 _maxBounds;
+        private Vector3 _minBounds;
+        private Vector3 _maxBounds;
 
         public Rect Bounds => new Rect(-_mapWidth / 2, -_mapHeight / 2, _mapWidth, _mapHeight);
-        public Vector2 MinBounds => _minBounds;
-        public Vector2 MaxBounds => _maxBounds;
+        public Vector3 MinBounds => _minBounds;
+        public Vector3 MaxBounds => _maxBounds;
 
         private void Start()
         {
@@ -38,8 +39,9 @@ namespace SpaceCombat.Environment
 
         private void CalculateBounds()
         {
-            _minBounds = new Vector2(-_mapWidth / 2 + _padding, -_mapHeight / 2 + _padding);
-            _maxBounds = new Vector2(_mapWidth / 2 - _padding, _mapHeight / 2 - _padding);
+            // For 3D XZ plane: X is width, Z is height (converted from 2D Y)
+            _minBounds = new Vector3(-_mapWidth / 2 + _padding, 0, -_mapHeight / 2 + _padding);
+            _maxBounds = new Vector3(_mapWidth / 2 - _padding, 0, _mapHeight / 2 - _padding);
         }
 
         private void OnValidate()
@@ -48,13 +50,25 @@ namespace SpaceCombat.Environment
         }
 
         /// <summary>
-        /// Clamp a position to stay within bounds
+        /// Clamp a position to stay within bounds (2D version for backward compatibility)
         /// </summary>
         public Vector2 ClampPosition(Vector2 position)
         {
             return new Vector2(
                 Mathf.Clamp(position.x, _minBounds.x, _maxBounds.x),
-                Mathf.Clamp(position.y, _minBounds.y, _maxBounds.y)
+                Mathf.Clamp(position.y, _minBounds.z, _maxBounds.z)
+            );
+        }
+
+        /// <summary>
+        /// Clamp a position to stay within bounds (3D version for XZ plane)
+        /// </summary>
+        public Vector3 ClampPosition3D(Vector3 position)
+        {
+            return new Vector3(
+                Mathf.Clamp(position.x, _minBounds.x, _maxBounds.x),
+                0, // Lock Y to 0
+                Mathf.Clamp(position.z, _minBounds.z, _maxBounds.z)
             );
         }
 
@@ -64,7 +78,16 @@ namespace SpaceCombat.Environment
         public bool IsInBounds(Vector2 position)
         {
             return position.x >= _minBounds.x && position.x <= _maxBounds.x &&
-                   position.y >= _minBounds.y && position.y <= _maxBounds.y;
+                   position.y >= _minBounds.z && position.y <= _maxBounds.z;
+        }
+
+        /// <summary>
+        /// Check if a position is within bounds (3D version)
+        /// </summary>
+        public bool IsInBounds(Vector3 position)
+        {
+            return position.x >= _minBounds.x && position.x <= _maxBounds.x &&
+                   position.z >= _minBounds.z && position.z <= _maxBounds.z;
         }
 
 #if UNITY_EDITOR
@@ -72,9 +95,9 @@ namespace SpaceCombat.Environment
         {
             if (!_showBorder) return;
 
-            // Calculate center and size
+            // Calculate center and size for 3D (XZ plane)
             Vector3 center = transform.position;
-            Vector3 size = new Vector3(_mapWidth, _mapHeight, 0);
+            Vector3 size = new Vector3(_mapWidth, 1f, _mapHeight); // Y is small since we're on XZ plane
 
             // Draw the border
             Gizmos.color = _borderColor;
