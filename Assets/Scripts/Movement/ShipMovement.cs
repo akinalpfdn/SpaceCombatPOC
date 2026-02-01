@@ -54,6 +54,7 @@ namespace SpaceCombat.Movement
         private float _targetTilt;
         private Quaternion _lastRotation;
         private float _angularVelocity;
+        private float _pendingTurnAngle;  // Track how much we're turning this frame
 
         // Properties
         public Vector2 Velocity => new Vector2(_rigidbody?.linearVelocity.x ?? 0, _rigidbody?.linearVelocity.z ?? 0);
@@ -142,18 +143,77 @@ namespace SpaceCombat.Movement
                 _rigidbody.position = clampedPos;
             }
 
-            // Rotate to face movement direction (only if auto-rotate is enabled)
+            // Calculate rotation and banking together (prevents jitter)
             if (_autoRotateEnabled && _rotateToMovement && _currentSpeed > _rotationThreshold)
             {
                 Vector3 moveDir = _currentVelocity.normalized;
-                RotateTowards(new Vector2(moveDir.x, moveDir.z));
+                Vector2 moveDir2D = new Vector2(moveDir.x, moveDir.z);
+                CalculateAndApplyRotation(moveDir2D);
             }
+            else if (_enableBanking)
+            {
+                // Still smooth out tilt when not rotating
+                _targetTilt = 0;
+                SmoothTilt();
+            }
+        }
 
-            // Apply banking/tilt effect
+        /// <summary>
+        /// Calculate rotation angle and apply both rotation + banking together
+        /// This prevents jitter by calculating turn amount before applying it
+        /// </summary>
+        private void CalculateAndApplyRotation(Vector2 direction)
+        {
+            if (direction.magnitude < 0.1f) return;
+
+            // Convert 2D direction to 3D XZ plane
+            Vector3 targetDir = new Vector3(direction.x, 0, direction.y);
+            Quaternion targetRotation = Quaternion.LookRotation(targetDir);
+
+            // Calculate how much we need to turn this frame
+            float currentY = transform.rotation.eulerAngles.y;
+            float targetY = targetRotation.eulerAngles.y;
+            float angleDiff = Mathf.DeltaAngle(currentY, targetY);
+
+            // Limit rotation to what's possible this frame
+            float maxTurnThisFrame = _rotationSpeed * Time.fixedDeltaTime;
+            float actualTurn = Mathf.Clamp(angleDiff, -maxTurnThisFrame, maxTurnThisFrame);
+
+            // Calculate target tilt based on the turn we're about to make
             if (_enableBanking)
             {
-                ApplyBanking();
+                // Turning left (negative actualTurn) = tilt left (negative Z)
+                // Turning right (positive actualTurn) = tilt right (positive Z)
+                _targetTilt = -actualTurn * _maxTiltAngle * _tiltPower / maxTurnThisFrame;
+                _targetTilt = Mathf.Clamp(_targetTilt, -_maxTiltAngle, _maxTiltAngle);
+
+                // Smooth the tilt
+                SmoothTilt();
             }
+
+            // Apply the Y rotation + current Z tilt
+            float newY = currentY + actualTurn;
+            transform.rotation = Quaternion.Euler(0, newY, _currentTilt);
+
+            // Update last rotation for next frame
+            _lastRotation = transform.rotation;
+        }
+
+        /// <summary>
+        /// Smoothly interpolate current tilt to target tilt
+        /// </summary>
+        private void SmoothTilt()
+        {
+            _currentTilt = Mathf.Lerp(
+                _currentTilt,
+                _targetTilt,
+                _tiltSmoothing * Time.fixedDeltaTime
+            );
+
+            // Apply current tilt without changing Y rotation
+            Vector3 currentEuler = transform.rotation.eulerAngles;
+            transform.rotation = Quaternion.Euler(0, currentEuler.y, _currentTilt);
+            _lastRotation = transform.rotation;
         }
 
         /// <summary>

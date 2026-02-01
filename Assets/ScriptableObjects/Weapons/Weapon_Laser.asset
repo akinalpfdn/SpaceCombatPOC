@@ -17,13 +17,13 @@ MonoBehaviour:
   damage: 50
   fireRate: 0.4
   projectileSpeed: 50
-  range: 15
+  range: 25
   accuracy: 0.95
   projectilePrefab: {fileID: 587130082223421870, guid: 237e92e04ff2cf64eb658f8436cbaffc, type: 3}
-  projectilesPerShot: 1
+  projectilesPerShot: 3
   spreadAngle: 0
   muzzleFlashPrefab: {fileID: 0}
   projectileColor: {r: 1, g: 1, b: 1, a: 1}
-  projectileScale: 1
+  projectileScale: 2
   fireSoundId: laser_fire
   hitSoundId: laser_hit
