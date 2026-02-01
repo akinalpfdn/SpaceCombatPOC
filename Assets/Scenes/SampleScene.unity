@@ -2297,7 +2297,7 @@ MonoBehaviour:
   _enemyPrefab: {fileID: 142680459996147334, guid: 4079a51bffb24744683c86ca9b69b63a, type: 3}
   _mapBounds: {fileID: 927220044}
   _debugDrawSpawnArea: 1
-  _debugLogSpawns: 0
+  _debugLogSpawns: 1
 --- !u!4 &1771477028
 Transform:
   m_ObjectHideFlags: 0

@@ -85,14 +85,34 @@ namespace SpaceCombat.Utilities
 
         /// <summary>
         /// Get an object and position it
+        /// Position is set BEFORE OnSpawn() so components can use their spawn position
         /// </summary>
         public T Get(Vector3 position, Quaternion rotation)
         {
-            var obj = Get();
-            if (obj != null)
+            T obj;
+
+            if (_availableObjects.Count > 0)
             {
-                obj.transform.SetPositionAndRotation(position, rotation);
+                obj = _availableObjects.Dequeue();
             }
+            else if (_autoExpand && _allObjects.Count < _maxSize)
+            {
+                obj = CreateNewObject();
+            }
+            else if (_availableObjects.Count == 0)
+            {
+                Debug.LogWarning($"Pool exhausted for {typeof(T).Name}! Consider increasing pool size.");
+                return null;
+            }
+            else
+            {
+                obj = _availableObjects.Dequeue();
+            }
+
+            // Set position BEFORE OnSpawn so components can correctly initialize with spawn position
+            obj.transform.SetPositionAndRotation(position, rotation);
+            obj.gameObject.SetActive(true);
+            obj.OnSpawn();
             return obj;
         }
 

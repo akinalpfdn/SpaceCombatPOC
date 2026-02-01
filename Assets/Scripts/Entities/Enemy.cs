@@ -470,6 +470,7 @@ namespace SpaceCombat.Entities
         // IPoolable
         public void OnSpawn()
         {
+            _spawnPosition = transform.position; // Update spawn position when spawned from pool
             _currentHealth = _maxHealth;
             _currentShield = _maxShield;
             SetState(EnemyState.Patrol);
