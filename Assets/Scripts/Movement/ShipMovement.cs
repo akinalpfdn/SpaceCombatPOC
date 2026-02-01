@@ -29,6 +29,11 @@ namespace SpaceCombat.Movement
         [SerializeField] private bool _rotateToMovement = true;
         [SerializeField] private float _rotationThreshold = 0.1f;
 
+        [Header("Banking/Tilt (2.5D Effect)")]
+        [SerializeField] private bool _enableBanking = true;
+        [SerializeField] private float _maxTiltAngle = 30f;  // Maximum tilt in degrees
+        [SerializeField] private float _tiltSmoothing = 5f;   // How fast to tilt
+
         [Header("Map Bounds")]
         [SerializeField] private bool _respectMapBounds = true;
 
@@ -43,6 +48,12 @@ namespace SpaceCombat.Movement
         private float _currentSpeed;
         private bool _autoRotateEnabled = true;
 
+        // Banking state
+        private float _currentTilt;
+        private float _targetTilt;
+        private Quaternion _lastRotation;
+        private float _angularVelocity;
+
         // Properties
         public Vector2 Velocity => new Vector2(_rigidbody?.linearVelocity.x ?? 0, _rigidbody?.linearVelocity.z ?? 0);
         public float MaxSpeed => _maxSpeed;
@@ -56,13 +67,16 @@ namespace SpaceCombat.Movement
             _rigidbody.useGravity = false;
             _rigidbody.angularDamping = 5f;
             _rigidbody.linearDamping = 0f;
-            // Lock Y position and X/Z rotation for 2.5D movement
+            // Lock Y position and X rotation for 2.5D movement
+            // Z rotation is left free for banking/tilt effect
             _rigidbody.constraints = RigidbodyConstraints.FreezePositionY |
-                                     RigidbodyConstraints.FreezeRotationX |
-                                     RigidbodyConstraints.FreezeRotationZ;
+                                     RigidbodyConstraints.FreezeRotationX;
 
             // Smooth movement - interpolate between physics frames
             _rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+
+            // Initialize banking state
+            _lastRotation = transform.rotation;
 
             // Find map bounds in scene
             if (_respectMapBounds)
@@ -133,6 +147,45 @@ namespace SpaceCombat.Movement
                 Vector3 moveDir = _currentVelocity.normalized;
                 RotateTowards(new Vector2(moveDir.x, moveDir.z));
             }
+
+            // Apply banking/tilt effect
+            if (_enableBanking)
+            {
+                ApplyBanking();
+            }
+        }
+
+        /// <summary>
+        /// Apply banking/tilt effect based on rotation
+        /// 2.5D Effect - Ship tilts into turns (like aircraft)
+        /// </summary>
+        private void ApplyBanking()
+        {
+            // Calculate angular velocity (how fast we're turning)
+            float angleDelta = Mathf.DeltaAngle(_lastRotation.eulerAngles.y, transform.eulerAngles.y);
+            _angularVelocity = angleDelta / Time.fixedDeltaTime;
+            _lastRotation = transform.rotation;
+
+            // Calculate target tilt based on angular velocity
+            // Turning left (negative angular velocity) = tilt left (negative Z rotation)
+            // Turning right (positive angular velocity) = tilt right (positive Z rotation)
+            _targetTilt = -_angularVelocity * _maxTiltAngle / _rotationSpeed;
+
+            // Clamp tilt to maximum angle
+            _targetTilt = Mathf.Clamp(_targetTilt, -_maxTiltAngle, _maxTiltAngle);
+
+            // Smoothly interpolate current tilt to target tilt
+            _currentTilt = Mathf.Lerp(
+                _currentTilt,
+                _targetTilt,
+                _tiltSmoothing * Time.fixedDeltaTime
+            );
+
+            // Apply tilt as local Z rotation
+            // Get current rotation (only Y axis for facing direction)
+            Vector3 currentEuler = transform.rotation.eulerAngles;
+            // Set Y rotation, apply Z tilt, keep X at 0
+            transform.rotation = Quaternion.Euler(0, currentEuler.y, _currentTilt);
         }
 
         /// <summary>
@@ -173,6 +226,7 @@ namespace SpaceCombat.Movement
         /// <summary>
         /// Rotate ship to face a direction
         /// 3D Version - Rotates around Y axis to face direction on XZ plane
+        /// Preserves Z-axis banking tilt
         /// </summary>
         public void RotateTowards(Vector2 direction)
         {
@@ -183,11 +237,28 @@ namespace SpaceCombat.Movement
             if (targetDir != Vector3.zero)
             {
                 Quaternion targetRotation = Quaternion.LookRotation(targetDir);
-                transform.rotation = Quaternion.Slerp(
-                    transform.rotation,
-                    targetRotation,
-                    _rotationSpeed * Time.fixedDeltaTime
-                );
+
+                if (_enableBanking)
+                {
+                    // Preserve current Z tilt when rotating Y
+                    Vector3 currentEuler = transform.rotation.eulerAngles;
+                    Quaternion rotated = Quaternion.Slerp(
+                        Quaternion.Euler(0, currentEuler.y, 0),  // Only Y rotation
+                        targetRotation,
+                        _rotationSpeed * Time.fixedDeltaTime
+                    );
+                    // Apply Y rotation + current Z tilt
+                    transform.rotation = Quaternion.Euler(0, rotated.eulerAngles.y, _currentTilt);
+                }
+                else
+                {
+                    // No banking - normal rotation
+                    transform.rotation = Quaternion.Slerp(
+                        transform.rotation,
+                        targetRotation,
+                        _rotationSpeed * Time.fixedDeltaTime
+                    );
+                }
             }
         }
 

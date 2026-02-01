@@ -59,6 +59,9 @@ MonoBehaviour:
   _velocitySmoothing: 0.1
   _rotateToMovement: 1
   _rotationThreshold: 0.1
+  _enableBanking: 1
+  _maxTiltAngle: 45
+  _tiltSmoothing: 20
   _respectMapBounds: 1
 --- !u!114 &4632643384639022553
 MonoBehaviour:
