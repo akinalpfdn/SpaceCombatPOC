@@ -38,12 +38,60 @@ namespace SpaceCombat.UI
         [SerializeField] private GameObject _gameOverPanel;
         [SerializeField] private TextMeshProUGUI _finalScoreText;
 
+        [Header("Force Position (Runtime)")]
+        [SerializeField] private bool _forcePositionAtRuntime = true;
+
         private void Awake()
         {
             SubscribeToEvents();
-            
+
             if (_gameOverPanel != null)
                 _gameOverPanel.SetActive(false);
+        }
+
+        private void Start()
+        {
+            if (_forcePositionAtRuntime)
+            {
+                ForcePositionUI();
+            }
+        }
+
+        private void ForcePositionUI()
+        {
+            RectTransform canvasRect = GetComponentInParent<Canvas>()?.GetComponent<RectTransform>();
+            if (canvasRect == null) return;
+
+            float halfWidth = canvasRect.rect.width / 2f;
+            float halfHeight = canvasRect.rect.height / 2f;
+
+            // Position relative to canvas center, using local coordinates
+            // Top-left corner is (-halfWidth, halfHeight)
+            // Top-right corner is (halfWidth, halfHeight)
+
+            if (_healthBar != null)
+            {
+                var rect = _healthBar.GetComponent<RectTransform>();
+                rect.localPosition = new Vector3(-halfWidth + 150, halfHeight - 50, 0);
+            }
+
+            if (_shieldBar != null)
+            {
+                var rect = _shieldBar.GetComponent<RectTransform>();
+                rect.localPosition = new Vector3(-halfWidth + 150, halfHeight - 100, 0);
+            }
+
+            if (_scoreText != null)
+            {
+                var rect = _scoreText.GetComponent<RectTransform>();
+                rect.localPosition = new Vector3(halfWidth - 200, halfHeight - 50, 0);
+            }
+
+            if (_enemyCountText != null)
+            {
+                var rect = _enemyCountText.GetComponent<RectTransform>();
+                rect.localPosition = new Vector3(halfWidth - 200, halfHeight - 100, 0);
+            }
         }
 
         private void OnDestroy()
