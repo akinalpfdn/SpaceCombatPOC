@@ -880,15 +880,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.Core.GameManager
   _balanceConfig: {fileID: 11400000, guid: 12816a3e73a4d5b43bd520a8a74ba810, type: 2}
+  _spawnConfig: {fileID: 11400000, guid: bfa573f513d00924e8a76c740d997b1b, type: 2}
   _playerSpawnPoint: {fileID: 975207472}
   _playerPrefab: {fileID: 596049113606997257, guid: 86a0b9ecf0dde204f9987d86c6070dbe, type: 3}
-  _enemyPrefab: {fileID: 142680459996147334, guid: 4079a51bffb24744683c86ca9b69b63a, type: 3}
-  _mapBounds: {fileID: 927220044}
-  _enemyCount: 90
-  _minDistanceFromPlayer: 20
-  _spawnDelayAfterDeath: 2
+  _spawnService: {fileID: 1771477027}
   _currentState: 1
   _score: 0
+  _respawnDelay: 2
+  _enableRespawn: 1
 --- !u!4 &595398651
 Transform:
   m_ObjectHideFlags: 0
@@ -2265,6 +2264,55 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &1771477026
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1771477028}
+  - component: {fileID: 1771477027}
+  m_Layer: 0
+  m_Name: EnemySpawnService
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1771477027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1771477026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb1610ac2f3cc314e8954a2f6f0e139e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.Spawning.EnemySpawnService
+  _config: {fileID: 11400000, guid: bfa573f513d00924e8a76c740d997b1b, type: 2}
+  _enemyPrefab: {fileID: 142680459996147334, guid: 4079a51bffb24744683c86ca9b69b63a, type: 3}
+  _mapBounds: {fileID: 927220044}
+  _debugDrawSpawnArea: 1
+  _debugLogSpawns: 0
+--- !u!4 &1771477028
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1771477026}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -11.75754, y: -0, z: -17.91288}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1793285962
 GameObject:
   m_ObjectHideFlags: 0
@@ -2852,3 +2900,4 @@ SceneRoots:
   - {fileID: 1418011940}
   - {fileID: 1793285966}
   - {fileID: 990000002}
+  - {fileID: 1771477028}

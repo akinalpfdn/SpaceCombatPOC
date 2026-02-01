@@ -1,19 +1,27 @@
 // ============================================
-// GAME MANAGER - Facade Pattern
+// GAME MANAGER - Facade Pattern (Refactored)
 // Coordinates all game systems
-// Entry point for game state management
+// Delegates spawning to ISpawnService (SRP)
 // ============================================
 
 using System.Collections;
 using UnityEngine;
 using SpaceCombat.Events;
 using SpaceCombat.Utilities;
+using SpaceCombat.Interfaces;
+using SpaceCombat.Spawning;
 
 namespace SpaceCombat.Core
 {
     /// <summary>
-    /// Main game manager - Facade for all subsystems
-    /// Handles game state, spawning, and enemy management
+    /// Main game manager - Facade for all subsystems.
+    /// 
+    /// Refactored to follow SOLID principles:
+    /// - Single Responsibility: Game state management only
+    /// - Open/Closed: Extensible via services
+    /// - Dependency Inversion: Depends on ISpawnService abstraction
+    /// 
+    /// Spawning logic moved to EnemySpawnService.
     /// </summary>
     public class GameManager : MonoBehaviour
     {
@@ -21,32 +29,37 @@ namespace SpaceCombat.Core
 
         [Header("Game Settings")]
         [SerializeField] private ScriptableObjects.GameBalanceConfig _balanceConfig;
+        [SerializeField] private SpawnConfig _spawnConfig;
 
         [Header("References")]
         [SerializeField] private Transform _playerSpawnPoint;
         [SerializeField] private Entities.PlayerShip _playerPrefab;
-        [SerializeField] private Entities.Enemy _enemyPrefab;
-        [SerializeField] private Environment.MapBounds _mapBounds;
-
-        [Header("Enemy Spawning")]
-        [SerializeField] private int _enemyCount = 10;
-        [SerializeField] private float _minDistanceFromPlayer = 20f;
-        [SerializeField] private float _spawnDelayAfterDeath = 2f;
+        
+        [Header("Spawn Service (Auto-assigned if null)")]
+        [SerializeField] private EnemySpawnService _spawnService;
 
         [Header("State")]
         [SerializeField] private GameState _currentState = GameState.Loading;
         [SerializeField] private int _score = 0;
 
+        [Header("Respawn Settings")]
+        [SerializeField] private float _respawnDelay = 2f;
+        [SerializeField] private bool _enableRespawn = true;
+
         // Runtime references
         private Entities.PlayerShip _player;
-        private ObjectPool<Entities.Enemy> _enemyPool;
-        private int _enemiesAlive;
+        private ISpawnService _spawnServiceInterface;
         private Coroutine _respawnCoroutine;
 
+        // Properties
         public GameState CurrentState => _currentState;
         public int Score => _score;
         public Entities.PlayerShip Player => _player;
-        public int EnemiesAlive => _enemiesAlive;
+        public int EnemiesAlive => _spawnServiceInterface?.ActiveEnemyCount ?? 0;
+
+        // ============================================
+        // LIFECYCLE
+        // ============================================
 
         private void Awake()
         {
@@ -68,6 +81,11 @@ namespace SpaceCombat.Core
         private void OnDestroy()
         {
             UnsubscribeFromEvents();
+            
+            if (Instance == this)
+            {
+                Instance = null;
+            }
         }
 
         // ============================================
@@ -76,11 +94,51 @@ namespace SpaceCombat.Core
 
         private void InitializeGame()
         {
+            // Get or create spawn service
+            InitializeSpawnService();
+            
             SubscribeToEvents();
-            SetupObjectPools();
             
             // Start game
             StartCoroutine(GameStartSequence());
+        }
+
+        private void InitializeSpawnService()
+        {
+            // Try to get from inspector reference
+            if (_spawnService != null)
+            {
+                _spawnServiceInterface = _spawnService;
+                return;
+            }
+            
+            // Try to get from ServiceLocator
+            _spawnServiceInterface = ServiceLocator.Get<ISpawnService>();
+            
+            // If still null, find in scene
+            if (_spawnServiceInterface == null)
+            {
+                _spawnService = FindObjectOfType<EnemySpawnService>();
+                if (_spawnService != null)
+                {
+                    _spawnServiceInterface = _spawnService;
+                }
+            }
+            
+            // Last resort: Create spawn service
+            if (_spawnServiceInterface == null)
+            {
+                Debug.LogWarning("[GameManager] No EnemySpawnService found, creating one");
+                var spawnServiceGO = new GameObject("EnemySpawnService");
+                _spawnService = spawnServiceGO.AddComponent<EnemySpawnService>();
+                _spawnServiceInterface = _spawnService;
+            }
+            
+            // Initialize with config
+            if (_spawnConfig != null)
+            {
+                _spawnServiceInterface.Initialize(_spawnConfig);
+            }
         }
 
         private void SubscribeToEvents()
@@ -93,21 +151,6 @@ namespace SpaceCombat.Core
         {
             EventBus.Unsubscribe<EntityDeathEvent>(OnEntityDeath);
             EventBus.Unsubscribe<ScoreChangedEvent>(OnScoreChanged);
-        }
-
-        private void SetupObjectPools()
-        {
-            var poolManager = PoolManager.Instance;
-            if (poolManager == null)
-            {
-                var poolGO = new GameObject("PoolManager");
-                poolManager = poolGO.AddComponent<PoolManager>();
-            }
-
-            if (_enemyPrefab != null)
-            {
-                _enemyPool = poolManager.CreatePool("Enemies", _enemyPrefab, 10, 50);
-            }
         }
 
         // ============================================
@@ -124,8 +167,11 @@ namespace SpaceCombat.Core
             // Spawn player
             SpawnPlayer();
 
-            // Spawn all enemies at once
-            SpawnAllEnemiesAtStart();
+            // Wait another frame for player to be ready
+            yield return null;
+
+            // Spawn initial enemies using spawn service
+            SpawnInitialEnemies();
 
             // Start playing
             SetState(GameState.Playing);
@@ -177,9 +223,8 @@ namespace SpaceCombat.Core
         {
             _score = 0;
 
-            // Reset enemies
-            _enemyPool?.ReturnAll();
-            _enemiesAlive = 0;
+            // Reset enemies via spawn service
+            _spawnServiceInterface?.ReturnAllEnemies();
 
             // Reset player
             if (_player != null)
@@ -192,18 +237,17 @@ namespace SpaceCombat.Core
             }
 
             SetState(GameState.Playing);
-            SpawnAllEnemiesAtStart();
+            SpawnInitialEnemies();
         }
 
         // ============================================
-        // SPAWNING
+        // SPAWNING (Delegated to SpawnService)
         // ============================================
 
         private void SpawnPlayer()
         {
             if (_player == null && _playerPrefab != null)
             {
-                // 3D Version: Use Vector3 for spawn position
                 Vector3 spawnPos = _playerSpawnPoint != null
                     ? _playerSpawnPoint.position
                     : Vector3.zero;
@@ -211,76 +255,42 @@ namespace SpaceCombat.Core
                 _player = Instantiate(_playerPrefab, spawnPos, Quaternion.identity);
                 _player.gameObject.tag = "Player";
                 _player.gameObject.layer = LayerMask.NameToLayer("Player");
+                
+                Debug.Log($"[GameManager] Player spawned at {spawnPos}");
             }
         }
 
-        public void SpawnEnemy(Vector2 position, ScriptableObjects.EnemyConfig config = null)
+        private void SpawnInitialEnemies()
         {
-            if (_enemyPool == null) return;
-
-            // 3D Version: Convert 2D (x,y) to 3D (x, 0, z) for XZ plane
-            Vector3 spawnPos3D = new Vector3(position.x, 0f, position.y);
-
-            var enemy = _enemyPool.Get(spawnPos3D, Quaternion.identity);
-            if (enemy != null)
+            if (_spawnServiceInterface == null)
             {
-                if (config != null)
-                {
-                    enemy.ApplyConfig(config);
-                }
-
-                enemy.gameObject.layer = LayerMask.NameToLayer("Enemy");
-
-                EventBus.Publish(new EnemySpawnedEvent(
-                    enemy.gameObject,
-                    position,
-                    config?.enemyName ?? "Enemy"
-                ));
+                Debug.LogError("[GameManager] SpawnService not available!");
+                return;
             }
+
+            Vector3 playerPosition = _player != null ? _player.transform.position : Vector3.zero;
+            int enemyCount = _spawnConfig?.InitialEnemyCount ?? 10;
+
+            _spawnServiceInterface.SpawnInitialEnemies(enemyCount, playerPosition);
+            
+            Debug.Log($"[GameManager] Spawned {enemyCount} initial enemies");
         }
 
-        // ============================================
-        // SPAWN MANAGEMENT
-        // ============================================
-
-        private void SpawnAllEnemiesAtStart()
+        private void RespawnEnemy()
         {
-            for (int i = 0; i < _enemyCount; i++)
-            {
-                Vector2 spawnPos = GetRandomSpawnPosition();
-                SpawnEnemy(spawnPos);
-                _enemiesAlive++;
-            }
-        }
-
-        private Vector2 GetRandomSpawnPosition()
-        {
-            if (_mapBounds == null)
-            {
-                // Fallback: Random position around circle (3D: on XZ plane)
-                float angle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
-                float distance = 50f; // Further away for fallback
-                return new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * distance;
-            }
-
-            Rect bounds = _mapBounds.Bounds;
-
-            // Simply spawn randomly across the entire map bounds
-            // No minimum distance check - truly random scattering
-            float x = Random.Range(bounds.xMin, bounds.xMax);
-            float y = Random.Range(bounds.yMin, bounds.yMax);
-            return new Vector2(x, y);
+            if (_spawnServiceInterface == null || _player == null) return;
+            
+            _spawnServiceInterface.SpawnEnemy(_player.transform.position);
         }
 
         private IEnumerator RespawnEnemyAfterDelay()
         {
-            yield return new WaitForSeconds(_spawnDelayAfterDeath);
+            float delay = _spawnConfig?.RespawnDelay ?? _respawnDelay;
+            yield return new WaitForSeconds(delay);
 
             if (_currentState == GameState.Playing)
             {
-                Vector2 spawnPos = GetRandomSpawnPosition();
-                SpawnEnemy(spawnPos);
-                _enemiesAlive++;
+                RespawnEnemy();
             }
 
             _respawnCoroutine = null;
@@ -304,23 +314,21 @@ namespace SpaceCombat.Core
 
         private void OnPlayerDeath()
         {
-            // Check lives remaining (future feature)
             SetState(GameState.GameOver);
         }
 
         private void OnEnemyDeath(EntityDeathEvent evt)
         {
-            _enemiesAlive--;
-
-            // Return enemy to pool
-            var enemy = evt.Entity.GetComponent<Entities.Enemy>();
-            if (enemy != null && _enemyPool != null)
+            // Return enemy to pool via spawn service
+            if (evt.Entity != null)
             {
-                _enemyPool.Return(enemy);
+                _spawnServiceInterface?.ReturnEnemy(evt.Entity);
             }
 
-            // Schedule respawn to maintain enemy count
-            if (_currentState == GameState.Playing)
+            // Schedule respawn if enabled
+            bool shouldRespawn = _spawnConfig?.EnableRespawn ?? _enableRespawn;
+            
+            if (_currentState == GameState.Playing && shouldRespawn)
             {
                 if (_respawnCoroutine != null)
                 {
@@ -338,13 +346,13 @@ namespace SpaceCombat.Core
         private void OnGameOver()
         {
             Debug.Log($"Game Over! Final Score: {_score}");
-            // Show game over UI
+            // TODO: Show game over UI
         }
 
         private void OnVictory()
         {
             Debug.Log($"Victory! Final Score: {_score}");
-            // Show victory UI
+            // TODO: Show victory UI
         }
 
         // ============================================
@@ -355,6 +363,33 @@ namespace SpaceCombat.Core
         {
             _score += amount;
             EventBus.Publish(new ScoreChangedEvent(_score, amount));
+        }
+
+        /// <summary>
+        /// Change spawn strategy at runtime.
+        /// </summary>
+        public void SetSpawnStrategy(SpawnDistributionType strategyType)
+        {
+            _spawnServiceInterface?.SetStrategy(strategyType);
+        }
+
+        /// <summary>
+        /// Force spawn an enemy (e.g., for testing or special events).
+        /// </summary>
+        public void ForceSpawnEnemy()
+        {
+            if (_player != null)
+            {
+                _spawnServiceInterface?.SpawnEnemy(_player.transform.position);
+            }
+        }
+
+        /// <summary>
+        /// Force spawn enemy at specific position.
+        /// </summary>
+        public void ForceSpawnEnemyAt(Vector3 position)
+        {
+            _spawnServiceInterface?.SpawnEnemyAt(position);
         }
     }
 }
