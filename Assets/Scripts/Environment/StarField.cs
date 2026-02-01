@@ -10,6 +10,7 @@ namespace SpaceCombat.Environment
     /// <summary>
     /// Spawns and manages background stars
     /// Creates dynamic star field effect with twinkling
+    /// 3D Version - Stars positioned on XZ plane
     /// </summary>
     public class StarField : MonoBehaviour
     {
@@ -75,9 +76,9 @@ namespace SpaceCombat.Environment
                     _starRenderers[i] = sr;
                 }
 
-                // Random position
+                // Random position on XZ plane
                 Vector2 randomPos = Random.insideUnitCircle * _fieldRadius;
-                star.transform.position = new Vector3(randomPos.x, randomPos.y, 0);
+                star.transform.position = new Vector3(randomPos.x, 0, randomPos.y);  // 3D: XZ plane
 
                 // Random size
                 float size = Random.Range(_minStarSize, _maxStarSize);
@@ -117,26 +118,27 @@ namespace SpaceCombat.Environment
         {
             if (_cameraTransform == null) return;
 
-            Vector2 cameraPos = _cameraTransform.position;
+            // 3D XZ plane: Use X and Z coordinates
+            Vector3 cameraPos = _cameraTransform.position;
 
             for (int i = 0; i < _starCount; i++)
             {
                 if (_stars[i] == null) continue;
 
-                Vector2 starPos = _stars[i].position;
-                Vector2 delta = starPos - cameraPos;
+                Vector3 starPos = _stars[i].position;
+                Vector3 delta = starPos - cameraPos;
 
-                // Wrap horizontally
+                // Wrap horizontally (X axis)
                 if (delta.x > _fieldRadius)
                     starPos.x -= _fieldRadius * 2f;
                 else if (delta.x < -_fieldRadius)
                     starPos.x += _fieldRadius * 2f;
 
-                // Wrap vertically
-                if (delta.y > _fieldRadius)
-                    starPos.y -= _fieldRadius * 2f;
-                else if (delta.y < -_fieldRadius)
-                    starPos.y += _fieldRadius * 2f;
+                // Wrap depth-wise (Z axis in 3D)
+                if (delta.z > _fieldRadius)
+                    starPos.z -= _fieldRadius * 2f;
+                else if (delta.z < -_fieldRadius)
+                    starPos.z += _fieldRadius * 2f;
 
                 _stars[i].position = starPos;
             }

@@ -101,9 +101,10 @@ namespace SpaceCombat.Entities
             // Visual feedback
             ShowDamageFlash();
 
-            // Publish damage event
+            // Publish damage event - 3D: convert Vector3 to Vector2 (x, z)
+            Vector3 pos = transform.position;
             EventBus.Publish(new DamageEvent(
-                gameObject, null, amount, damageType, transform.position
+                gameObject, null, amount, damageType, new Vector2(pos.x, pos.z)
             ));
 
             if (!IsAlive)
@@ -160,9 +161,11 @@ namespace SpaceCombat.Entities
         {
             OnDeath?.Invoke();
             OnDeathEffect();
-            
+
+            // 3D: convert Vector3 position to Vector2 (x, z)
+            Vector3 pos = transform.position;
             EventBus.Publish(new EntityDeathEvent(
-                gameObject, transform.position, this is PlayerShip, GetScoreValue()
+                gameObject, new Vector2(pos.x, pos.z), this is PlayerShip, GetScoreValue()
             ));
         }
 
@@ -208,8 +211,9 @@ namespace SpaceCombat.Entities
         /// </summary>
         protected virtual void OnShieldDamaged(float amount, DamageType damageType)
         {
-            // Play shield hit sound/effect
-            EventBus.Publish(new PlaySFXEvent("shield_hit", transform.position));
+            // Play shield hit sound/effect - 3D: convert Vector3 to Vector2 (x, z)
+            Vector3 pos = transform.position;
+            EventBus.Publish(new PlaySFXEvent("shield_hit", new Vector2(pos.x, pos.z)));
         }
 
         /// <summary>
@@ -217,8 +221,9 @@ namespace SpaceCombat.Entities
         /// </summary>
         protected virtual void OnHealthDamaged(float amount, DamageType damageType)
         {
-            // Play hull hit sound/effect
-            EventBus.Publish(new PlaySFXEvent("hull_hit", transform.position));
+            // Play hull hit sound/effect - 3D: convert Vector3 to Vector2 (x, z)
+            Vector3 pos = transform.position;
+            EventBus.Publish(new PlaySFXEvent("hull_hit", new Vector2(pos.x, pos.z)));
         }
 
         /// <summary>
@@ -234,8 +239,9 @@ namespace SpaceCombat.Entities
         /// </summary>
         protected virtual void OnDeathEffect()
         {
-            // Override to spawn explosion effects
-            EventBus.Publish(new ExplosionEvent(transform.position, 1f, ExplosionSize.Medium));
+            // Override to spawn explosion effects - 3D: convert Vector3 to Vector2 (x, z)
+            Vector3 pos = transform.position;
+            EventBus.Publish(new ExplosionEvent(new Vector2(pos.x, pos.z), 1f, ExplosionSize.Medium));
         }
 
         /// <summary>

@@ -105,9 +105,10 @@ namespace SpaceCombat.Combat
             _lastFireTime = Time.time;
 
             // Calculate fire direction (use ship's forward if no specific aim)
-            Vector2 fireDirection = _aimDirection.magnitude > 0.1f 
-                ? _aimDirection 
-                : (Vector2)transform.up;
+            // 3D XZ plane: transform.forward gives ship facing direction (x, 0, z) -> convert to (x, z) for Vector2
+            Vector2 fireDirection = _aimDirection.magnitude > 0.1f
+                ? _aimDirection
+                : new Vector2(transform.forward.x, transform.forward.z);
 
             // Fire multiple projectiles if configured
             int projectileCount = _currentWeaponConfig.projectilesPerShot;
@@ -123,14 +124,15 @@ namespace SpaceCombat.Combat
             SpawnMuzzleFlash();
             PlayFireSound();
 
-            // Events
-            OnWeaponFired?.Invoke();
+            // Events - 3D: convert Vector3 firePoint position to Vector2 (x, z)
+            Vector3 firePos = _firePoint.position;
             EventBus.Publish(new ProjectileFiredEvent(
-                _firePoint.position, 
-                fireDirection, 
+                new Vector2(firePos.x, firePos.z),
+                fireDirection,
                 _currentWeaponConfig.weaponName,
                 _isPlayerWeapon
             ));
+            OnWeaponFired?.Invoke();
         }
 
         /// <summary>
@@ -258,9 +260,11 @@ namespace SpaceCombat.Combat
 
             if (!string.IsNullOrEmpty(soundId))
             {
+                // 3D: convert Vector3 firePoint position to Vector2 (x, z)
+                Vector3 firePos = _firePoint.position;
                 EventBus.Publish(new PlaySFXEvent(
                     soundId,
-                    _firePoint.position
+                    new Vector2(firePos.x, firePos.z)
                 ));
             }
         }

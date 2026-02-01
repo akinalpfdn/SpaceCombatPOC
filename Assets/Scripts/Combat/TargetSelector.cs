@@ -330,7 +330,7 @@ namespace SpaceCombat.Combat
             else
             {
                 _targetHealthBar = indicatorObj.AddComponent<HealthBar>();
-                _targetHealthBar.SetOffset(new Vector2(0, -1.5f));
+                _targetHealthBar.SetOffset(new Vector3(0, 0, -1.5f));  // 3D: offset on Z for "below"
             }
 
             if (_targetHealthBar != null)

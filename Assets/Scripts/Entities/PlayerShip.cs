@@ -276,22 +276,24 @@ namespace SpaceCombat.Entities
         protected override void OnShieldDamaged(float amount, DamageType damageType)
         {
             base.OnShieldDamaged(amount, damageType);
-            
-            // Additional shield hit effects
+
+            // Additional shield hit effects - 3D: convert Vector3 to Vector2 (x, z)
             if (_config != null)
             {
-                EventBus.Publish(new PlaySFXEvent(_config.shieldHitSoundId, transform.position));
+                Vector3 pos = transform.position;
+                EventBus.Publish(new PlaySFXEvent(_config.shieldHitSoundId, new Vector2(pos.x, pos.z)));
             }
         }
 
         protected override void OnHealthDamaged(float amount, DamageType damageType)
         {
             base.OnHealthDamaged(amount, damageType);
-            
-            // Camera shake, screen flash, etc.
+
+            // Camera shake, screen flash, etc. - 3D: convert Vector3 to Vector2 (x, z)
             if (_config != null)
             {
-                EventBus.Publish(new PlaySFXEvent(_config.hullHitSoundId, transform.position));
+                Vector3 pos = transform.position;
+                EventBus.Publish(new PlaySFXEvent(_config.hullHitSoundId, new Vector2(pos.x, pos.z)));
             }
 
             // Publish player health event for UI
@@ -301,14 +303,17 @@ namespace SpaceCombat.Entities
         protected override void OnDeathEffect()
         {
             base.OnDeathEffect();
-            
+
             if (_config != null)
             {
-                EventBus.Publish(new PlaySFXEvent(_config.explosionSoundId, transform.position));
+                // 3D: convert Vector3 to Vector2 (x, z)
+                Vector3 pos = transform.position;
+                EventBus.Publish(new PlaySFXEvent(_config.explosionSoundId, new Vector2(pos.x, pos.z)));
             }
 
-            // Large explosion
-            EventBus.Publish(new ExplosionEvent(transform.position, 2f, ExplosionSize.Large));
+            // Large explosion - 3D: convert Vector3 to Vector2 (x, z)
+            Vector3 deathPos = transform.position;
+            EventBus.Publish(new ExplosionEvent(new Vector2(deathPos.x, deathPos.z), 2f, ExplosionSize.Large));
         }
 
         /// <summary>

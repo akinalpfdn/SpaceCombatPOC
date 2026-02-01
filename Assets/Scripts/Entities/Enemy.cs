@@ -451,10 +451,12 @@ namespace SpaceCombat.Entities
         protected override void OnDeathEffect()
         {
             base.OnDeathEffect();
-            
+
             if (_config != null)
             {
-                EventBus.Publish(new PlaySFXEvent(_config.deathSoundId, transform.position));
+                // 3D: convert Vector3 position to Vector2 (x, z)
+                Vector3 pos = transform.position;
+                EventBus.Publish(new PlaySFXEvent(_config.deathSoundId, new Vector2(pos.x, pos.z)));
             }
 
             EventBus.Publish(new ScoreChangedEvent(GetScoreValue(), GetScoreValue()));

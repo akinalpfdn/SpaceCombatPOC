@@ -108,8 +108,9 @@ namespace SpaceCombat.Combat
                     // Spawn hit effect
                     SpawnHitEffect(hit.point);
 
-                    // Play hit sound
-                    EventBus.Publish(new PlaySFXEvent(_hitSoundId, transform.position));
+                    // Play hit sound - 3D: convert Vector3 position to Vector2 (x, z)
+                    Vector3 pos = transform.position;
+                    EventBus.Publish(new PlaySFXEvent(_hitSoundId, new Vector2(pos.x, pos.z)));
                 }
 
                 // Despawn
@@ -214,8 +215,9 @@ namespace SpaceCombat.Combat
                 // Spawn hit effect
                 SpawnHitEffect(other.ClosestPoint(transform.position));
 
-                // Play hit sound
-                EventBus.Publish(new PlaySFXEvent(_hitSoundId, transform.position));
+                // Play hit sound - 3D: convert Vector3 position to Vector2 (x, z)
+                Vector3 pos = transform.position;
+                EventBus.Publish(new PlaySFXEvent(_hitSoundId, new Vector2(pos.x, pos.z)));
             }
 
             // Despawn projectile
