@@ -11,6 +11,7 @@ namespace SpaceCombat.UI
     /// <summary>
     /// Displays player health and shield as text
     /// Attach to Player ship or a UI canvas
+    /// 3D Version - Uses XZ plane for movement, Y for vertical offset
     /// </summary>
     public class PlayerStatusDisplay : MonoBehaviour
     {
@@ -20,7 +21,7 @@ namespace SpaceCombat.UI
         [Header("Display Settings")]
         [SerializeField] private bool _showHealth = true;
         [SerializeField] private bool _showShield = true;
-        [SerializeField] private Vector2 _offset = new Vector2(0, -1.5f);
+        [SerializeField] private Vector3 _offset = new Vector3(0, 0, -1.5f);  // 3D: offset on Z for "below"
         [SerializeField] private float _lineSpacing = 0.4f;
 
         [Header("Text Styling")]
@@ -56,8 +57,9 @@ namespace SpaceCombat.UI
         {
             if (_target == null || _container == null) return;
 
-            // Position container at entity position + offset (world space, no rotation)
-            _container.position = (Vector2)transform.position + _offset;
+            // 3D Version: Position container at entity position + offset (XZ plane movement)
+            Vector3 pos = transform.position;
+            _container.position = new Vector3(pos.x + _offset.x, pos.y + _offset.y, pos.z + _offset.z);
             _container.rotation = Quaternion.identity;
 
             // Only update if values changed

@@ -22,7 +22,7 @@ namespace SpaceCombat.UI
     public class HealthBarConfig
     {
         [Header("Size & Position")]
-        public Vector2 Offset = new Vector2(0, -1f);
+        public Vector3 Offset = new Vector3(0, 0, -1f);  // 3D: offset on Z for "below" entity
         public Vector2 Size = new Vector2(2f, 0.3f);
         public float BorderPadding = 0.05f;
         
@@ -100,11 +100,12 @@ namespace SpaceCombat.UI
         private void LateUpdate()
         {
             if (_entity == null || _barContainer == null) return;
-            
-            // Keep bar at world position (not affected by entity rotation)
-            _barContainer.position = (Vector2)_entity.transform.position + _config.Offset;
+
+            // 3D Version: Keep bar at world position on XZ plane (not affected by entity rotation)
+            Vector3 pos = _entity.transform.position;
+            _barContainer.position = new Vector3(pos.x + _config.Offset.x, pos.y + _config.Offset.y, pos.z + _config.Offset.z);
             _barContainer.rotation = Quaternion.identity;
-            
+
             // Only update visuals if health changed (optimization)
             float currentPercent = _entity.CurrentHealth / _entity.MaxHealth;
             if (!Mathf.Approximately(currentPercent, _lastHealthPercent))
@@ -277,8 +278,9 @@ namespace SpaceCombat.UI
         
         /// <summary>
         /// Set the position offset from the entity.
+        /// 3D Version: Uses Vector3 for XZ plane positioning
         /// </summary>
-        public void SetOffset(Vector2 offset)
+        public void SetOffset(Vector3 offset)
         {
             _config.Offset = offset;
         }
