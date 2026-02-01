@@ -33,6 +33,7 @@ namespace SpaceCombat.Movement
         [SerializeField] private bool _enableBanking = true;
         [SerializeField] private float _maxTiltAngle = 30f;  // Maximum tilt in degrees
         [SerializeField] private float _tiltSmoothing = 5f;   // How fast to tilt
+        [SerializeField] private float _tiltPower = 2.5f;     // Tilt intensity multiplier (higher = more aggressive)
 
         [Header("Map Bounds")]
         [SerializeField] private bool _respectMapBounds = true;
@@ -169,7 +170,8 @@ namespace SpaceCombat.Movement
             // Calculate target tilt based on angular velocity
             // Turning left (negative angular velocity) = tilt left (negative Z rotation)
             // Turning right (positive angular velocity) = tilt right (positive Z rotation)
-            _targetTilt = -_angularVelocity * _maxTiltAngle / _rotationSpeed;
+            // TiltPower multiplies the effect for more aggressive banking
+            _targetTilt = -_angularVelocity * _maxTiltAngle * _tiltPower / _rotationSpeed;
 
             // Clamp tilt to maximum angle
             _targetTilt = Mathf.Clamp(_targetTilt, -_maxTiltAngle, _maxTiltAngle);

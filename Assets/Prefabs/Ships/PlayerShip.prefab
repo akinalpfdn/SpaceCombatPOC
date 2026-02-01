@@ -62,6 +62,7 @@ MonoBehaviour:
   _enableBanking: 1
   _maxTiltAngle: 45
   _tiltSmoothing: 20
+  _tiltPower: 3
   _respectMapBounds: 1
 --- !u!114 &4632643384639022553
 MonoBehaviour:
