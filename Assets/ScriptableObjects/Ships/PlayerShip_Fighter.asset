@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.ScriptableObjects.ShipConfig
   shipName: Fighter
   shipSprite: {fileID: 0}
-  maxHealth: 200
+  maxHealth: 200000
   maxShield: 50
   shieldRegenRate: 2
   shieldRegenDelay: 3

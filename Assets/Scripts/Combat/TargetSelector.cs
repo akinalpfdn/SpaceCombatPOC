@@ -291,9 +291,22 @@ namespace SpaceCombat.Combat
             var indicatorObj = Instantiate(_targetIndicatorPrefab, target.position, Quaternion.identity);
             _currentIndicator = indicatorObj.GetComponent<TargetIndicator>();
 
+            // Get target indicator scale from enemy config
+            var enemy = target.GetComponent<Enemy>();
+            float scale = 1f;
+            if (enemy != null)
+            {
+                scale = enemy.TargetIndicatorScale;
+            }
+
+            // Apply scale to indicator
+            indicatorObj.transform.localScale = Vector3.one * scale;
+
             if (_currentIndicator != null)
             {
                 _currentIndicator.SetTarget(target);
+                // Pass the base scale so pulse animation works correctly
+                _currentIndicator.SetBaseScale(scale);
             }
 
             // Spawn health bar - use prefab if assigned, otherwise fallback to AddComponent

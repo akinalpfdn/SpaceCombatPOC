@@ -49,6 +49,7 @@ namespace SpaceCombat.Entities
         public EnemyState CurrentState => _currentState;
         public Transform Target => _target;
         public bool IsActive => gameObject.activeInHierarchy;
+        public float TargetIndicatorScale => _config?.targetIndicatorScale ?? 1f;
 
         protected override void Awake()
         {

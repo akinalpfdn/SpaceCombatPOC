@@ -21,6 +21,7 @@ namespace SpaceCombat.Combat
 
         private Transform _target;
         private float _pulseTime;
+        private float _baseScale = 1f;
 
         private void Start()
         {
@@ -38,8 +39,8 @@ namespace SpaceCombat.Combat
             if (_pulse)
             {
                 _pulseTime += Time.deltaTime * _pulseSpeed;
-                float scale = Mathf.Lerp(_pulseMin, _pulseMax, (Mathf.Sin(_pulseTime) + 1f) / 2f);
-                transform.localScale = Vector3.one * scale;
+                float pulseMultiplier = Mathf.Lerp(_pulseMin, _pulseMax, (Mathf.Sin(_pulseTime) + 1f) / 2f);
+                transform.localScale = Vector3.one * (_baseScale * pulseMultiplier);
             }
 
             // Follow target
@@ -60,6 +61,11 @@ namespace SpaceCombat.Combat
             _color = color;
             if (_spriteRenderer != null)
                 _spriteRenderer.color = color;
+        }
+
+        public void SetBaseScale(float scale)
+        {
+            _baseScale = scale;
         }
     }
 }

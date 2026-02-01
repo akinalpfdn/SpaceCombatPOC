@@ -33,6 +33,9 @@ namespace SpaceCombat.ScriptableObjects
         [Header("Rewards")]
         public int scoreValue = 100;
 
+        [Header("UI")]
+        public float targetIndicatorScale = 1f;
+
         [Header("Audio")]
         public string deathSoundId = "explosion_small";
     }
