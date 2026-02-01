@@ -10,6 +10,7 @@ namespace SpaceCombat.Environment
     /// <summary>
     /// Infinite scrolling background tile
     /// Repositions when moving out of view
+    /// 3D Version - Camera moves on XZ plane
     /// </summary>
     public class InfiniteBackground : MonoBehaviour
     {
@@ -44,12 +45,12 @@ namespace SpaceCombat.Environment
                 myPos.x += offset;
             }
 
-            // Check vertical wrap
-            float distY = cameraPos.y - myPos.y;
-            if (Mathf.Abs(distY) > _tileSize.y)
+            // Check depth wrap (Z axis in 3D)
+            float distZ = cameraPos.z - myPos.z;
+            if (Mathf.Abs(distZ) > _tileSize.y)
             {
-                float offset = Mathf.Sign(distY) * _tileSize.y * 2f;
-                myPos.y += offset;
+                float offset = Mathf.Sign(distZ) * _tileSize.y * 2f;
+                myPos.z += offset;
             }
 
             transform.position = myPos;

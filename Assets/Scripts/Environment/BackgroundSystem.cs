@@ -12,6 +12,7 @@ namespace SpaceCombat.Environment
     /// <summary>
     /// Parallax scrolling background for space environment
     /// Multiple layers move at different speeds based on camera movement
+    /// 3D Version - Camera moves on XZ plane
     /// </summary>
     public class ParallaxBackground : MonoBehaviour
     { 
@@ -37,7 +38,8 @@ namespace SpaceCombat.Environment
                 _cameraTransform = Camera.main?.transform;
             }
 
-            _cameraStartPos = _cameraTransform != null ? _cameraTransform.position : Vector3.zero;
+            // Use world origin (0,0,0) as reference instead of camera start position
+            _cameraStartPos = Vector3.zero;
 
             // Store initial positions
             _layerStartPositions = new Vector3[_layers.Length];
@@ -65,8 +67,9 @@ namespace SpaceCombat.Environment
                 // Layer moves with camera - creating depth illusion
                 // Factor 0.98 = moves 98% with camera (appears very slow on screen - DarkOrbit style)
                 // Factor 0.5 = moves 50% with camera (appears medium speed)
+                // 3D Version: Use X and Z axes (camera moves on XZ plane)
                 Vector3 targetPos = _layerStartPositions[i] + (cameraDelta * layer.parallaxFactor);
-                layer.transform.position = new Vector3(targetPos.x, targetPos.y, _layerStartPositions[i].z);
+                layer.transform.position = new Vector3(targetPos.x, _layerStartPositions[i].y, targetPos.z);
             }
         }
     }

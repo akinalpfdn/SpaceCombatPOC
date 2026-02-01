@@ -203,9 +203,10 @@ namespace SpaceCombat.Core
         {
             if (_player == null && _playerPrefab != null)
             {
-                Vector2 spawnPos = _playerSpawnPoint != null 
-                    ? _playerSpawnPoint.position 
-                    : Vector2.zero;
+                // 3D Version: Use Vector3 for spawn position
+                Vector3 spawnPos = _playerSpawnPoint != null
+                    ? _playerSpawnPoint.position
+                    : Vector3.zero;
 
                 _player = Instantiate(_playerPrefab, spawnPos, Quaternion.identity);
                 _player.gameObject.tag = "Player";
@@ -217,7 +218,10 @@ namespace SpaceCombat.Core
         {
             if (_enemyPool == null) return;
 
-            var enemy = _enemyPool.Get(position, Quaternion.identity);
+            // 3D Version: Convert 2D (x,y) to 3D (x, 0, z) for XZ plane
+            Vector3 spawnPos3D = new Vector3(position.x, 0f, position.y);
+
+            var enemy = _enemyPool.Get(spawnPos3D, Quaternion.identity);
             if (enemy != null)
             {
                 if (config != null)
@@ -228,8 +232,8 @@ namespace SpaceCombat.Core
                 enemy.gameObject.layer = LayerMask.NameToLayer("Enemy");
 
                 EventBus.Publish(new EnemySpawnedEvent(
-                    enemy.gameObject, 
-                    position, 
+                    enemy.gameObject,
+                    position,
                     config?.enemyName ?? "Enemy"
                 ));
             }
@@ -253,33 +257,19 @@ namespace SpaceCombat.Core
         {
             if (_mapBounds == null)
             {
-                // Fallback: Random position around circle
+                // Fallback: Random position around circle (3D: on XZ plane)
                 float angle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
-                float distance = 15f;
+                float distance = 50f; // Further away for fallback
                 return new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * distance;
             }
 
             Rect bounds = _mapBounds.Bounds;
-            Vector2 playerPos = _player != null ? (Vector2)_player.transform.position : Vector2.zero;
 
-            // Try to find a valid spawn position
-            for (int attempt = 0; attempt < 50; attempt++)
-            {
-                float x = Random.Range(bounds.xMin, bounds.xMax);
-                float y = Random.Range(bounds.yMin, bounds.yMax);
-                Vector2 candidatePos = new Vector2(x, y);
-
-                // Check minimum distance from player
-                float distanceFromPlayer = Vector2.Distance(candidatePos, playerPos);
-                if (distanceFromPlayer >= _minDistanceFromPlayer)
-                {
-                    return candidatePos;
-                }
-            }
-
-            // Fallback: Return position at map bounds edge with minimum distance
-            Vector2 dir = (Random.insideUnitCircle).normalized;
-            return playerPos + dir * _minDistanceFromPlayer;
+            // Simply spawn randomly across the entire map bounds
+            // No minimum distance check - truly random scattering
+            float x = Random.Range(bounds.xMin, bounds.xMax);
+            float y = Random.Range(bounds.yMin, bounds.yMax);
+            return new Vector2(x, y);
         }
 
         private IEnumerator RespawnEnemyAfterDelay()
