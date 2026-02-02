@@ -51,6 +51,10 @@ namespace SpaceCombat.VFX
         private Vector3 _baseScale;
         private bool _isInitialized;
 
+        // Deferred trail activation: waits 2 frames so FixedUpdate applies velocity
+        // before trail starts recording. Prevents "ghost trail" artifact on spawn.
+        private int _trailActivationFrame;
+
         private static readonly int BASE_COLOR_ID = Shader.PropertyToID("_BaseColor");
 
         // ============================================
@@ -65,6 +69,24 @@ namespace SpaceCombat.VFX
             if (_config != null)
             {
                 ApplyConfig(_config);
+            }
+        }
+
+        /// <summary>
+        /// Deferred trail activation - waits 2 frames so FixedUpdate moves the
+        /// projectile to its correct position before trail starts recording.
+        /// Frame 0: Spawn + velocity set (projectile still at fire point)
+        /// Frame 1: FixedUpdate moves projectile forward
+        /// Frame 2: Trail starts emitting from correct moving position
+        /// </summary>
+        private void LateUpdate()
+        {
+            if (_trailActivationFrame > 0 && _trailRenderer != null
+                && Time.frameCount >= _trailActivationFrame)
+            {
+                _trailActivationFrame = 0;
+                _trailRenderer.Clear();
+                _trailRenderer.emitting = true;
             }
         }
 
@@ -126,6 +148,9 @@ namespace SpaceCombat.VFX
             {
                 _trailRenderer.Clear();
                 _trailRenderer.enabled = true;
+                _trailRenderer.emitting = false;
+                // Wait 2 frames: next FixedUpdate moves projectile, then trail starts
+                _trailActivationFrame = Time.frameCount + 2;
             }
         }
 
@@ -136,9 +161,11 @@ namespace SpaceCombat.VFX
         public void OnDespawn()
         {
             _meshRenderer.enabled = false;
+            _trailActivationFrame = 0;
 
             if (_trailRenderer != null)
             {
+                _trailRenderer.emitting = false;
                 _trailRenderer.enabled = false;
             }
         }

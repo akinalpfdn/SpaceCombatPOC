@@ -10,6 +10,10 @@ namespace SpaceCombat.ScriptableObjects
         public string shipName = "Fighter";
         public Sprite shipSprite;
 
+        [Header("Prefab")]
+        [Tooltip("The ship prefab to instantiate. Should have WeaponController and fire point Transforms.")]
+        public GameObject shipPrefab;
+
         [Header("Stats")]
         public float maxHealth = 100f;
         public float maxShield = 50f;

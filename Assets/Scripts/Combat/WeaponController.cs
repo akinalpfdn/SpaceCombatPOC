@@ -22,6 +22,8 @@ namespace SpaceCombat.Combat
         [Header("Configuration")]
         [SerializeField] private WeaponConfig _currentWeaponConfig;
         [SerializeField] private Transform _firePoint;
+        [Tooltip("Multiple fire points for ships with multiple weapon mounts. If set, overrides single _firePoint.")]
+        [SerializeField] private Transform[] _firePoints;
         [SerializeField] private LayerMask _targetLayers;
         [SerializeField] private bool _isPlayerWeapon = true;
 
@@ -54,15 +56,34 @@ namespace SpaceCombat.Combat
         }
 
         /// <summary>
-        /// Initialize with weapon config
+        /// Initialize with weapon config and a single fire point.
         /// </summary>
         public void Initialize(WeaponConfig config, Transform firePoint = null)
         {
             _currentWeaponConfig = config;
-            
+
             if (firePoint != null)
                 _firePoint = firePoint;
-            
+
+            if (_firePoint == null)
+                _firePoint = transform;
+
+            InitializeProjectilePool();
+        }
+
+        /// <summary>
+        /// Initialize with weapon config and multiple fire points.
+        /// Each fire point spawns a projectile per shot (e.g. 3 fire points = 3 lasers).
+        /// </summary>
+        public void Initialize(WeaponConfig config, Transform[] firePoints)
+        {
+            _currentWeaponConfig = config;
+            _firePoints = firePoints;
+
+            // Keep single _firePoint as fallback (first in array)
+            if (firePoints != null && firePoints.Length > 0)
+                _firePoint = firePoints[0];
+
             if (_firePoint == null)
                 _firePoint = transform;
 
@@ -101,7 +122,8 @@ namespace SpaceCombat.Combat
         }
 
         /// <summary>
-        /// Force fire (ignores cooldown)
+        /// Force fire (ignores cooldown).
+        /// Spawns projectiles from all active fire points.
         /// </summary>
         public void Fire()
         {
@@ -115,14 +137,29 @@ namespace SpaceCombat.Combat
                 ? _aimDirection
                 : new Vector2(transform.forward.x, transform.forward.z);
 
-            // Fire multiple projectiles if configured
-            int projectileCount = _currentWeaponConfig.projectilesPerShot;
-            float spreadAngle = _currentWeaponConfig.spreadAngle;
+            // Determine which fire points to use
+            bool hasMultipleFirePoints = _firePoints != null && _firePoints.Length > 1;
 
-            for (int i = 0; i < projectileCount; i++)
+            if (hasMultipleFirePoints)
             {
-                Vector2 direction = CalculateSpreadDirection(fireDirection, i, projectileCount, spreadAngle);
-                SpawnProjectile(direction);
+                // Multi-fire-point: spawn from each mount point
+                foreach (var fp in _firePoints)
+                {
+                    if (fp == null) continue;
+                    SpawnProjectileAt(fp, fireDirection);
+                }
+            }
+            else
+            {
+                // Single fire point: use spread/multi-shot from config
+                int projectileCount = _currentWeaponConfig.projectilesPerShot;
+                float spreadAngle = _currentWeaponConfig.spreadAngle;
+
+                for (int i = 0; i < projectileCount; i++)
+                {
+                    Vector2 direction = CalculateSpreadDirection(fireDirection, i, projectileCount, spreadAngle);
+                    SpawnProjectileAt(_firePoint, direction);
+                }
             }
 
             // Effects
@@ -176,22 +213,22 @@ namespace SpaceCombat.Combat
         }
 
         /// <summary>
-        /// Spawn a projectile
+        /// Spawn a projectile at the specified fire point
         /// </summary>
-        private void SpawnProjectile(Vector2 direction)
+        private void SpawnProjectileAt(Transform firePoint, Vector2 direction)
         {
             Projectile projectile = null;
 
             // Try to get from pool
             if (_projectilePool != null)
             {
-                projectile = _projectilePool.Get(_firePoint.position, Quaternion.identity);
+                projectile = _projectilePool.Get(firePoint.position, Quaternion.identity);
             }
             else if (_currentWeaponConfig.projectilePrefab != null)
             {
                 // Fallback to instantiate
-                var go = Instantiate(_currentWeaponConfig.projectilePrefab, 
-                    _firePoint.position, Quaternion.identity);
+                var go = Instantiate(_currentWeaponConfig.projectilePrefab,
+                    firePoint.position, Quaternion.identity);
                 projectile = go.GetComponent<Projectile>();
             }
 
@@ -256,13 +293,27 @@ namespace SpaceCombat.Combat
         }
 
         /// <summary>
-        /// Spawn muzzle flash effect
+        /// Spawn muzzle flash effect at all active fire points
         /// </summary>
         private void SpawnMuzzleFlash()
         {
-            if (_currentWeaponConfig?.muzzleFlashPrefab != null)
+            if (_currentWeaponConfig?.muzzleFlashPrefab == null) return;
+
+            bool hasMultipleFirePoints = _firePoints != null && _firePoints.Length > 1;
+
+            if (hasMultipleFirePoints)
             {
-                var flash = Instantiate(_currentWeaponConfig.muzzleFlashPrefab, 
+                foreach (var fp in _firePoints)
+                {
+                    if (fp == null) continue;
+                    var flash = Instantiate(_currentWeaponConfig.muzzleFlashPrefab,
+                        fp.position, fp.rotation, fp);
+                    Destroy(flash, 0.5f);
+                }
+            }
+            else
+            {
+                var flash = Instantiate(_currentWeaponConfig.muzzleFlashPrefab,
                     _firePoint.position, _firePoint.rotation, _firePoint);
                 Destroy(flash, 0.5f);
             }
@@ -301,14 +352,28 @@ namespace SpaceCombat.Combat
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
-            if (_firePoint == null) return;
+            // Draw all fire points
+            bool hasMultipleFirePoints = _firePoints != null && _firePoints.Length > 0;
 
-            // Draw fire direction
-            Gizmos.color = Color.red;
-            Gizmos.DrawRay(_firePoint.position, _aimDirection * 2f);
+            if (hasMultipleFirePoints)
+            {
+                foreach (var fp in _firePoints)
+                {
+                    if (fp == null) continue;
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawRay(fp.position, _aimDirection * 2f);
+                    Gizmos.color = Color.yellow;
+                    Gizmos.DrawWireSphere(fp.position, 0.15f);
+                }
+            }
+            else if (_firePoint != null)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawRay(_firePoint.position, _aimDirection * 2f);
+            }
 
             // Draw weapon range
-            if (_currentWeaponConfig != null)
+            if (_currentWeaponConfig != null && _firePoint != null)
             {
                 Gizmos.color = new Color(1f, 0f, 0f, 0.2f);
                 Gizmos.DrawWireSphere(_firePoint.position, _currentWeaponConfig.range);

@@ -15,11 +15,11 @@ MonoBehaviour:
   _bodyMesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
   _bodyMaterial: {fileID: 2100000, guid: be913106a78511f4abf9701b44f0d10b, type: 2}
   _meshScale: {x: 0.05, y: 0.05, z: 0.25}
-  _emissionColor: {r: 1, g: 0.3, b: 0.1, a: 1}
+  _emissionColor: {r: 1, g: 0, b: 0, a: 1}
   _emissionIntensity: 3
   _trailMaterial: {fileID: 2100000, guid: c8b5c7b0853435c4b8786fb04e2683db, type: 2}
-  _trailStartWidth: 0.05
-  _trailEndWidth: 0
-  _trailTime: 0.08
+  _trailStartWidth: 0.029
+  _trailEndWidth: 0.008
+  _trailTime: 0.02
   _trailCornerVertices: 2
   _trailMinVertexDistance: 0.1
