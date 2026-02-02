@@ -6,6 +6,16 @@ Kod her zaman production-grade, scalable ve SOLID uyumlu olmalidir.
 
 ---
 
+## Kullanici Profili
+
+- Kullanici Unity'yi yeni ogreniyor, bu ilk projesi.
+- Aciklamalar ogretici olmali: "ne yapiyoruz" degil "neden yapiyoruz" ve "bu Unity'de ne ise yariyor" da anlatilmali.
+- Yeni bir Unity konsepti (component, material, shader, ScriptableObject, prefab, vb.) ilk kez kullanildiginda kisa bir aciklama ekle.
+- Teknik kararlarda seceneklerin artilerini/eksilerini goster, sadece "su sekilde yap" deme.
+- Inspector'da yapilacak islemleri adim adim tarif et (hangi obje → hangi component → hangi field).
+
+---
+
 ## Mimari Prensipler
 
 ### SOLID - Her Zaman Uyulmali

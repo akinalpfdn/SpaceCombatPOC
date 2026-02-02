@@ -19,7 +19,7 @@ MonoBehaviour:
   maxSpeed: 9
   acceleration: 5
   rotationSpeed: 120
-  weapon: {fileID: 11400000, guid: 849b5560bac627e4fae1a2d1d9930fc8, type: 2}
+  weapon: {fileID: 11400000, guid: 1c8cc8d045e6f7b4ba4066e70c37b27a, type: 2}
   attackRange: 20
   detectionRange: 30
   fireRateMultiplier: 4

@@ -210,6 +210,192 @@ namespace SpaceCombat.Editor
             }
         }
 
+        // ============================================
+        // PHASE 2: VISUAL VARIANTS (Player Blue + Enemy Red)
+        // ============================================
+
+        [MenuItem("Tools/SpaceCombat/Setup Laser Visual Variants")]
+        public static void SetupLaserVisualVariants()
+        {
+            if (!AssetDatabase.IsValidFolder("Assets/ScriptableObjects/Visuals"))
+            {
+                AssetDatabase.CreateFolder("Assets/ScriptableObjects", "Visuals");
+            }
+
+            // 1. Create player cyan visual config
+            CreateVisualConfig(
+                path: "Assets/ScriptableObjects/Visuals/LaserVisual_PlayerCyan.asset",
+                meshScale: new Vector3(0.08f, 0.08f, 0.4f),
+                emissionColor: new Color(0.2f, 0.8f, 1f, 1f), // Cyan/blue
+                emissionIntensity: 5f,
+                trailStartWidth: 0.12f,
+                trailTime: 0.15f
+            );
+
+            // 2. Update existing LaserVisual_Red for enemy use (smaller, dimmer)
+            UpdateEnemyVisualConfig();
+
+            // 3. Create separate enemy weapon config
+            CreateEnemyWeaponConfig();
+
+            // 4. Link configs: Player weapon = cyan, Enemy = red
+            LinkVariantConfigs();
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            Debug.Log("[LaserVisualSetup] Visual variants setup complete!");
+            Debug.Log("  Player: Cyan laser, wide trail, bright glow");
+            Debug.Log("  Enemy: Red laser, thin trail, dimmer glow");
+        }
+
+        private static void CreateVisualConfig(
+            string path, Vector3 meshScale, Color emissionColor,
+            float emissionIntensity, float trailStartWidth, float trailTime)
+        {
+            var existing = AssetDatabase.LoadAssetAtPath<ProjectileVisualConfig>(path);
+            if (existing != null)
+            {
+                Debug.Log($"[LaserVisualSetup] {path} already exists, skipping.");
+                return;
+            }
+
+            var config = ScriptableObject.CreateInstance<ProjectileVisualConfig>();
+            var so = new SerializedObject(config);
+
+            // Body mesh - Capsule
+            var tempCapsule = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            so.FindProperty("_bodyMesh").objectReferenceValue =
+                tempCapsule.GetComponent<MeshFilter>().sharedMesh;
+            Object.DestroyImmediate(tempCapsule);
+
+            // Materials (shared between variants - color comes from MaterialPropertyBlock)
+            var bodyMat = AssetDatabase.LoadAssetAtPath<Material>("Assets/Materials/Projectiles/LaserBody.mat");
+            var trailMat = AssetDatabase.LoadAssetAtPath<Material>("Assets/Materials/Projectiles/LaserTrail.mat");
+            so.FindProperty("_bodyMaterial").objectReferenceValue = bodyMat;
+            so.FindProperty("_trailMaterial").objectReferenceValue = trailMat;
+
+            // Config-specific values
+            so.FindProperty("_meshScale").vector3Value = meshScale;
+            so.FindProperty("_emissionColor").colorValue = emissionColor;
+            so.FindProperty("_emissionIntensity").floatValue = emissionIntensity;
+            so.FindProperty("_trailStartWidth").floatValue = trailStartWidth;
+            so.FindProperty("_trailEndWidth").floatValue = 0f;
+            so.FindProperty("_trailTime").floatValue = trailTime;
+            so.FindProperty("_trailCornerVertices").intValue = 2;
+            so.FindProperty("_trailMinVertexDistance").floatValue = 0.1f;
+
+            so.ApplyModifiedProperties();
+
+            AssetDatabase.CreateAsset(config, path);
+            Debug.Log($"[LaserVisualSetup] Created {path}");
+        }
+
+        private static void UpdateEnemyVisualConfig()
+        {
+            string path = "Assets/ScriptableObjects/Visuals/LaserVisual_Red.asset";
+            var config = AssetDatabase.LoadAssetAtPath<ProjectileVisualConfig>(path);
+            if (config == null)
+            {
+                // Create it if it doesn't exist
+                CreateVisualConfig(
+                    path: path,
+                    meshScale: new Vector3(0.05f, 0.05f, 0.25f), // Smaller bolt
+                    emissionColor: new Color(1f, 0.3f, 0.1f, 1f), // Red/orange
+                    emissionIntensity: 3f, // Dimmer than player
+                    trailStartWidth: 0.05f, // Thinner trail
+                    trailTime: 0.08f // Shorter trail
+                );
+                return;
+            }
+
+            // Update existing config with enemy-appropriate values
+            var so = new SerializedObject(config);
+            so.FindProperty("_meshScale").vector3Value = new Vector3(0.05f, 0.05f, 0.25f);
+            so.FindProperty("_emissionColor").colorValue = new Color(1f, 0.3f, 0.1f, 1f);
+            so.FindProperty("_emissionIntensity").floatValue = 3f;
+            so.FindProperty("_trailStartWidth").floatValue = 0.05f;
+            so.FindProperty("_trailTime").floatValue = 0.08f;
+            so.ApplyModifiedProperties();
+
+            EditorUtility.SetDirty(config);
+            Debug.Log($"[LaserVisualSetup] Updated {path} with enemy visual values (smaller, dimmer)");
+        }
+
+        private static void CreateEnemyWeaponConfig()
+        {
+            string path = "Assets/ScriptableObjects/Weapons/Weapon_EnemyLaser.asset";
+            var existing = AssetDatabase.LoadAssetAtPath<WeaponConfig>(path);
+            if (existing != null)
+            {
+                Debug.Log("[LaserVisualSetup] Weapon_EnemyLaser already exists, skipping.");
+                return;
+            }
+
+            // Load player weapon as template for projectile prefab reference
+            var playerWeapon = AssetDatabase.LoadAssetAtPath<WeaponConfig>(
+                "Assets/ScriptableObjects/Weapons/Weapon_Laser.asset");
+            if (playerWeapon == null)
+            {
+                Debug.LogError("[LaserVisualSetup] Weapon_Laser not found, cannot create enemy variant.");
+                return;
+            }
+
+            var enemyWeapon = ScriptableObject.CreateInstance<WeaponConfig>();
+            enemyWeapon.weaponName = "Enemy Laser";
+            enemyWeapon.damageType = playerWeapon.damageType;
+            enemyWeapon.damage = 15f; // Lower than player
+            enemyWeapon.fireRate = 0.5f;
+            enemyWeapon.projectileSpeed = 35f; // Slower than player
+            enemyWeapon.range = 20f;
+            enemyWeapon.accuracy = 0.85f; // Less accurate than player
+            enemyWeapon.projectilePrefab = playerWeapon.projectilePrefab; // Same prefab
+            enemyWeapon.projectilesPerShot = 1; // Single shot
+            enemyWeapon.spreadAngle = 0f;
+            enemyWeapon.projectileColor = new Color(1f, 0.3f, 0.1f, 1f); // Red
+            enemyWeapon.projectileScale = 1f; // Smaller than player
+            enemyWeapon.fireSoundId = "laser_fire";
+            enemyWeapon.hitSoundId = "laser_hit";
+
+            // Link enemy visual config
+            var enemyVisual = AssetDatabase.LoadAssetAtPath<ProjectileVisualConfig>(
+                "Assets/ScriptableObjects/Visuals/LaserVisual_Red.asset");
+            enemyWeapon.projectileVisualConfig = enemyVisual;
+
+            AssetDatabase.CreateAsset(enemyWeapon, path);
+            Debug.Log($"[LaserVisualSetup] Created {path}");
+        }
+
+        private static void LinkVariantConfigs()
+        {
+            // Link player weapon to cyan visual
+            var playerVisual = AssetDatabase.LoadAssetAtPath<ProjectileVisualConfig>(
+                "Assets/ScriptableObjects/Visuals/LaserVisual_PlayerCyan.asset");
+            var playerWeapon = AssetDatabase.LoadAssetAtPath<WeaponConfig>(
+                "Assets/ScriptableObjects/Weapons/Weapon_Laser.asset");
+
+            if (playerVisual != null && playerWeapon != null)
+            {
+                playerWeapon.projectileVisualConfig = playerVisual;
+                playerWeapon.projectileColor = new Color(0.2f, 0.8f, 1f, 1f); // Cyan
+                EditorUtility.SetDirty(playerWeapon);
+                Debug.Log("[LaserVisualSetup] Player Weapon_Laser → LaserVisual_PlayerCyan");
+            }
+
+            // Link enemy config to enemy weapon
+            var enemyWeapon = AssetDatabase.LoadAssetAtPath<WeaponConfig>(
+                "Assets/ScriptableObjects/Weapons/Weapon_EnemyLaser.asset");
+            var enemyConfig = AssetDatabase.LoadAssetAtPath<EnemyConfig>(
+                "Assets/ScriptableObjects/Enemies/Enemy_Drone.asset");
+
+            if (enemyWeapon != null && enemyConfig != null)
+            {
+                enemyConfig.weapon = enemyWeapon;
+                EditorUtility.SetDirty(enemyConfig);
+                Debug.Log("[LaserVisualSetup] Enemy_Drone → Weapon_EnemyLaser");
+            }
+        }
+
         [MenuItem("Tools/SpaceCombat/Setup Laser Visuals - Preview (No Save)")]
         public static void PreviewLaserVisuals()
         {
