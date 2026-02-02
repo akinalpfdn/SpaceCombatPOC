@@ -25,9 +25,6 @@ namespace SpaceCombat.Combat
         [SerializeField] private LayerMask _targetLayers;
         [SerializeField] private bool _isPlayerWeapon = true;
 
-        [Header("Projectile Appearance Override")]
-        [SerializeField] private Sprite _projectileSprite; // Assign blue sprite for player, red for enemy
-
         [Header("Audio Override")]
         [SerializeField] private string _fireSoundId; // Override fire sound (e.g., "enemy_laser" for enemies)
 
@@ -212,9 +209,21 @@ namespace SpaceCombat.Combat
                 );
 
                 // Set visual properties
-                if (_projectileSprite != null)
-                    projectile.SetSprite(_projectileSprite);
-                projectile.SetColor(_currentWeaponConfig.projectileColor);
+                var visualConfig = _currentWeaponConfig.projectileVisualConfig;
+                if (visualConfig != null)
+                {
+                    // Mesh-based visual: apply config + HDR color
+                    var visual = projectile.GetComponentInChildren<Interfaces.IProjectileVisual>();
+                    if (visual is VFX.MeshProjectileVisual meshVisual)
+                    {
+                        meshVisual.ApplyConfig(visualConfig);
+                    }
+                    projectile.SetColor(_currentWeaponConfig.projectileColor, visualConfig.EmissionIntensity);
+                }
+                else
+                {
+                    projectile.SetColor(_currentWeaponConfig.projectileColor);
+                }
                 projectile.SetScale(_currentWeaponConfig.projectileScale);
                 projectile.SetDamageType(_currentWeaponConfig.damageType);
                 projectile.SetOwner(gameObject);

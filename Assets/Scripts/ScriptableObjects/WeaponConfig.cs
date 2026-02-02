@@ -27,6 +27,9 @@ namespace SpaceCombat.ScriptableObjects
         public Color projectileColor = Color.red;
         public float projectileScale = 1f;
 
+        [Tooltip("Mesh-based visual config. When assigned, overrides sprite-based rendering with 3D mesh + trail.")]
+        public ProjectileVisualConfig projectileVisualConfig;
+
         [Header("Audio")]
         public string fireSoundId = "laser_fire";
         public string hitSoundId = "laser_hit";

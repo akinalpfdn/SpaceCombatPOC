@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(claude mcp add mcp-unity -- node \"c:\\\\Users\\\\akina\\\\SpaceCombatPOC\\\\Library\\\\PackageCache\\\\com.gamelovers.mcp-unity@f94664f26acd\\\\Server~\\\\build\\\\index.js\")",
+      "mcp__mcp-unity__get_scene_info",
+      "mcp__mcp-unity__create_material",
+      "mcp__mcp-unity__modify_material",
+      "mcp__mcp-unity__recompile_scripts",
+      "mcp__mcp-unity__add_asset_to_scene",
+      "mcp__mcp-unity__get_gameobject",
+      "mcp__mcp-unity__batch_execute",
+      "mcp__mcp-unity__update_component",
+      "mcp__mcp-unity__delete_gameobject",
+      "mcp__mcp-unity__execute_menu_item",
+      "mcp__mcp-unity__get_console_logs"
+    ]
+  }
+}

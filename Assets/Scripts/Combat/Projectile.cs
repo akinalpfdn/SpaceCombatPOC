@@ -1,6 +1,7 @@
 // ============================================
 // PROJECTILE - Poolable high-performance projectile
 // Handles movement, collision, and damage dealing
+// Visual rendering delegated to IProjectileVisual
 // ============================================
 
 using UnityEngine;
@@ -10,33 +11,44 @@ using SpaceCombat.Events;
 namespace SpaceCombat.Combat
 {
     /// <summary>
-    /// Base projectile class - supports object pooling
-    /// Handles movement, collision detection, and damage
-    /// 3D Version - Movement on XZ plane
+    /// Base projectile class - supports object pooling.
+    /// Handles movement, collision detection, and damage.
+    /// 3D Version - Movement on XZ plane.
+    ///
+    /// Design Patterns:
+    /// - Strategy: Visual rendering delegated to IProjectileVisual
+    /// - Object Pool: Implements IPoolable for efficient reuse
+    ///
+    /// SOLID Principles:
+    /// - Single Responsibility: Only physics/damage, visuals delegated
+    /// - Open/Closed: New visual styles via IProjectileVisual implementations
     /// </summary>
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(Collider))]
     public class Projectile : MonoBehaviour, IProjectile
     {
+        // ============================================
+        // SERIALIZED FIELDS
+        // ============================================
+
         [Header("Configuration")]
         [SerializeField] private float _damage = 10f;
         [SerializeField] private float _speed = 20f;
         [SerializeField] private float _lifetime = 3f;
         [SerializeField] private DamageType _damageType = DamageType.Normal;
 
-        [Header("Visual")]
-        [SerializeField] private SpriteRenderer _spriteRenderer;
-        [SerializeField] private TrailRenderer _trailRenderer;
-
         [Header("Effects")]
         [SerializeField] private GameObject _hitEffectPrefab;
         [SerializeField] private string _hitSoundId = "projectile_hit";
 
-        // Components
+        // ============================================
+        // RUNTIME STATE
+        // ============================================
+
         private Rigidbody _rigidbody;
         private Collider _collider;
+        private IProjectileVisual _projectileVisual;
 
-        // State
         private Vector3 _direction;
         private LayerMask _targetLayers;
         private float _spawnTime;
@@ -46,21 +58,26 @@ namespace SpaceCombat.Combat
         // Pool reference for proper return
         private Utilities.ObjectPool<Projectile> _pool;
 
-        // IPoolable
-        public bool IsActive => _isActive;
+        // ============================================
+        // PUBLIC PROPERTIES
+        // ============================================
 
-        // IProjectile
+        public bool IsActive => _isActive;
         public float Damage => _damage;
         public float Speed => _speed;
         public DamageType DamageType => _damageType;
+
+        // ============================================
+        // UNITY LIFECYCLE
+        // ============================================
 
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody>();
             _collider = GetComponent<Collider>();
 
-            if (_spriteRenderer == null)
-                _spriteRenderer = GetComponent<SpriteRenderer>();
+            // Detect visual component (Strategy pattern)
+            _projectileVisual = GetComponent<IProjectileVisual>();
 
             // Configure rigidbody for 3D
             _rigidbody.useGravity = false;
@@ -72,7 +89,6 @@ namespace SpaceCombat.Combat
 
         private void Update()
         {
-            // Check lifetime
             if (_isActive && Time.time - _spawnTime >= _lifetime)
             {
                 Despawn();
@@ -83,51 +99,21 @@ namespace SpaceCombat.Combat
         {
             if (_isActive)
             {
-                // Move projectile
                 _rigidbody.linearVelocity = _direction * _speed;
-
-                // Raycast ahead for fast-moving projectiles to prevent pass-through
                 CheckRaycastCollision();
             }
         }
 
-        private void CheckRaycastCollision()
-        {
-            float distance = _speed * Time.fixedDeltaTime * 2f; // Check 2 frames ahead
-            RaycastHit hit;
-
-            if (Physics.Raycast(transform.position, _direction, out hit, distance, _targetLayers))
-            {
-                // Don't hit owner
-                if (_owner != null && hit.collider.gameObject == _owner)
-                    return;
-
-                // Deal damage
-                var damageable = hit.collider.GetComponent<IDamageable>();
-                if (damageable != null)
-                {
-                    damageable.TakeDamage(_damage, _damageType);
-
-                    // Spawn hit effect
-                    SpawnHitEffect(hit.point);
-
-                    // Play hit sound - 3D: convert Vector3 position to Vector2 (x, z)
-                    Vector3 pos = transform.position;
-                    EventBus.Publish(new PlaySFXEvent(_hitSoundId, new Vector2(pos.x, pos.z)));
-                }
-
-                // Despawn
-                Despawn();
-            }
-        }
+        // ============================================
+        // PUBLIC METHODS
+        // ============================================
 
         /// <summary>
-        /// Initialize projectile with direction and stats
-        /// 3D Version - Converts 2D direction to XZ plane
+        /// Initialize projectile with direction and stats.
+        /// Converts 2D direction to XZ plane.
         /// </summary>
         public void Initialize(Vector2 direction, float damage, float speed, LayerMask targetLayers)
         {
-            // Convert 2D direction to 3D XZ plane
             _direction = new Vector3(direction.x, 0, direction.y).normalized;
             _damage = damage;
             _speed = speed;
@@ -135,54 +121,46 @@ namespace SpaceCombat.Combat
             _spawnTime = Time.time;
             _isActive = true;
 
-            // Set rotation to face direction (Y-axis rotation for XZ plane)
             if (_direction != Vector3.zero)
             {
                 transform.rotation = Quaternion.LookRotation(_direction);
             }
 
-            // Set initial velocity
             _rigidbody.linearVelocity = _direction * _speed;
         }
 
         /// <summary>
-        /// Set projectile color
+        /// Set projectile color with emission intensity for HDR bloom.
+        /// </summary>
+        public void SetColor(Color color, float emissionIntensity)
+        {
+            _projectileVisual?.SetColor(color, emissionIntensity);
+        }
+
+        /// <summary>
+        /// Set projectile color (uses config's default emission intensity).
         /// </summary>
         public void SetColor(Color color)
         {
-            if (_spriteRenderer != null)
-            {
-                _spriteRenderer.color = color;
-            }
-
-            if (_trailRenderer != null)
-            {
-                _trailRenderer.startColor = color;
-                _trailRenderer.endColor = new Color(color.r, color.g, color.b, 0f);
-            }
+            _projectileVisual?.SetColor(color, 0f);
         }
 
         /// <summary>
-        /// Set projectile sprite
-        /// </summary>
-        public void SetSprite(Sprite sprite)
-        {
-            if (_spriteRenderer != null && sprite != null)
-            {
-                _spriteRenderer.sprite = sprite;
-            }
-        }
-
-        /// <summary>
-        /// Set projectile scale
+        /// Set projectile visual scale.
         /// </summary>
         public void SetScale(float scale)
         {
+            if (_projectileVisual != null)
+            {
+                _projectileVisual.SetScale(scale);
+                return;
+            }
+
             transform.localScale = Vector3.one * scale;
         }
 
         /// <summary>
-        /// Set damage type
+        /// Set damage type.
         /// </summary>
         public void SetDamageType(DamageType type)
         {
@@ -190,56 +168,11 @@ namespace SpaceCombat.Combat
         }
 
         /// <summary>
-        /// Set owner (to prevent self-damage)
+        /// Set owner (to prevent self-damage).
         /// </summary>
         public void SetOwner(GameObject owner)
         {
             _owner = owner;
-        }
-
-        private void OnTriggerEnter(Collider other)
-        {
-            if (!_isActive) return;
-
-            // Check if this is a valid target
-            if ((_targetLayers.value & (1 << other.gameObject.layer)) == 0)
-                return;
-
-            // Don't hit owner
-            if (_owner != null && other.gameObject == _owner)
-                return;
-
-            // Try to damage the target
-            var damageable = other.GetComponent<IDamageable>();
-            if (damageable != null)
-            {
-                damageable.TakeDamage(_damage, _damageType);
-
-                // Spawn hit effect
-                SpawnHitEffect(other.ClosestPoint(transform.position));
-
-                // Play hit sound - 3D: convert Vector3 position to Vector2 (x, z)
-                Vector3 pos = transform.position;
-                EventBus.Publish(new PlaySFXEvent(_hitSoundId, new Vector2(pos.x, pos.z)));
-            }
-
-            // Despawn projectile
-            Despawn();
-        }
-
-        /// <summary>
-        /// Spawn hit effect at position
-        /// 3D Version - Uses Vector3
-        /// </summary>
-        private void SpawnHitEffect(Vector3 position)
-        {
-            // We only spawn if a prefab is assigned.
-            // The old "Color" fallback is removed because HitEffect.cs no longer supports it.
-            if (_hitEffectPrefab != null)
-            {
-                // Use the static Spawn method from your HitEffect script
-                VFX.HitEffect.Spawn(_hitEffectPrefab, position, Quaternion.identity);
-            }
         }
 
         /// <summary>
@@ -251,9 +184,68 @@ namespace SpaceCombat.Combat
             _pool = pool;
         }
 
-        /// <summary>
-        /// Return to pool or destroy
-        /// </summary>
+        // ============================================
+        // COLLISION
+        // ============================================
+
+        private void CheckRaycastCollision()
+        {
+            float distance = _speed * Time.fixedDeltaTime * 2f;
+
+            if (Physics.Raycast(transform.position, _direction, out RaycastHit hit, distance, _targetLayers))
+            {
+                if (_owner != null && hit.collider.gameObject == _owner)
+                    return;
+
+                var damageable = hit.collider.GetComponent<IDamageable>();
+                if (damageable != null)
+                {
+                    damageable.TakeDamage(_damage, _damageType);
+                    SpawnHitEffect(hit.point);
+
+                    Vector3 pos = transform.position;
+                    EventBus.Publish(new PlaySFXEvent(_hitSoundId, new Vector2(pos.x, pos.z)));
+                }
+
+                Despawn();
+            }
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (!_isActive) return;
+
+            if ((_targetLayers.value & (1 << other.gameObject.layer)) == 0)
+                return;
+
+            if (_owner != null && other.gameObject == _owner)
+                return;
+
+            var damageable = other.GetComponent<IDamageable>();
+            if (damageable != null)
+            {
+                damageable.TakeDamage(_damage, _damageType);
+                SpawnHitEffect(other.ClosestPoint(transform.position));
+
+                Vector3 pos = transform.position;
+                EventBus.Publish(new PlaySFXEvent(_hitSoundId, new Vector2(pos.x, pos.z)));
+            }
+
+            Despawn();
+        }
+
+        // ============================================
+        // PRIVATE METHODS
+        // ============================================
+
+        private void SpawnHitEffect(Vector3 position)
+        {
+            if (_hitEffectPrefab != null)
+            {
+                VFX.HitEffect.Spawn(_hitEffectPrefab, position, Quaternion.identity);
+            }
+        }
+
         private void Despawn()
         {
             _isActive = false;
@@ -269,16 +261,18 @@ namespace SpaceCombat.Combat
         }
 
         // ============================================
-        // IPoolable Implementation
+        // IPoolable IMPLEMENTATION
         // ============================================
 
         public void OnSpawn()
         {
             _isActive = true;
             _spawnTime = Time.time;
-            
+
             if (_collider != null)
                 _collider.enabled = true;
+
+            _projectileVisual?.OnSpawn();
         }
 
         public void OnDespawn()
@@ -288,6 +282,8 @@ namespace SpaceCombat.Combat
 
             if (_collider != null)
                 _collider.enabled = false;
+
+            _projectileVisual?.OnDespawn();
         }
 
         public void ResetState()
@@ -298,26 +294,14 @@ namespace SpaceCombat.Combat
             _owner = null;
             _damageType = DamageType.Normal;
 
-            // Reset trail
-            if (_trailRenderer != null)
-            {
-                _trailRenderer.Clear();
-            }
-
-            // Reset color
-            if (_spriteRenderer != null)
-            {
-                _spriteRenderer.color = Color.white;
-            }
-
-            transform.localScale = Vector3.one;
+            _projectileVisual?.ResetVisual();
         }
     }
 
     /// <summary>
-    /// Homing projectile variant - follows target
-    /// Demonstrates OCP - extends without modifying base
-    /// 3D Version - Works on XZ plane
+    /// Homing projectile variant - follows target.
+    /// Demonstrates OCP - extends without modifying base.
+    /// 3D Version - Works on XZ plane.
     /// </summary>
     public class HomingProjectile : Projectile
     {
@@ -336,7 +320,6 @@ namespace SpaceCombat.Combat
 
         private void Update()
         {
-            // Find target if we don't have one
             if (_target == null && Time.time >= _homingStartTime)
             {
                 FindTarget();
@@ -347,11 +330,10 @@ namespace SpaceCombat.Combat
         {
             if (!IsActive) return;
 
-            // Home towards target
             if (_target != null && Time.time >= _homingStartTime)
             {
                 Vector3 targetDir = (_target.position - transform.position).normalized;
-                targetDir.y = 0; // Keep on XZ plane
+                targetDir.y = 0;
 
                 Quaternion targetRotation = Quaternion.LookRotation(targetDir);
                 transform.rotation = Quaternion.Slerp(
@@ -361,19 +343,16 @@ namespace SpaceCombat.Combat
                 );
             }
 
-            // Apply velocity in forward direction
             GetComponent<Rigidbody>().linearVelocity = transform.forward * Speed;
         }
 
         private void FindTarget()
         {
-            // Find closest enemy in range using 3D physics
             var colliders = Physics.OverlapSphere(transform.position, _homingRange);
             float closestDist = float.MaxValue;
 
             foreach (var col in colliders)
             {
-                // Skip if it's the owner or not damageable
                 if (col.GetComponent<IDamageable>() == null) continue;
 
                 float dist = Vector3.Distance(transform.position, col.transform.position);
