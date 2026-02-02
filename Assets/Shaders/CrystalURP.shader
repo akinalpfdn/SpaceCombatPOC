@@ -50,6 +50,7 @@ Shader "SpaceCombat/CrystalURP"
             #pragma vertex vert
             #pragma fragment frag
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             #pragma multi_compile_fog
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
@@ -155,6 +156,24 @@ Shader "SpaceCombat/CrystalURP"
                 half transDot = pow(saturate(dot(viewDirWS, -transDir)), _TranslucencyPower);
                 half3 translucency = _TranslucencyColor.rgb * transDot * _TranslucencyScale * mainLight.color;
 
+                // Additional lights (Point Light, Spot Light)
+                half3 additionalDiffuse = half3(0, 0, 0);
+                half3 additionalSpecular = half3(0, 0, 0);
+                #ifdef _ADDITIONAL_LIGHTS
+                uint additionalLightsCount = GetAdditionalLightsCount();
+                for (uint lightIndex = 0u; lightIndex < additionalLightsCount; ++lightIndex)
+                {
+                    Light addLight = GetAdditionalLight(lightIndex, i.positionWS);
+                    half addNdotL = saturate(dot(normalWS, addLight.direction));
+                    half3 addHalfDir = normalize(addLight.direction + viewDirWS);
+                    half addNdotH = saturate(dot(normalWS, addHalfDir));
+                    half addAtten = addLight.distanceAttenuation * addLight.shadowAttenuation;
+
+                    additionalDiffuse += crystalColor * (addNdotL * 0.6 + 0.4) * addLight.color * addAtten;
+                    additionalSpecular += addLight.color * pow(addNdotH, specPow) * _Metallic * 2.0 * addAtten;
+                }
+                #endif
+
                 // Ambient
                 half3 ambient = SampleSH(normalWS) * crystalColor * 0.6;
 
@@ -162,7 +181,7 @@ Shader "SpaceCombat/CrystalURP"
                 half3 emission = emissionTex.rgb * _EmissionColor.rgb * _EmissionPower;
 
                 // Combine - opaque crystal: solid body + glowing edges + inner glow
-                half3 finalColor = ambient + diffuse + specular + fresnelContrib + translucency + emission;
+                half3 finalColor = ambient + diffuse + specular + additionalDiffuse + additionalSpecular + fresnelContrib + translucency + emission;
 
                 finalColor = MixFog(finalColor, i.fogFactor);
 

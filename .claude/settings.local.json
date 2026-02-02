@@ -20,7 +20,11 @@
       "Bash(done)",
       "mcp__mcp-unity__get_material_info",
       "mcp__mcp-unity__assign_material",
-      "mcp__mcp-unity__select_gameobject"
+      "mcp__mcp-unity__select_gameobject",
+      "mcp__mcp-unity__update_gameobject",
+      "mcp__mcp-unity__reparent_gameobject",
+      "mcp__mcp-unity__move_gameobject",
+      "mcp__mcp-unity__set_transform"
     ]
   }
 }

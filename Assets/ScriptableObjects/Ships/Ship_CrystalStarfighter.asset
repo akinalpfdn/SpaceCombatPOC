@@ -15,11 +15,11 @@ MonoBehaviour:
   shipName: Crystal Starfighter
   shipSprite: {fileID: 0}
   shipPrefab: {fileID: 0}
-  maxHealth: 150
-  maxShield: 75
+  maxHealth: 150000
+  maxShield: 75000
   shieldRegenRate: 3
   shieldRegenDelay: 2.5
-  maxSpeed: 14
+  maxSpeed: 20
   acceleration: 9
   deceleration: 4
   rotationSpeed: 220
