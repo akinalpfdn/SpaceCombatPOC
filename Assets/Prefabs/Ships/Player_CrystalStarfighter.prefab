@@ -173,6 +173,7 @@ MonoBehaviour:
   _weaponController: {fileID: 0}
   _shipMovement: {fileID: 0}
   _mainCamera: {fileID: 0}
+  _doubleClickTime: 0.3
   _targetIndicatorPrefab: {fileID: 3787043342725239422, guid: 3632ac2bf675ef94e805a43e7b9ee1b6, type: 3}
   _healthBarPrefab: {fileID: 4674260991152052681, guid: a908d1210d1c54c4ab61070c37258f08, type: 3}
 --- !u!114 &362525359733449936
@@ -190,7 +191,7 @@ MonoBehaviour:
   _target: {fileID: 0}
   _showHealth: 1
   _showShield: 1
-  _offset: {x: 0, y: -1.5, z: -1.5}
+  _offset: {x: 0, y: -1.5, z: -3.5}
   _lineSpacing: 0.7
   _fontScale: 0.9
   _healthColor: {r: 0.2, g: 0.8, b: 0.2, a: 1}

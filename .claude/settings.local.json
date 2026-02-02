@@ -18,7 +18,9 @@
       "Bash(for f in *)",
       "Bash(do echo \"$f\")",
       "Bash(done)",
-      "mcp__mcp-unity__get_material_info"
+      "mcp__mcp-unity__get_material_info",
+      "mcp__mcp-unity__assign_material",
+      "mcp__mcp-unity__select_gameobject"
     ]
   }
 }
