@@ -256,8 +256,9 @@ namespace SpaceCombat.Combat
             Vector3 direction3D = (_currentTarget.position - transform.position).normalized;
             Vector2 direction = new Vector2(direction3D.x, direction3D.z);
 
-            // Set weapon aim direction
+            // Set weapon aim direction + target position for multi-fire-point convergence
             _weaponController.SetAimDirection(direction);
+            _weaponController.SetTargetPosition(_currentTarget.position);
 
             // Also rotate ship to face target
             if (_shipMovement != null)
@@ -291,6 +292,9 @@ namespace SpaceCombat.Combat
             _currentTarget = null;
             _isFiringEnabled = false;
             ClearIndicator();
+            // Clear weapon target position so it falls back to convergence distance
+            if (_weaponController != null)
+                _weaponController.SetTargetPosition(null);
             // Re-enable auto-rotation when clearing target
             if (_shipMovement != null)
                 _shipMovement.SetAutoRotate(true);

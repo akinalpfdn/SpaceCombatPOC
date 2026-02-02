@@ -50,6 +50,7 @@ namespace SpaceCombat.AI.States
                 Vector3 aimDir = (ctx.Target.position - ctx.Transform.position).normalized;
                 Vector2 aimDir2D = new Vector2(aimDir.x, aimDir.z);
                 ctx.WeaponController.SetAimDirection(aimDir2D);
+                ctx.WeaponController.SetTargetPosition(ctx.Target.position);
 
                 if (ctx.WeaponController.TryFire())
                 {

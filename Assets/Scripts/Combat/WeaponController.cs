@@ -26,6 +26,8 @@ namespace SpaceCombat.Combat
         [SerializeField] private Transform[] _firePoints;
         [SerializeField] private LayerMask _targetLayers;
         [SerializeField] private bool _isPlayerWeapon = true;
+        [Tooltip("Fallback convergence distance when no target is set. Used for multi-fire-point.")]
+        [SerializeField] private float _fallbackConvergenceDistance = 15f;
 
         [Header("Audio Override")]
         [SerializeField] private string _fireSoundId; // Override fire sound (e.g., "enemy_laser" for enemies)
@@ -33,6 +35,7 @@ namespace SpaceCombat.Combat
         [Header("State")]
         [SerializeField] private float _lastFireTime;
         [SerializeField] private Vector2 _aimDirection = Vector2.up;
+        private Vector3? _targetPosition;
 
         // Properties
         public bool CanFire => Time.time >= _lastFireTime + (_currentWeaponConfig?.fireRate ?? 0.2f);
@@ -110,6 +113,16 @@ namespace SpaceCombat.Combat
         }
 
         /// <summary>
+        /// Set target position for multi-fire-point convergence.
+        /// All fire points will aim at this world position.
+        /// Pass null to clear (falls back to convergence distance).
+        /// </summary>
+        public void SetTargetPosition(Vector3? position)
+        {
+            _targetPosition = position;
+        }
+
+        /// <summary>
         /// Try to fire the weapon
         /// </summary>
         public bool TryFire()
@@ -149,10 +162,28 @@ namespace SpaceCombat.Combat
 
                 float damageMultiplier = activeCount > 0 ? 1f / activeCount : 1f;
 
+                // Calculate aim point: use actual target position if available,
+                // otherwise use fallback convergence distance ahead of ship
+                Vector3 aimPoint;
+                if (_targetPosition.HasValue)
+                {
+                    aimPoint = _targetPosition.Value;
+                }
+                else
+                {
+                    Vector3 forward3D = new Vector3(fireDirection.x, 0f, fireDirection.y);
+                    aimPoint = transform.position + forward3D.normalized * _fallbackConvergenceDistance;
+                }
+
                 foreach (var fp in _firePoints)
                 {
                     if (fp == null) continue;
-                    SpawnProjectileAt(fp, fireDirection, damageMultiplier);
+
+                    // Direction from this fire point toward the aim point
+                    Vector3 toTarget = aimPoint - fp.position;
+                    Vector2 dir = new Vector2(toTarget.x, toTarget.z).normalized;
+
+                    SpawnProjectileAt(fp, dir, damageMultiplier);
                 }
             }
             else
@@ -364,14 +395,31 @@ namespace SpaceCombat.Combat
 
             if (hasMultipleFirePoints)
             {
+                // Calculate aim point for gizmo display
+                Vector3 aimPoint;
+                if (_targetPosition.HasValue)
+                {
+                    aimPoint = _targetPosition.Value;
+                }
+                else
+                {
+                    Vector3 forward3D = new Vector3(_aimDirection.x, 0f, _aimDirection.y).normalized;
+                    if (forward3D.magnitude < 0.1f)
+                        forward3D = transform.forward;
+                    aimPoint = transform.position + forward3D * _fallbackConvergenceDistance;
+                }
+
                 foreach (var fp in _firePoints)
                 {
                     if (fp == null) continue;
                     Gizmos.color = Color.red;
-                    Gizmos.DrawRay(fp.position, _aimDirection * 2f);
+                    Gizmos.DrawLine(fp.position, aimPoint);
                     Gizmos.color = Color.yellow;
                     Gizmos.DrawWireSphere(fp.position, 0.15f);
                 }
+
+                Gizmos.color = _targetPosition.HasValue ? Color.red : Color.cyan;
+                Gizmos.DrawWireSphere(aimPoint, 0.3f);
             }
             else if (_firePoint != null)
             {

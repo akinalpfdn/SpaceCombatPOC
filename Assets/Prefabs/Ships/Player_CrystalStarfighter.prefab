@@ -118,6 +118,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   _isPlayerWeapon: 1
+  _fallbackConvergenceDistance: 15
   _fireSoundId: 
   _lastFireTime: 0
   _aimDirection: {x: 0, y: 1}
