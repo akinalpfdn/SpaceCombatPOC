@@ -308,9 +308,9 @@ namespace SpaceCombat.Editor
             // Create managers parent
             var managers = new GameObject("--- MANAGERS ---");
             
-            var bootstrap = new GameObject("GameBootstrap");
-            bootstrap.AddComponent<Core.GameBootstrap>();
-            
+            var lifetimeScope = new GameObject("[GameLifetimeScope]");
+            lifetimeScope.AddComponent<Core.GameLifetimeScope>();
+
             var gameManager = new GameObject("GameManager");
             gameManager.AddComponent<Core.GameManager>();
             

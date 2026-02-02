@@ -3,7 +3,8 @@
     "rootNamespace": "SpaceCombat",
     "references": [
         "Unity.InputSystem",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "VContainer"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

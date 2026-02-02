@@ -2,7 +2,8 @@
     "name": "SpaceCombat.Editor",
     "rootNamespace": "SpaceCombat.Editor",
     "references": [
-        "SpaceCombat"
+        "SpaceCombat",
+        "VContainer"
     ],
     "includePlatforms": [
         "Editor"

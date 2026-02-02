@@ -5,6 +5,7 @@
 // ============================================
 
 using UnityEngine;
+using VContainer;
 using SpaceCombat.Interfaces;
 using SpaceCombat.Events;
 using SpaceCombat.ScriptableObjects;
@@ -31,6 +32,13 @@ namespace SpaceCombat.Entities
         // Components
         private Rigidbody _rigidbody;
         private EnemyStateMachine _stateMachine;
+        private Core.GameManager _gameManager;
+
+        [Inject]
+        public void Construct(Core.GameManager gameManager)
+        {
+            _gameManager = gameManager;
+        }
 
         // IEnemy - read from state machine
         public EnemyState CurrentState
@@ -135,14 +143,12 @@ namespace SpaceCombat.Entities
 
         private Transform FindPlayerTarget()
         {
-            var gameManager = Core.GameManager.Instance;
-            if (gameManager != null && gameManager.Player != null)
+            if (_gameManager != null && _gameManager.Player != null)
             {
-                return gameManager.Player.transform;
+                return _gameManager.Player.transform;
             }
 
-            var player = GameObject.FindGameObjectWithTag("Player");
-            return player != null ? player.transform : null;
+            return null;
         }
 
         // ============================================

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using SpaceCombat.Interfaces;
-using SpaceCombat.Core;
 using Component = UnityEngine.Component;
 
 namespace SpaceCombat.Utilities
@@ -12,20 +11,7 @@ namespace SpaceCombat.Utilities
     /// </summary>
     public class PoolManager : MonoBehaviour
     {
-        public static PoolManager Instance { get; private set; }
-
         private readonly Dictionary<string, IPool> _pools = new();
-
-        private void Awake()
-        {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-            Instance = this;
-            ServiceLocator.Register(this);
-        }
 
         /// <summary>
         /// Create and register a new pool

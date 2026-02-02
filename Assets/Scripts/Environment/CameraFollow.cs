@@ -1,4 +1,5 @@
 using UnityEngine;
+using VContainer;
 
 namespace SpaceCombat.Environment
 {
@@ -7,6 +8,14 @@ namespace SpaceCombat.Environment
         [Header("Target")]
         [SerializeField] private Transform _target;
         [SerializeField] private bool _findPlayerOnStart = true;
+
+        private Core.GameManager _gameManager;
+
+        [Inject]
+        public void Construct(Core.GameManager gameManager)
+        {
+            _gameManager = gameManager;
+        }
 
         [Header("Follow Settings")]
         [SerializeField] private float _smoothSpeed = 20f;  // Increased for tighter follow
@@ -57,10 +66,9 @@ namespace SpaceCombat.Environment
 
         private void TryFindPlayer()
         {
-            var gameManager = Core.GameManager.Instance;
-            if (gameManager != null && gameManager.Player != null)
+            if (_gameManager != null && _gameManager.Player != null)
             {
-                _target = gameManager.Player.transform;
+                _target = _gameManager.Player.transform;
             }
         }
     }

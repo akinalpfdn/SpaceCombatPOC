@@ -6,6 +6,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using VContainer;
 using SpaceCombat.Events;
 
 namespace SpaceCombat.UI
@@ -40,6 +41,14 @@ namespace SpaceCombat.UI
 
         [Header("Force Position (Runtime)")]
         [SerializeField] private bool _forcePositionAtRuntime = true;
+
+        private Core.GameManager _gameManager;
+
+        [Inject]
+        public void Construct(Core.GameManager gameManager)
+        {
+            _gameManager = gameManager;
+        }
 
         private void Awake()
         {
@@ -170,7 +179,7 @@ namespace SpaceCombat.UI
                 
                 if (_finalScoreText != null)
                 {
-                    var gm = Core.GameManager.Instance;
+                    var gm = _gameManager;
                     _finalScoreText.text = $"Final Score: {gm?.Score ?? 0:N0}";
                 }
             }
@@ -189,7 +198,7 @@ namespace SpaceCombat.UI
             // Update enemy count display
             if (_enemyCountText != null)
             {
-                var gm = Core.GameManager.Instance;
+                var gm = _gameManager;
                 if (gm != null)
                 {
                     _enemyCountText.text = string.Format(_enemyCountFormat, gm.EnemiesAlive);
@@ -200,12 +209,12 @@ namespace SpaceCombat.UI
         // Button callbacks
         public void OnRestartClicked()
         {
-            Core.GameManager.Instance?.RestartGame();
+            _gameManager?.RestartGame();
         }
 
         public void OnPauseClicked()
         {
-            var gm = Core.GameManager.Instance;
+            var gm = _gameManager;
             if (gm != null)
             {
                 if (gm.CurrentState == GameState.Playing)

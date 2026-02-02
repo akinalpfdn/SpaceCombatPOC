@@ -6,6 +6,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using VContainer;
 using SpaceCombat.Events;
 using SpaceCombat.Interfaces;
 using SpaceCombat.Utilities;
@@ -20,8 +21,6 @@ namespace SpaceCombat.VFX
     /// </summary>
     public class VFXManager : MonoBehaviour
     {
-        public static VFXManager Instance { get; private set; }
-
         [Header("Explosion Prefabs (add PoolableVFX component)")]
         [SerializeField] private GameObject _explosionSmall;
         [SerializeField] private GameObject _explosionMedium;
@@ -43,18 +42,22 @@ namespace SpaceCombat.VFX
 
         // VFX pools - keyed by prefab instance ID
         private readonly Dictionary<int, ObjectPool<PoolableVFX>> _vfxPools = new();
+        private PoolManager _poolManager;
+
+        [Inject]
+        public void Construct(PoolManager poolManager)
+        {
+            _poolManager = poolManager;
+        }
 
         private void Awake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-            Instance = this;
-
-            InitializePools();
             SubscribeToEvents();
+        }
+
+        private void Start()
+        {
+            InitializePools();
         }
 
         private void OnDestroy()
@@ -64,14 +67,13 @@ namespace SpaceCombat.VFX
 
         private void InitializePools()
         {
-            var poolManager = PoolManager.Instance;
-            if (poolManager == null) return;
+            if (_poolManager == null) return;
 
-            TryCreateVFXPool(poolManager, _explosionSmall, "VFX_ExplosionSmall", _explosionPoolSize);
-            TryCreateVFXPool(poolManager, _explosionMedium, "VFX_ExplosionMedium", _explosionPoolSize);
-            TryCreateVFXPool(poolManager, _explosionLarge, "VFX_ExplosionLarge", _explosionPoolSize / 2);
-            TryCreateVFXPool(poolManager, _hitEffectDefault, "VFX_HitDefault", _hitEffectPoolSize);
-            TryCreateVFXPool(poolManager, _shieldHitEffect, "VFX_ShieldHit", _hitEffectPoolSize / 2);
+            TryCreateVFXPool(_poolManager, _explosionSmall, "VFX_ExplosionSmall", _explosionPoolSize);
+            TryCreateVFXPool(_poolManager, _explosionMedium, "VFX_ExplosionMedium", _explosionPoolSize);
+            TryCreateVFXPool(_poolManager, _explosionLarge, "VFX_ExplosionLarge", _explosionPoolSize / 2);
+            TryCreateVFXPool(_poolManager, _hitEffectDefault, "VFX_HitDefault", _hitEffectPoolSize);
+            TryCreateVFXPool(_poolManager, _shieldHitEffect, "VFX_ShieldHit", _hitEffectPoolSize / 2);
         }
 
         private void TryCreateVFXPool(PoolManager poolManager, GameObject prefab, string poolId, int size)

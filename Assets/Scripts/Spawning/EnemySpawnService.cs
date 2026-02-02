@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using VContainer;
+using VContainer.Unity;
 using SpaceCombat.Interfaces;
 using SpaceCombat.Utilities;
 using SpaceCombat.Core;
@@ -41,6 +43,17 @@ namespace SpaceCombat.Spawning
         [SerializeField] private bool _debugDrawSpawnArea = true;
         [SerializeField] private bool _debugLogSpawns = false;
 
+        // Injected dependencies
+        private PoolManager _poolManager;
+        private IObjectResolver _container;
+
+        [Inject]
+        public void Construct(PoolManager poolManager, IObjectResolver container)
+        {
+            _poolManager = poolManager;
+            _container = container;
+        }
+
         // Runtime state
         private ISpawnStrategy _currentStrategy;
         private ObjectPool<Entities.Enemy> _enemyPool;
@@ -56,21 +69,15 @@ namespace SpaceCombat.Spawning
 
         private void Awake()
         {
-            // Register with ServiceLocator
-            ServiceLocator.Register<ISpawnService>(this);
         }
 
         private void Start()
         {
-            if (_config != null)
-            {
-                Initialize(_config);
-            }
+            // Initialization is handled by GameManager.InitializeSpawnService()
         }
 
         private void OnDestroy()
         {
-            ServiceLocator.Unregister<ISpawnService>();
         }
 
         // ============================================
@@ -123,17 +130,16 @@ namespace SpaceCombat.Spawning
 
         private void SetupObjectPool()
         {
-            var poolManager = PoolManager.Instance;
-            if (poolManager == null)
+            if (_poolManager == null)
             {
-                var poolGO = new GameObject("PoolManager");
-                poolManager = poolGO.AddComponent<PoolManager>();
+                Debug.LogError("[EnemySpawnService] PoolManager not injected!");
+                return;
             }
 
             if (_enemyPrefab != null)
             {
                 int maxEnemies = _config?.MaxEnemies ?? 50;
-                _enemyPool = poolManager.CreatePool("Enemies", _enemyPrefab, 10, maxEnemies);
+                _enemyPool = _poolManager.CreatePool("Enemies", _enemyPrefab, 10, maxEnemies);
             }
             else
             {
@@ -196,11 +202,15 @@ namespace SpaceCombat.Spawning
             var enemy = _enemyPool.Get(position, Quaternion.identity);
             if (enemy != null)
             {
+                // Inject dependencies into pool-spawned enemy and its components
+                _container?.InjectGameObject(enemy.gameObject);
+
                 enemy.gameObject.layer = LayerMask.NameToLayer("Enemy");
                 _activeEnemies.Add(enemy);
 
-                // Inject player target so enemy doesn't need FindGameObjectWithTag
-                var player = Core.GameManager.Instance?.Player;
+                // Lazy-resolve GameManager to avoid circular dependency
+                var gameManager = _container?.Resolve<GameManager>();
+                var player = gameManager?.Player;
                 if (player != null)
                 {
                     enemy.SetTarget(player.transform);

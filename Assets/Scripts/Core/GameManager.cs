@@ -6,6 +6,8 @@
 
 using System.Collections;
 using UnityEngine;
+using VContainer;
+using VContainer.Unity;
 using SpaceCombat.Events;
 using SpaceCombat.Utilities;
 using SpaceCombat.Interfaces;
@@ -25,8 +27,6 @@ namespace SpaceCombat.Core
     /// </summary>
     public class GameManager : MonoBehaviour
     {
-        public static GameManager Instance { get; private set; }
-
         [Header("Game Settings")]
         [SerializeField] private ScriptableObjects.GameBalanceConfig _balanceConfig;
         [SerializeField] private SpawnConfig _spawnConfig;
@@ -50,6 +50,14 @@ namespace SpaceCombat.Core
         private Entities.PlayerShip _player;
         private ISpawnService _spawnServiceInterface;
         private Coroutine _respawnCoroutine;
+        private IObjectResolver _container;
+
+        [Inject]
+        public void Construct(ISpawnService spawnService, IObjectResolver container)
+        {
+            _spawnServiceInterface = spawnService;
+            _container = container;
+        }
 
         // Properties
         public GameState CurrentState => _currentState;
@@ -63,14 +71,6 @@ namespace SpaceCombat.Core
 
         private void Awake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-            Instance = this;
-
-            ServiceLocator.Register(this);
         }
 
         private void Start()
@@ -81,11 +81,6 @@ namespace SpaceCombat.Core
         private void OnDestroy()
         {
             UnsubscribeFromEvents();
-            
-            if (Instance == this)
-            {
-                Instance = null;
-            }
         }
 
         // ============================================
@@ -105,35 +100,19 @@ namespace SpaceCombat.Core
 
         private void InitializeSpawnService()
         {
-            // Try to get from inspector reference
+            // Prefer inspector reference
             if (_spawnService != null)
             {
                 _spawnServiceInterface = _spawnService;
+            }
+
+            // _spawnServiceInterface already set by [Inject] if available
+            if (_spawnServiceInterface == null)
+            {
+                Debug.LogError("[GameManager] No ISpawnService available! Assign via inspector or VContainer.");
                 return;
             }
-            
-            // Try to get from ServiceLocator
-            _spawnServiceInterface = ServiceLocator.Get<ISpawnService>();
-            
-            // If still null, find in scene (one-time startup cost)
-            if (_spawnServiceInterface == null)
-            {
-                _spawnService = Object.FindFirstObjectByType<EnemySpawnService>();
-                if (_spawnService != null)
-                {
-                    _spawnServiceInterface = _spawnService;
-                }
-            }
-            
-            // Last resort: Create spawn service
-            if (_spawnServiceInterface == null)
-            {
-                Debug.LogWarning("[GameManager] No EnemySpawnService found, creating one");
-                var spawnServiceGO = new GameObject("EnemySpawnService");
-                _spawnService = spawnServiceGO.AddComponent<EnemySpawnService>();
-                _spawnServiceInterface = _spawnService;
-            }
-            
+
             // Initialize with config
             if (_spawnConfig != null)
             {
@@ -253,6 +232,7 @@ namespace SpaceCombat.Core
                     : Vector3.zero;
 
                 _player = Instantiate(_playerPrefab, spawnPos, Quaternion.identity);
+                _container?.InjectGameObject(_player.gameObject);
                 _player.gameObject.tag = "Player";
                 _player.gameObject.layer = LayerMask.NameToLayer("Player");
                 

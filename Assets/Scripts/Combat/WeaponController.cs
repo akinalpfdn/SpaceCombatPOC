@@ -5,6 +5,7 @@
 
 using System;
 using UnityEngine;
+using VContainer;
 using SpaceCombat.Interfaces;
 using SpaceCombat.Events;
 using SpaceCombat.ScriptableObjects;
@@ -42,6 +43,13 @@ namespace SpaceCombat.Combat
         public event Action OnWeaponFired;
 
         private ObjectPool<Projectile> _projectilePool;
+        private PoolManager _poolManager;
+
+        [Inject]
+        public void Construct(PoolManager poolManager)
+        {
+            _poolManager = poolManager;
+        }
 
         private void Start()
         {
@@ -223,18 +231,17 @@ namespace SpaceCombat.Combat
             var projectilePrefab = _currentWeaponConfig.projectilePrefab.GetComponent<Projectile>();
             if (projectilePrefab == null) return;
 
-            var poolManager = PoolManager.Instance;
-            if (poolManager != null)
+            if (_poolManager != null)
             {
                 string poolId = $"Projectile_{_currentWeaponConfig.weaponName}_{GetInstanceID()}";
-                
-                if (!poolManager.HasPool(poolId))
+
+                if (!_poolManager.HasPool(poolId))
                 {
-                    _projectilePool = poolManager.CreatePool(poolId, projectilePrefab, 20, 100);
+                    _projectilePool = _poolManager.CreatePool(poolId, projectilePrefab, 20, 100);
                 }
                 else
                 {
-                    _projectilePool = poolManager.GetPool<Projectile>(poolId);
+                    _projectilePool = _poolManager.GetPool<Projectile>(poolId);
                 }
             }
         }

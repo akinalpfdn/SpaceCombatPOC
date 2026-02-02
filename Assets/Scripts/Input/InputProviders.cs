@@ -6,6 +6,7 @@
 
 using System;
 using UnityEngine;
+using VContainer;
 using SpaceCombat.Interfaces;
 using SpaceCombat.Core;
 
@@ -40,14 +41,18 @@ namespace SpaceCombat.Input
 
         // Cached references
         private Transform _playerTransform;
+        private GameManager _gameManager;
+
+        [Inject]
+        public void Construct(GameManager gameManager)
+        {
+            _gameManager = gameManager;
+        }
 
         private void Awake()
         {
             if (_mainCamera == null)
                 _mainCamera = Camera.main;
-
-            // Register as input provider
-            ServiceLocator.Register<IInputProvider>(this);
         }
 
         private void Update()
@@ -79,9 +84,8 @@ namespace SpaceCombat.Input
                 // Cache player transform - only search once
                 if (_playerTransform == null)
                 {
-                    var gameManager = Core.GameManager.Instance;
-                    if (gameManager != null && gameManager.Player != null)
-                        _playerTransform = gameManager.Player.transform;
+                    if (_gameManager != null && _gameManager.Player != null)
+                        _playerTransform = _gameManager.Player.transform;
                 }
 
                 if (_playerTransform != null)
@@ -132,7 +136,6 @@ namespace SpaceCombat.Input
 
         private void OnDestroy()
         {
-            ServiceLocator.Unregister<IInputProvider>();
         }
     }
 
@@ -175,7 +178,6 @@ namespace SpaceCombat.Input
 
         private void Awake()
         {
-            ServiceLocator.Register<IInputProvider>(this);
         }
 
         private void Update()
@@ -336,7 +338,6 @@ namespace SpaceCombat.Input
 
         private void OnDestroy()
         {
-            ServiceLocator.Unregister<IInputProvider>();
         }
     }
 

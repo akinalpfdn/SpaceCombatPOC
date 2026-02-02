@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 0}
   m_Name: SoundLibrary
-  m_EditorClassIdentifier: Assembly-CSharp:SpaceCombat.Audio:SoundLibrary
+  m_EditorClassIdentifier: SpaceCombat:SpaceCombat.Audio:SoundLibrary
   soundEffects:
   - id: laser_fire
     clip: {fileID: 8300000, guid: 5f12c59ee0e58a042b7539131608b8a3, type: 3}

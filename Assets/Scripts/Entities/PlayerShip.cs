@@ -4,6 +4,7 @@
 // ============================================
 
 using UnityEngine;
+using VContainer;
 using SpaceCombat.Interfaces;
 using SpaceCombat.Events;
 using SpaceCombat.ScriptableObjects;
@@ -39,7 +40,7 @@ namespace SpaceCombat.Entities
         public Vector2 Velocity => _movement?.Velocity ?? Vector2.zero;
         public float MaxSpeed => _config?.maxSpeed ?? 10f;
 
-        // Input provider - set externally or via ServiceLocator
+        // Input provider - injected via VContainer
         private IInputProvider _inputProvider;
 
         // State
@@ -56,13 +57,14 @@ namespace SpaceCombat.Entities
             SetupVisuals();
         }
 
+        [Inject]
+        public void Construct(IInputProvider inputProvider)
+        {
+            SetInputProvider(inputProvider);
+        }
+
         private void Start()
         {
-            // Get input provider
-            if (ServiceLocator.TryGet<IInputProvider>(out var inputProvider))
-            {
-                SetInputProvider(inputProvider);
-            }
 
             // Apply config if enabled, otherwise use inspector values
             if (_useConfigSettings && _config != null)
