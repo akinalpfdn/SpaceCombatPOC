@@ -5,6 +5,7 @@
 //
 // Controls:
 // - Click enemy → Select target
+// - Double-click enemy → Select target & toggle attack
 // - SPACE once → Start attacking selected target
 // - SPACE again → Stop attacking
 // - SHIFT → Select closest enemy in range & start attacking
@@ -22,6 +23,7 @@ namespace SpaceCombat.Combat
     /// Attach this to the Player ship.
     /// - Hold mouse button → ship moves toward cursor
     /// - Click enemy → select target (shows indicator)
+    /// - Double-click enemy → select target & toggle attack
     /// - SPACE → toggle attack on selected target
     /// - SHIFT → select closest enemy and start attacking
     /// </summary>
@@ -42,6 +44,9 @@ namespace SpaceCombat.Combat
         [SerializeField] private ShipMovement _shipMovement;
         [SerializeField] private Camera _mainCamera;
 
+        [Header("Double-Click")]
+        [SerializeField] private float _doubleClickTime = 0.3f;
+
         [Header("Target Indicator")]
         [SerializeField] private GameObject _targetIndicatorPrefab;
         [SerializeField] private GameObject _healthBarPrefab;
@@ -52,6 +57,8 @@ namespace SpaceCombat.Combat
         private HealthBar _targetHealthBar;
         private bool _isFiringEnabled = false;
         private bool _wasSpacePressed = false;
+        private float _lastClickTime;
+        private Transform _lastClickedTarget;
 
         // Properties
         public Transform CurrentTarget => _currentTarget;
@@ -186,23 +193,50 @@ namespace SpaceCombat.Combat
                 var enemy = hit.collider.GetComponent<Enemy>();
                 if (enemy != null && IsInRange(enemy.transform))
                 {
-                    // Toggle target: if already targeting this enemy, clear it
-                    if (_currentTarget == enemy.transform)
+                    // Detect double-click on same target
+                    bool isDoubleClick = (Time.unscaledTime - _lastClickTime < _doubleClickTime)
+                        && _lastClickedTarget == enemy.transform;
+
+                    _lastClickTime = Time.unscaledTime;
+                    _lastClickedTarget = enemy.transform;
+
+                    if (isDoubleClick)
                     {
-                        ClearTarget();
+                        // Double-click: toggle firing (same as SPACE)
+                        if (_currentTarget == enemy.transform)
+                        {
+                            _isFiringEnabled = !_isFiringEnabled;
+                        }
+                        else
+                        {
+                            // Double-click on new enemy: select & start attacking
+                            ClearIndicator();
+                            _currentTarget = enemy.transform;
+                            _isFiringEnabled = true;
+
+                            if (_shipMovement != null)
+                                _shipMovement.SetAutoRotate(false);
+
+                            SpawnTargetIndicator(_currentTarget);
+                        }
                     }
                     else
                     {
-                        // Clear previous indicator
-                        ClearIndicator();
+                        // Single click: toggle target selection (existing behavior)
+                        if (_currentTarget == enemy.transform)
+                        {
+                            ClearTarget();
+                        }
+                        else
+                        {
+                            ClearIndicator();
 
-                        _currentTarget = enemy.transform;
-                        // Disable auto-rotation when targeting so we can face the target
-                        if (_shipMovement != null)
-                            _shipMovement.SetAutoRotate(false);
+                            _currentTarget = enemy.transform;
+                            if (_shipMovement != null)
+                                _shipMovement.SetAutoRotate(false);
 
-                        // Spawn indicator on target
-                        SpawnTargetIndicator(_currentTarget);
+                            SpawnTargetIndicator(_currentTarget);
+                        }
                     }
                 }
             }

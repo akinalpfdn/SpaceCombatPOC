@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66965a9bcd4edde49b6e109e8c3cb329, type: 3}
+  m_Name: Ship_StarhawkFighter
+  m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.ScriptableObjects.ShipConfig
+  shipName: Stellar Phoenix
+  shipSprite: {fileID: 0}
+  shipPrefab: {fileID: 0}
+  maxHealth: 2000
+  maxShield: 100
+  shieldRegenRate: 5
+  shieldRegenDelay: 2
+  maxSpeed: 20
+  acceleration: 10
+  deceleration: 3
+  rotationSpeed: 180
+  availableWeapons:
+  - {fileID: 11400000, guid: 849b5560bac627e4fae1a2d1d9930fc8, type: 2}
+  shieldHitSoundId: shield_hit
+  hullHitSoundId: hull_hit
+  explosionSoundId: explosion_medium

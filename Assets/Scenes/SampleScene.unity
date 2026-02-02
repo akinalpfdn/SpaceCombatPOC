@@ -882,7 +882,7 @@ MonoBehaviour:
   _balanceConfig: {fileID: 11400000, guid: 12816a3e73a4d5b43bd520a8a74ba810, type: 2}
   _spawnConfig: {fileID: 11400000, guid: bfa573f513d00924e8a76c740d997b1b, type: 2}
   _playerSpawnPoint: {fileID: 975207472}
-  _playerPrefab: {fileID: 596049113606997257, guid: 86a0b9ecf0dde204f9987d86c6070dbe, type: 3}
+  _playerPrefab: {fileID: 596049113606997257, guid: 368d663f32955204da576ddeb54acca4, type: 3}
   _spawnService: {fileID: 1771477027}
   _currentState: 1
   _score: 0

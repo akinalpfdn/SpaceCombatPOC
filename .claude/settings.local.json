@@ -17,7 +17,8 @@
       "mcp__mcp-unity__get_console_logs",
       "Bash(for f in *)",
       "Bash(do echo \"$f\")",
-      "Bash(done)"
+      "Bash(done)",
+      "mcp__mcp-unity__get_material_info"
     ]
   }
 }
