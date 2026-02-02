@@ -142,11 +142,17 @@ namespace SpaceCombat.Combat
 
             if (hasMultipleFirePoints)
             {
-                // Multi-fire-point: spawn from each mount point
+                // Multi-fire-point: split damage across fire points so total stays the same
+                int activeCount = 0;
+                foreach (var fp in _firePoints)
+                    if (fp != null) activeCount++;
+
+                float damageMultiplier = activeCount > 0 ? 1f / activeCount : 1f;
+
                 foreach (var fp in _firePoints)
                 {
                     if (fp == null) continue;
-                    SpawnProjectileAt(fp, fireDirection);
+                    SpawnProjectileAt(fp, fireDirection, damageMultiplier);
                 }
             }
             else
@@ -213,9 +219,10 @@ namespace SpaceCombat.Combat
         }
 
         /// <summary>
-        /// Spawn a projectile at the specified fire point
+        /// Spawn a projectile at the specified fire point.
+        /// damageMultiplier splits damage across multiple fire points (e.g. 0.5 for 2 guns).
         /// </summary>
-        private void SpawnProjectileAt(Transform firePoint, Vector2 direction)
+        private void SpawnProjectileAt(Transform firePoint, Vector2 direction, float damageMultiplier = 1f)
         {
             Projectile projectile = null;
 
@@ -240,7 +247,7 @@ namespace SpaceCombat.Combat
 
                 projectile.Initialize(
                     direction,
-                    _currentWeaponConfig.damage,
+                    _currentWeaponConfig.damage * damageMultiplier,
                     _currentWeaponConfig.projectileSpeed,
                     _targetLayers
                 );

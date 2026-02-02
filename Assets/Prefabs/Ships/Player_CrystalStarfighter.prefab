@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &101013616186084269
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2155474795333768639}
+  m_Layer: 0
+  m_Name: FirePoint_L
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2155474795333768639
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 101013616186084269}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.00053, y: 0.00766, z: 0.00111}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 248976076001103780}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1145839844609182422
 GameObject:
   m_ObjectHideFlags: 0
@@ -38,7 +69,7 @@ Transform:
   m_Children:
   - {fileID: 2673502855802272265}
   - {fileID: 6463785372573789754}
-  - {fileID: 3297939740727710910}
+  - {fileID: 248976076001103780}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8272370351278946531
@@ -80,7 +111,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.Combat.WeaponController
   _currentWeaponConfig: {fileID: 11400000, guid: 849b5560bac627e4fae1a2d1d9930fc8, type: 2}
   _firePoint: {fileID: 2673502855802272265}
-  _firePoints: []
+  _firePoints:
+  - {fileID: 2155474795333768639}
+  - {fileID: 1781634882737947125}
   _targetLayers:
     serializedVersion: 2
     m_Bits: 128
@@ -109,7 +142,7 @@ MonoBehaviour:
   _spriteRenderer: {fileID: 0}
   _flashDuration: 0.1
   _damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
-  _config: {fileID: 11400000, guid: cf4e7a5aa0988264e81b24fa21954303, type: 2}
+  _config: {fileID: 11400000, guid: c20d45e8297c7d24da3530a316fa265f, type: 2}
   _useConfigSettings: 1
   _movement: {fileID: 0}
   _weaponController: {fileID: 0}
@@ -211,6 +244,37 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 1.87875
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1375022709270066646
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1781634882737947125}
+  m_Layer: 0
+  m_Name: FirePoint_R
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1781634882737947125
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1375022709270066646}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.00048, y: -0.00769, z: 0.00111}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 248976076001103780}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6216708766474657427
 GameObject:
   m_ObjectHideFlags: 0
@@ -242,7 +306,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2242435719637757755}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &3048404534692246357
+--- !u!1001 &359781170375862351
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -250,6 +314,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2242435719637757755}
     m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 928c9189bce93304f9a243f148c6fd39, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 928c9189bce93304f9a243f148c6fd39, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 928c9189bce93304f9a243f148c6fd39, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 150
+      objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 928c9189bce93304f9a243f148c6fd39, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -290,19 +366,29 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 928c9189bce93304f9a243f148c6fd39, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 49b4a2226777d844b95bfcb117a55a6f, type: 2}
     - target: {fileID: 919132149155446097, guid: 928c9189bce93304f9a243f148c6fd39, type: 3}
       propertyPath: m_Name
-      value: Meshy_AI_Crystal_Starfighter_0202165411_texture
+      value: CrystalStarfighter
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 928c9189bce93304f9a243f148c6fd39, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2155474795333768639}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 928c9189bce93304f9a243f148c6fd39, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1781634882737947125}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 928c9189bce93304f9a243f148c6fd39, type: 3}
---- !u!4 &3297939740727710910 stripped
+--- !u!4 &248976076001103780 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 928c9189bce93304f9a243f148c6fd39, type: 3}
-  m_PrefabInstance: {fileID: 3048404534692246357}
+  m_PrefabInstance: {fileID: 359781170375862351}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6789532618860595665
 PrefabInstance:

@@ -14,7 +14,10 @@
       "mcp__mcp-unity__update_component",
       "mcp__mcp-unity__delete_gameobject",
       "mcp__mcp-unity__execute_menu_item",
-      "mcp__mcp-unity__get_console_logs"
+      "mcp__mcp-unity__get_console_logs",
+      "Bash(for f in *)",
+      "Bash(do echo \"$f\")",
+      "Bash(done)"
     ]
   }
 }
