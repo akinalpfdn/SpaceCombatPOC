@@ -192,6 +192,10 @@ namespace SpaceCombat.Combat
 
             if (projectile != null)
             {
+                // Set pool reference so projectile can return itself
+                if (_projectilePool != null)
+                    projectile.SetPool(_projectilePool);
+
                 projectile.Initialize(
                     direction,
                     _currentWeaponConfig.damage,

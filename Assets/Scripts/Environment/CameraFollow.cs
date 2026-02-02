@@ -19,11 +19,7 @@ namespace SpaceCombat.Environment
         {
             if (_findPlayerOnStart && _target == null)
             {
-                var player = GameObject.FindGameObjectWithTag("Player");
-                if (player != null)
-                {
-                    _target = player.transform;
-                }
+                TryFindPlayer();
             }
         }
 
@@ -31,11 +27,7 @@ namespace SpaceCombat.Environment
         {
             if (_target == null)
             {
-                var player = GameObject.FindGameObjectWithTag("Player");
-                if (player != null)
-                {
-                    _target = player.transform;
-                }
+                TryFindPlayer();
                 return;
             }
 
@@ -61,6 +53,15 @@ namespace SpaceCombat.Environment
         public void SetTarget(Transform target)
         {
             _target = target;
+        }
+
+        private void TryFindPlayer()
+        {
+            var gameManager = Core.GameManager.Instance;
+            if (gameManager != null && gameManager.Player != null)
+            {
+                _target = gameManager.Player.transform;
+            }
         }
     }
 }

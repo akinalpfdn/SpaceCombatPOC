@@ -436,6 +436,15 @@ namespace SpaceCombat.Entities
 
         private void FindTarget()
         {
+            // Prefer GameManager reference over tag search
+            var gameManager = Core.GameManager.Instance;
+            if (gameManager != null && gameManager.Player != null)
+            {
+                _target = gameManager.Player.transform;
+                return;
+            }
+
+            // Last resort fallback
             var player = GameObject.FindGameObjectWithTag("Player");
             if (player != null)
             {

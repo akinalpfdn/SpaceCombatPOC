@@ -115,10 +115,10 @@ namespace SpaceCombat.Core
             // Try to get from ServiceLocator
             _spawnServiceInterface = ServiceLocator.Get<ISpawnService>();
             
-            // If still null, find in scene
+            // If still null, find in scene (one-time startup cost)
             if (_spawnServiceInterface == null)
             {
-                _spawnService = FindObjectOfType<EnemySpawnService>();
+                _spawnService = Object.FindFirstObjectByType<EnemySpawnService>();
                 if (_spawnService != null)
                 {
                     _spawnServiceInterface = _spawnService;

@@ -14,7 +14,7 @@ namespace SpaceCombat.Utilities
     {
         public static PoolManager Instance { get; private set; }
 
-        private readonly Dictionary<string, object> _pools = new();
+        private readonly Dictionary<string, IPool> _pools = new();
 
         private void Awake()
         {
@@ -54,9 +54,9 @@ namespace SpaceCombat.Utilities
         /// </summary>
         public ObjectPool<T> GetPool<T>(string poolId) where T : Component, IPoolable
         {
-            if (_pools.TryGetValue(poolId, out var pool))
+            if (_pools.TryGetValue(poolId, out var pool) && pool is ObjectPool<T> typedPool)
             {
-                return pool as ObjectPool<T>;
+                return typedPool;
             }
 
             Debug.LogError($"Pool {poolId} not found!");
@@ -78,8 +78,7 @@ namespace SpaceCombat.Utilities
         {
             if (_pools.TryGetValue(poolId, out var pool))
             {
-                var clearMethod = pool.GetType().GetMethod("Clear");
-                clearMethod?.Invoke(pool, null);
+                pool.Clear();
                 _pools.Remove(poolId);
             }
         }
@@ -91,8 +90,7 @@ namespace SpaceCombat.Utilities
         {
             foreach (var pool in _pools.Values)
             {
-                var clearMethod = pool.GetType().GetMethod("Clear");
-                clearMethod?.Invoke(pool, null);
+                pool.Clear();
             }
             _pools.Clear();
         }

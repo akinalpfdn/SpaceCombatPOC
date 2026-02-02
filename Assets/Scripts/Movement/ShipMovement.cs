@@ -37,10 +37,10 @@ namespace SpaceCombat.Movement
 
         [Header("Map Bounds")]
         [SerializeField] private bool _respectMapBounds = true;
+        [SerializeField] private MapBounds _mapBounds;
 
         // Components
         private Rigidbody _rigidbody;
-        private MapBounds _mapBounds;
 
         // State
         private Vector3 _currentVelocity;
@@ -80,10 +80,10 @@ namespace SpaceCombat.Movement
             // Initialize banking state
             _lastRotation = transform.rotation;
 
-            // Find map bounds in scene
-            if (_respectMapBounds)
+            // Try to find map bounds if not assigned in inspector
+            if (_respectMapBounds && _mapBounds == null)
             {
-                _mapBounds = FindObjectOfType<MapBounds>();
+                _mapBounds = Object.FindFirstObjectByType<MapBounds>();
             }
         }
 
@@ -288,7 +288,7 @@ namespace SpaceCombat.Movement
         /// <summary>
         /// Rotate ship to face a direction
         /// 3D Version - Rotates around Y axis to face direction on XZ plane
-        /// Preserves Z-axis banking tilt
+        /// Applies banking/tilt effect when enabled
         /// </summary>
         public void RotateTowards(Vector2 direction)
         {
@@ -302,15 +302,27 @@ namespace SpaceCombat.Movement
 
                 if (_enableBanking)
                 {
-                    // Preserve current Z tilt when rotating Y
-                    Vector3 currentEuler = transform.rotation.eulerAngles;
-                    Quaternion rotated = Quaternion.Slerp(
-                        Quaternion.Euler(0, currentEuler.y, 0),  // Only Y rotation
-                        targetRotation,
-                        _rotationSpeed * Time.fixedDeltaTime
-                    );
-                    // Apply Y rotation + current Z tilt
-                    transform.rotation = Quaternion.Euler(0, rotated.eulerAngles.y, _currentTilt);
+                    // Use the same banking logic as CalculateAndApplyRotation
+                    // Calculate turn amount first, then apply rotation + tilt together
+                    float currentY = transform.rotation.eulerAngles.y;
+                    float targetY = targetRotation.eulerAngles.y;
+                    float angleDiff = Mathf.DeltaAngle(currentY, targetY);
+
+                    // Limit rotation to what's possible this frame
+                    float maxTurnThisFrame = _rotationSpeed * Time.fixedDeltaTime;
+                    float actualTurn = Mathf.Clamp(angleDiff, -maxTurnThisFrame, maxTurnThisFrame);
+
+                    // Calculate target tilt based on the turn we're about to make
+                    _targetTilt = -actualTurn * _maxTiltAngle * _tiltPower / maxTurnThisFrame;
+                    _targetTilt = Mathf.Clamp(_targetTilt, -_maxTiltAngle, _maxTiltAngle);
+
+                    // Smooth the tilt
+                    SmoothTilt();
+
+                    // Apply the Y rotation + current Z tilt
+                    float newY = currentY + actualTurn;
+                    transform.rotation = Quaternion.Euler(0, newY, _currentTilt);
+                    _lastRotation = transform.rotation;
                 }
                 else
                 {

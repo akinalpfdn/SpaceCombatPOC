@@ -43,6 +43,9 @@ namespace SpaceCombat.Combat
         private GameObject _owner;
         private bool _isActive;
 
+        // Pool reference for proper return
+        private Utilities.ObjectPool<Projectile> _pool;
+
         // IPoolable
         public bool IsActive => _isActive;
 
@@ -240,19 +243,24 @@ namespace SpaceCombat.Combat
         }
 
         /// <summary>
+        /// Set pool reference so projectile can return itself properly.
+        /// Called by WeaponController after getting from pool.
+        /// </summary>
+        public void SetPool(Utilities.ObjectPool<Projectile> pool)
+        {
+            _pool = pool;
+        }
+
+        /// <summary>
         /// Return to pool or destroy
         /// </summary>
         private void Despawn()
         {
             _isActive = false;
-            
-            // Try to return to pool
-            var poolManager = Utilities.PoolManager.Instance;
-            if (poolManager != null)
+
+            if (_pool != null)
             {
-                // Find our pool and return
-                // This is a simplified approach - in production you'd track the pool reference
-                gameObject.SetActive(false);
+                _pool.Return(this);
             }
             else
             {

@@ -38,6 +38,9 @@ namespace SpaceCombat.Input
         private bool _isFiring;
         private bool _isSpecialAbility;
 
+        // Cached references
+        private Transform _playerTransform;
+
         private void Awake()
         {
             if (_mainCamera == null)
@@ -73,14 +76,18 @@ namespace SpaceCombat.Input
         {
             if (_useMouseForAim && _mainCamera != null)
             {
-                // Get mouse position in world space
-                Vector3 mousePos = _mainCamera.ScreenToWorldPoint(UnityEngine.Input.mousePosition);
-                
-                // Find player to calculate aim direction
-                var player = GameObject.FindGameObjectWithTag("Player");
-                if (player != null)
+                // Cache player transform - only search once
+                if (_playerTransform == null)
                 {
-                    _aimDirection = ((Vector2)mousePos - (Vector2)player.transform.position).normalized;
+                    var gameManager = Core.GameManager.Instance;
+                    if (gameManager != null && gameManager.Player != null)
+                        _playerTransform = gameManager.Player.transform;
+                }
+
+                if (_playerTransform != null)
+                {
+                    Vector3 mousePos = _mainCamera.ScreenToWorldPoint(UnityEngine.Input.mousePosition);
+                    _aimDirection = ((Vector2)mousePos - (Vector2)_playerTransform.position).normalized;
                 }
             }
             else

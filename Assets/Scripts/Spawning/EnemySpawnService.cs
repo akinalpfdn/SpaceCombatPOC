@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using SpaceCombat.Interfaces;
 using SpaceCombat.Utilities;
@@ -44,7 +45,7 @@ namespace SpaceCombat.Spawning
         private ISpawnStrategy _currentStrategy;
         private ObjectPool<Entities.Enemy> _enemyPool;
         private Bounds _spawnBounds;
-        private List<Entities.Enemy> _activeEnemies = new List<Entities.Enemy>();
+        private HashSet<Entities.Enemy> _activeEnemies = new HashSet<Entities.Enemy>();
 
         // Events
         public event Action<GameObject, Vector3> OnEnemySpawned;
@@ -197,6 +198,13 @@ namespace SpaceCombat.Spawning
             {
                 enemy.gameObject.layer = LayerMask.NameToLayer("Enemy");
                 _activeEnemies.Add(enemy);
+
+                // Inject player target so enemy doesn't need FindGameObjectWithTag
+                var player = Core.GameManager.Instance?.Player;
+                if (player != null)
+                {
+                    enemy.SetTarget(player.transform);
+                }
 
                 if (_debugLogSpawns)
                 {

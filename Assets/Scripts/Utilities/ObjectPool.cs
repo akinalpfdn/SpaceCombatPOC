@@ -12,15 +12,29 @@ using SpaceCombat.Core;
 namespace SpaceCombat.Utilities
 {
     /// <summary>
+    /// Non-generic interface for pool operations.
+    /// Eliminates reflection in PoolManager.
+    /// </summary>
+    public interface IPool
+    {
+        int AvailableCount { get; }
+        int TotalCount { get; }
+        int ActiveCount { get; }
+        void ReturnAll();
+        void Clear();
+    }
+
+    /// <summary>
     /// Generic object pool for Unity GameObjects
     /// Reduces garbage collection and instantiation overhead
     /// </summary>
     /// <typeparam name="T">Component type that implements IPoolable</typeparam>
-    public class ObjectPool<T> where T : Component, IPoolable
+    public class ObjectPool<T> : IPool where T : Component, IPoolable
     {
         private readonly T _prefab;
         private readonly Transform _parent;
         private readonly Queue<T> _availableObjects;
+        private readonly HashSet<T> _availableSet; // O(1) contains check
         private readonly List<T> _allObjects;
         private readonly int _maxSize;
         private readonly bool _autoExpand;
@@ -37,6 +51,7 @@ namespace SpaceCombat.Utilities
             _parent = parent;
             _autoExpand = autoExpand;
             _availableObjects = new Queue<T>(initialSize);
+            _availableSet = new HashSet<T>();
             _allObjects = new List<T>(initialSize);
 
             Prewarm(initialSize);
@@ -63,19 +78,18 @@ namespace SpaceCombat.Utilities
             if (_availableObjects.Count > 0)
             {
                 obj = _availableObjects.Dequeue();
+                _availableSet.Remove(obj);
             }
             else if (_autoExpand && _allObjects.Count < _maxSize)
             {
                 obj = CreateNewObject();
-            }
-            else if (_availableObjects.Count == 0)
-            {
-                Debug.LogWarning($"Pool exhausted for {typeof(T).Name}! Consider increasing pool size.");
-                return null;
+                _availableObjects.Dequeue(); // Remove from available since we're using it
+                _availableSet.Remove(obj);
             }
             else
             {
-                obj = _availableObjects.Dequeue();
+                Debug.LogWarning($"Pool exhausted for {typeof(T).Name}! Consider increasing pool size.");
+                return null;
             }
 
             obj.gameObject.SetActive(true);
@@ -94,19 +108,18 @@ namespace SpaceCombat.Utilities
             if (_availableObjects.Count > 0)
             {
                 obj = _availableObjects.Dequeue();
+                _availableSet.Remove(obj);
             }
             else if (_autoExpand && _allObjects.Count < _maxSize)
             {
                 obj = CreateNewObject();
-            }
-            else if (_availableObjects.Count == 0)
-            {
-                Debug.LogWarning($"Pool exhausted for {typeof(T).Name}! Consider increasing pool size.");
-                return null;
+                _availableObjects.Dequeue(); // Remove from available since we're using it
+                _availableSet.Remove(obj);
             }
             else
             {
-                obj = _availableObjects.Dequeue();
+                Debug.LogWarning($"Pool exhausted for {typeof(T).Name}! Consider increasing pool size.");
+                return null;
             }
 
             // Set position BEFORE OnSpawn so components can correctly initialize with spawn position
@@ -126,8 +139,8 @@ namespace SpaceCombat.Utilities
             obj.OnDespawn();
             obj.ResetState();
             obj.gameObject.SetActive(false);
-            
-            if (!_availableObjects.Contains(obj))
+
+            if (_availableSet.Add(obj)) // O(1) duplicate check
             {
                 _availableObjects.Enqueue(obj);
             }
@@ -154,6 +167,7 @@ namespace SpaceCombat.Utilities
             obj.ResetState();
             _allObjects.Add(obj);
             _availableObjects.Enqueue(obj);
+            _availableSet.Add(obj);
             return obj;
         }
 
@@ -171,6 +185,7 @@ namespace SpaceCombat.Utilities
             }
             _allObjects.Clear();
             _availableObjects.Clear();
+            _availableSet.Clear();
         }
     }
  
