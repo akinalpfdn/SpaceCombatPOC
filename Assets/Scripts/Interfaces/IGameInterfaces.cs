@@ -9,17 +9,23 @@ using System;
 namespace SpaceCombat.Interfaces
 {
     /// <summary>
-    /// For entities that can take damage
+    /// For entities that can take damage.
     /// </summary>
     public interface IDamageable
     {
         float CurrentHealth { get; }
         float MaxHealth { get; }
         bool IsAlive { get; }
-        
-        void TakeDamage(float amount, DamageType damageType = DamageType.Normal);
+
+        /// <summary>
+        /// Apply damage to the entity.
+        /// </summary>
+        /// <param name="amount">Damage amount</param>
+        /// <param name="damageType">Type of damage for visual effects</param>
+        /// <param name="source">Source of damage for popup aggregation (null = no aggregation)</param>
+        void TakeDamage(float amount, DamageType damageType = DamageType.Normal, GameObject source = null);
         void Heal(float amount);
-        
+
         event Action<float, float> OnHealthChanged; // current, max
         event Action OnDeath;
     }

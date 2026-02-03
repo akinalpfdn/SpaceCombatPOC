@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 142680459996147334}
   - component: {fileID: 8128652702184582322}
   - component: {fileID: 6593360817303410791}
+  - component: {fileID: 4168644045387018962}
   m_Layer: 7
   m_Name: Enemy
   m_TagString: Untagged
@@ -30,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2255247427936912491}
@@ -52,11 +53,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.Combat.WeaponController
   _currentWeaponConfig: {fileID: 11400000, guid: 849b5560bac627e4fae1a2d1d9930fc8, type: 2}
   _firePoint: {fileID: 2255247427936912491}
+  _firePoints: []
   _targetLayers:
     serializedVersion: 2
     m_Bits: 64
   _isPlayerWeapon: 0
-  _projectileSprite: {fileID: 21300000, guid: 31ddc915eaa558e428406ff70d51e032, type: 3}
+  _fallbackConvergenceDistance: 15
   _fireSoundId: enemy_laser
   _lastFireTime: 0
   _aimDirection: {x: 0, y: 1}
@@ -82,11 +84,6 @@ MonoBehaviour:
   _flashDuration: 0.1
   _damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
   _config: {fileID: 11400000, guid: 340f3ccd1f47d1f45b12d829e12d8515, type: 2}
-  _detectionRange: 12
-  _attackRange: 8
-  _patrolRadius: 5
-  _moveSpeed: 5
-  _rotationSpeed: 120
   _weaponController: {fileID: 4869607988499088699}
 --- !u!54 &8128652702184582322
 Rigidbody:
@@ -136,6 +133,19 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.93875
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4168644045387018962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1308714026295151175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36e8de515c81ffe4eaf7182d7a53cd4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SpaceCombat::SpaceCombat.AI.EnemyStateMachine
+  _currentStateName: 
 --- !u!1 &3992494143750376393
 GameObject:
   m_ObjectHideFlags: 0

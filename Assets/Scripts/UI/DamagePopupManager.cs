@@ -49,6 +49,35 @@ namespace SpaceCombat.UI
         private GameObject _poolParent;
 
         // ============================================
+        // DAMAGE AGGREGATION
+        // ============================================
+
+        /// <summary>
+        /// Tracks pending damage from a specific source to aggregate multi-hit attacks.
+        /// Key: SourceId (attacker's instance ID)
+        /// </summary>
+        private Dictionary<int, PendingDamage> _pendingDamage;
+
+        /// <summary>
+        /// Time window for aggregating damage from the same source (seconds).
+        /// Projectiles from the same volley typically hit within 50-100ms.
+        /// </summary>
+        private const float AGGREGATION_WINDOW = 0.1f;
+
+        /// <summary>
+        /// Stores accumulated damage waiting to be displayed.
+        /// </summary>
+        private struct PendingDamage
+        {
+            public Vector3 Position;
+            public float TotalDamage;
+            public bool IsCritical;
+            public bool IsShieldDamage;
+            public Interfaces.DamageType DamageType;
+            public float Timestamp;
+        }
+
+        // ============================================
         // UNITY LIFECYCLE
         // ============================================
 
@@ -56,10 +85,17 @@ namespace SpaceCombat.UI
         {
             _pool = new Queue<DamagePopup>();
             _activePopups = new List<DamagePopup>();
+            _pendingDamage = new Dictionary<int, PendingDamage>();
 
             // Create parent object for organization
             _poolParent = new GameObject("DamagePopupPool");
             _poolParent.transform.SetParent(transform);
+        }
+
+        private void Update()
+        {
+            // Process pending damage that has exceeded the aggregation window
+            ProcessPendingDamage();
         }
 
         private void Start()
@@ -126,13 +162,94 @@ namespace SpaceCombat.UI
 
         private void OnDamagePopupEvent(DamagePopupEvent evt)
         {
-            SpawnPopup(
-                evt.WorldPosition,
-                evt.DamageAmount,
-                evt.IsCritical,
-                evt.IsShieldDamage,
-                evt.DamageType
-            );
+            // If no source ID, spawn immediately (no aggregation)
+            if (evt.SourceId == 0)
+            {
+                SpawnPopup(
+                    evt.WorldPosition,
+                    evt.DamageAmount,
+                    evt.IsCritical,
+                    evt.IsShieldDamage,
+                    evt.DamageType
+                );
+                return;
+            }
+
+            // Aggregate damage from the same source
+            if (_pendingDamage.TryGetValue(evt.SourceId, out var pending))
+            {
+                // Add to existing pending damage
+                pending.TotalDamage += evt.DamageAmount;
+                pending.IsCritical |= evt.IsCritical;  // Any crit makes it a crit
+                pending.Position = evt.WorldPosition;   // Update to latest hit position
+                _pendingDamage[evt.SourceId] = pending;
+
+                if (_debugLog)
+                {
+                    Debug.Log($"[DamagePopupManager] Aggregated damage from source {evt.SourceId}: +{evt.DamageAmount} = {pending.TotalDamage}");
+                }
+            }
+            else
+            {
+                // Start new pending damage
+                _pendingDamage[evt.SourceId] = new PendingDamage
+                {
+                    Position = evt.WorldPosition,
+                    TotalDamage = evt.DamageAmount,
+                    IsCritical = evt.IsCritical,
+                    IsShieldDamage = evt.IsShieldDamage,
+                    DamageType = evt.DamageType,
+                    Timestamp = Time.time
+                };
+
+                if (_debugLog)
+                {
+                    Debug.Log($"[DamagePopupManager] Started aggregating damage from source {evt.SourceId}: {evt.DamageAmount}");
+                }
+            }
+        }
+
+        // ============================================
+        // DAMAGE AGGREGATION
+        // ============================================
+
+        /// <summary>
+        /// Processes pending damage and spawns popups when aggregation window expires.
+        /// </summary>
+        private void ProcessPendingDamage()
+        {
+            if (_pendingDamage.Count == 0) return;
+
+            float currentTime = Time.time;
+            var keysToRemove = new List<int>();
+
+            foreach (var kvp in _pendingDamage)
+            {
+                if (currentTime - kvp.Value.Timestamp >= AGGREGATION_WINDOW)
+                {
+                    // Aggregation window expired - spawn the popup
+                    var pending = kvp.Value;
+                    SpawnPopup(
+                        pending.Position,
+                        pending.TotalDamage,
+                        pending.IsCritical,
+                        pending.IsShieldDamage,
+                        pending.DamageType
+                    );
+                    keysToRemove.Add(kvp.Key);
+
+                    if (_debugLog)
+                    {
+                        Debug.Log($"[DamagePopupManager] Spawned aggregated popup for source {kvp.Key}: {pending.TotalDamage}");
+                    }
+                }
+            }
+
+            // Clean up processed entries
+            foreach (var key in keysToRemove)
+            {
+                _pendingDamage.Remove(key);
+            }
         }
 
         // ============================================

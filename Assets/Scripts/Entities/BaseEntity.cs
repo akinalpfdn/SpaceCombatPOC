@@ -69,14 +69,20 @@ namespace SpaceCombat.Entities
         }
 
         /// <summary>
-        /// Take damage with shield absorption
+        /// Take damage with shield absorption.
         /// </summary>
-        public virtual void TakeDamage(float amount, DamageType damageType = DamageType.Normal)
+        /// <param name="amount">Damage amount</param>
+        /// <param name="damageType">Type of damage for visual effects</param>
+        /// <param name="source">Source of damage for popup aggregation (null = no aggregation)</param>
+        public virtual void TakeDamage(float amount, DamageType damageType = DamageType.Normal, GameObject source = null)
         {
             if (!IsAlive || _isInvincible) return;
 
             float damageToHealth = amount;
             float damageToShield = 0f;
+
+            // Get source ID for damage aggregation (0 = no aggregation)
+            int sourceId = source != null ? source.GetInstanceID() : 0;
 
             // Shield absorbs damage first
             if (_currentShield > 0)
@@ -94,7 +100,8 @@ namespace SpaceCombat.Entities
                     damageToShield,
                     isCritical: false,
                     isShieldDamage: true,
-                    damageType
+                    damageType,
+                    sourceId
                 ));
             }
 
@@ -110,7 +117,8 @@ namespace SpaceCombat.Entities
                     damageToHealth,
                     isCritical: false,
                     isShieldDamage: false,
-                    damageType
+                    damageType,
+                    sourceId
                 ));
             }
 

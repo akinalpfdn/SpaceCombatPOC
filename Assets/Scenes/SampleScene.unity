@@ -330,6 +330,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 154031801}
   m_CullTransparentMesh: 1
+--- !u!1 &269955912
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 269955914}
+  - component: {fileID: 269955913}
+  m_Layer: 0
+  m_Name: DamagePopupManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &269955913
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 269955912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a0d4316246a82043adeeae663db66ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SpaceCombat::SpaceCombat.UI.DamagePopupManager
+  _config: {fileID: 11400000, guid: 7fcb0f636f94f47448d2aecd7b39fbeb, type: 2}
+  _debugLog: 0
+--- !u!4 &269955914
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 269955912}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.34858, y: -0, z: -38.15228}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &397036599
 GameObject:
   m_ObjectHideFlags: 0
@@ -2915,3 +2961,4 @@ SceneRoots:
   - {fileID: 990000002}
   - {fileID: 1771477028}
   - {fileID: 1783934766}
+  - {fileID: 269955914}

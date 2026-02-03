@@ -294,24 +294,32 @@ namespace SpaceCombat.Events
     /// <summary>
     /// Published when damage is dealt and should be displayed as floating text.
     /// DamagePopupManager subscribes to this and spawns popup at the position.
+    ///
+    /// Damage Aggregation:
+    /// - Damage from the same source to the same target within a short time window
+    ///   is aggregated into a single popup (e.g., 4 fire points = 1 combined number)
+    /// - Different sources show separate popups (e.g., 3 enemies = 3 numbers)
     /// </summary>
     public struct DamagePopupEvent : IGameEvent
     {
-        public Vector3 WorldPosition;        // Where to spawn the popup
+        public Vector3 WorldPosition;        // Where to spawn the popup (target position)
         public float DamageAmount;           // Damage value to display
         public bool IsCritical;              // Critical hits shown differently
         public bool IsShieldDamage;          // Shield damage vs health damage
         public Interfaces.DamageType DamageType;  // For color coding
+        public int SourceId;                 // Source instance ID for aggregation (0 = no aggregation)
 
         public DamagePopupEvent(Vector3 worldPosition, float damage,
             bool isCritical = false, bool isShieldDamage = false,
-            Interfaces.DamageType damageType = Interfaces.DamageType.Normal)
+            Interfaces.DamageType damageType = Interfaces.DamageType.Normal,
+            int sourceId = 0)
         {
             WorldPosition = worldPosition;
             DamageAmount = damage;
             IsCritical = isCritical;
             IsShieldDamage = isShieldDamage;
             DamageType = damageType;
+            SourceId = sourceId;
         }
     }
 }

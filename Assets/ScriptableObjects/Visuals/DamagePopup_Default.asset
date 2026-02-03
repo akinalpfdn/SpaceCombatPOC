@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac8c1207b3126154e87b9b0c12b563a3, type: 3}
   m_Name: DamagePopup_Default
   m_EditorClassIdentifier: SpaceCombat::SpaceCombat.ScriptableObjects.DamagePopupConfig
-  _fontAsset: {fileID: 0}
-  _baseFontSize: 4
+  _fontAsset: {fileID: 11400000, guid: e26efda4b59307243901bee93f94bb65, type: 2}
+  _baseFontSize: 0.15
   _criticalSizeMultiplier: 1.5
   _duration: 1.2
-  _riseSpeed: 2
+  _riseSpeed: 4.52
   _horizontalSpread: 0.3
   _verticalOffset: 0.5
   _scaleCurve:
