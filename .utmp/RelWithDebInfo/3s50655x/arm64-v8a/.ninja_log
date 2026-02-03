@@ -1,0 +1,12 @@
+# ninja log v5
+79	527	7917799644321493	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	e022edba02a9389a
+529	797	7917799646979726	C:/Users/akina/SpaceCombatPOC/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/3s50655x/obj/arm64-v8a/libswappywrapper.so	832083b3846f3e35
+23	1884	7917799657812099	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	dd6a0d46bbbacbb3
+33	1894	7917799657847283	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	d1127b96d7da0ace
+1	1923	7917799658331174	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	b9d8d09f5fe14775
+54	1944	7917799658529515	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	10f273084a791d33
+15	2060	7917799659733518	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	d214dce34561ad0e
+66	2208	7917799661230405	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	3e056e3eae07545a
+44	2236	7917799661530746	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	d05572d0f1e8a2ac
+8	2366	7917799662806620	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	74a0e209327e454e
+2366	2474	7917799663943831	C:/Users/akina/SpaceCombatPOC/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/3s50655x/obj/arm64-v8a/libgame.so	6c1a8ced82ac7ebe

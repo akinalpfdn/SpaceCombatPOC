@@ -193,7 +193,7 @@ MonoBehaviour:
   _showShield: 1
   _offset: {x: 0, y: -1.5, z: -3.5}
   _lineSpacing: 0.7
-  _fontScale: 0.9
+  _fontScale: 0.6
   _healthColor: {r: 0.2, g: 0.8, b: 0.2, a: 1}
   _shieldColor: {r: 0.3, g: 0.5, b: 1, a: 1}
   _sortingOrder: 200

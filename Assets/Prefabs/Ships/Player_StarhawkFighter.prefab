@@ -33,7 +33,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3, y: 3, z: 3}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2673502855802272265}
@@ -145,6 +145,7 @@ MonoBehaviour:
   _weaponController: {fileID: 0}
   _shipMovement: {fileID: 0}
   _mainCamera: {fileID: 0}
+  _doubleClickTime: 0.3
   _targetIndicatorPrefab: {fileID: 3787043342725239422, guid: 3632ac2bf675ef94e805a43e7b9ee1b6, type: 3}
   _healthBarPrefab: {fileID: 4674260991152052681, guid: a908d1210d1c54c4ab61070c37258f08, type: 3}
 --- !u!114 &362525359733449936
@@ -442,6 +443,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2242435719637757755}
     m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 1eb3b0b4b3734694bae3d64524691ee6, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1eb3b0b4b3734694bae3d64524691ee6, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1eb3b0b4b3734694bae3d64524691ee6, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 150
+      objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1eb3b0b4b3734694bae3d64524691ee6, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
