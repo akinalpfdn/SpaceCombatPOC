@@ -162,10 +162,11 @@ Shader "SpaceCombat/ShieldURP"
                 // Only visible on the hemisphere facing the hit
                 float glowArea = smoothstep(currentRadius + rippleWidth * 2.0, 0.0, surfaceDist) * fadeOut;
 
-                // Extra falloff for backside of sphere (prevents wrap-around)
-                float hemisphereClip = smoothstep(-0.2, 0.3, cosAngle);
-                ripple *= hemisphereClip;
-                glowArea *= hemisphereClip;
+                // Very tight angular falloff - only show effect within ~30 degree cone from hit point
+                // cosAngle = 1.0 means same direction as hit, 0.87 = ~30 degrees, 0.7 = ~45 degrees
+                float angularFalloff = smoothstep(0.7, 0.98, cosAngle);
+                ripple *= angularFalloff;
+                glowArea *= angularFalloff;
 
                 return float2(ripple, glowArea);
             }
