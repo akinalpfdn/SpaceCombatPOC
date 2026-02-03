@@ -5,6 +5,7 @@
 // ============================================
 
 using UnityEngine;
+using SpaceCombat.Entities;
 using SpaceCombat.Interfaces;
 using SpaceCombat.Events;
 
@@ -200,8 +201,23 @@ namespace SpaceCombat.Combat
                 var damageable = hit.collider.GetComponent<IDamageable>();
                 if (damageable != null)
                 {
+                    // Check for shield hit before applying damage
+                    var entity = hit.collider.GetComponent<BaseEntity>();
+                    bool hadShield = entity != null && entity.HasShield && entity.CurrentShield > 0;
+
                     damageable.TakeDamage(_damage, _damageType);
                     SpawnHitEffect(hit.point);
+
+                    // Publish shield hit event if entity had shield
+                    if (hadShield)
+                    {
+                        EventBus.Publish(new ShieldHitEvent(
+                            hit.collider.gameObject,
+                            hit.point,
+                            _damage,
+                            _damageType
+                        ));
+                    }
 
                     Vector3 pos = transform.position;
                     EventBus.Publish(new PlaySFXEvent(_hitSoundId, new Vector2(pos.x, pos.z)));
@@ -224,8 +240,25 @@ namespace SpaceCombat.Combat
             var damageable = other.GetComponent<IDamageable>();
             if (damageable != null)
             {
+                // Check for shield hit before applying damage
+                var entity = other.GetComponent<BaseEntity>();
+                bool hadShield = entity != null && entity.HasShield && entity.CurrentShield > 0;
+
+                Vector3 hitPoint = other.ClosestPoint(transform.position);
+
                 damageable.TakeDamage(_damage, _damageType);
-                SpawnHitEffect(other.ClosestPoint(transform.position));
+                SpawnHitEffect(hitPoint);
+
+                // Publish shield hit event if entity had shield
+                if (hadShield)
+                {
+                    EventBus.Publish(new ShieldHitEvent(
+                        other.gameObject,
+                        hitPoint,
+                        _damage,
+                        _damageType
+                    ));
+                }
 
                 Vector3 pos = transform.position;
                 EventBus.Publish(new PlaySFXEvent(_hitSoundId, new Vector2(pos.x, pos.z)));

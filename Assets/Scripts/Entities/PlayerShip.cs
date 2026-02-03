@@ -11,6 +11,7 @@ using SpaceCombat.ScriptableObjects;
 using SpaceCombat.Combat;
 using SpaceCombat.Movement;
 using SpaceCombat.Core;
+using SpaceCombat.VFX.Shield;
 
 namespace SpaceCombat.Entities
 {
@@ -35,6 +36,7 @@ namespace SpaceCombat.Entities
         [Header("Effects")]
         [SerializeField] private ParticleSystem _engineTrail;
         [SerializeField] private GameObject _shieldVisual;
+        [SerializeField] private ShieldVisualController _shieldVisualController;
 
         // Properties from IMovable
         public Vector2 Velocity => _movement?.Velocity ?? Vector2.zero;
@@ -228,11 +230,21 @@ namespace SpaceCombat.Entities
 
         private void UpdateShieldVisual()
         {
+            // Use ShieldVisualController if available (DarkOrbit-style effects)
+            if (_shieldVisualController != null)
+            {
+                bool showShield = HasShield && _currentShield > 0;
+                _shieldVisualController.SetShieldActive(showShield);
+                // Color/health updates are handled automatically via OnShieldChanged subscription
+                return;
+            }
+
+            // Fallback: Legacy sprite-based shield visual
             if (_shieldVisual != null)
             {
                 bool showShield = HasShield && _currentShield > 0;
                 _shieldVisual.SetActive(showShield);
-                
+
                 if (showShield)
                 {
                     float shieldAlpha = _currentShield / _maxShield;
@@ -324,19 +336,22 @@ namespace SpaceCombat.Entities
         public void Respawn(Vector3 position)
         {
             transform.position = position;
-            
+
             _currentHealth = _maxHealth;
             _currentShield = _maxShield;
 
             NotifyHealthChanged();
             NotifyShieldChanged();
 
+            // Reset shield visual
+            _shieldVisualController?.OnSpawn();
+
             // Brief invincibility
             SetInvincible(true);
             _invincibilityEndTime = Time.time + 2f;
-            
+
             gameObject.SetActive(true);
-            
+
             // Start blinking effect
             StartCoroutine(InvincibilityBlink());
         }

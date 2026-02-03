@@ -146,6 +146,27 @@ namespace SpaceCombat.Events
 
     public enum ExplosionSize { Small, Medium, Large }
 
+    /// <summary>
+    /// Published when a projectile hits an entity's shield.
+    /// Used by ShieldVisualController to spawn ripple effects at exact hit point.
+    /// </summary>
+    public struct ShieldHitEvent : IGameEvent
+    {
+        public GameObject Target;           // Entity that was hit
+        public Vector3 HitWorldPosition;    // Exact world-space hit point (from raycast)
+        public float DamageAmount;          // For intensity scaling
+        public Interfaces.DamageType DamageType;  // For potential color variation
+
+        public ShieldHitEvent(GameObject target, Vector3 hitPosition,
+            float damage, Interfaces.DamageType damageType)
+        {
+            Target = target;
+            HitWorldPosition = hitPosition;
+            DamageAmount = damage;
+            DamageType = damageType;
+        }
+    }
+
     // ============================================
     // GAME STATE EVENTS
     // ============================================
