@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: NewShieldVisual
   m_EditorClassIdentifier: SpaceCombat::SpaceCombat.ScriptableObjects.ShieldVisualConfig
   _shieldMesh: {fileID: 0}
-  _shieldMaterial: {fileID: 0}
-  _meshScale: {x: 1.2, y: 1, z: 1.5}
-  _idleFresnelPower: 4
-  _idleFresnelIntensity: 0.3
-  _idlePulseSpeed: 1
-  _idlePulseAmount: 0.1
+  _shieldMaterial: {fileID: 2100000, guid: 44b9c2f2affa94e4eb3c9ba4c745e0de, type: 2}
+  _meshScale: {x: 2, y: 2, z: 2}
+  _idleFresnelPower: 1
+  _idleFresnelIntensity: 0
+  _idlePulseSpeed: 0
+  _idlePulseAmount: 0
   _rippleSpeed: 3
   _rippleDuration: 0.6
   _rippleWidth: 0.15

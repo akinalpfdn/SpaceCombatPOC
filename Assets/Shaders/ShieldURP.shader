@@ -113,15 +113,38 @@ Shader "SpaceCombat/ShieldURP"
                 return output;
             }
 
+            // Hexagonal distance function - returns distance to nearest hexagon edge
+            float HexDist(float2 p)
+            {
+                p = abs(p);
+                float c = dot(p, normalize(float2(1.0, 1.73)));
+                c = max(c, p.x);
+                return c;
+            }
+
             float HexagonPattern(float2 uv, float scale, float lineWidth)
             {
                 float2 p = uv * scale;
-                float2 h = float2(1.0, sqrt(3.0));
-                float2 a = fmod(p, h) - h * 0.5;
-                float2 b = fmod(p - h * 0.5, h) - h * 0.5;
-                float2 gv = length(a) < length(b) ? a : b;
-                float d = abs(max(dot(gv, normalize(float2(1.0, 1.73))), gv.x));
-                float hexLine = smoothstep(lineWidth, lineWidth * 0.5, abs(d - 0.5));
+
+                // Hexagon grid repetition
+                float2 r = float2(1.0, sqrt(3.0));
+                float2 h = r * 0.5;
+
+                // Two offset grids for proper hexagon tiling
+                float2 a = fmod(p, r) - h;
+                float2 b = fmod(p - h, r) - h;
+
+                // Pick the closer center
+                float2 gv = (dot(a, a) < dot(b, b)) ? a : b;
+
+                // Distance to hexagon edge (0 at center, 0.5 at edge)
+                float hexDist = HexDist(gv);
+
+                // Create line at the edge of hexagons
+                float edge = 0.5;
+                float hexLine = smoothstep(edge - lineWidth, edge, hexDist) *
+                               smoothstep(edge + lineWidth, edge, hexDist);
+
                 return hexLine;
             }
 

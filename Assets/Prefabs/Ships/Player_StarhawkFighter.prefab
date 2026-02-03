@@ -82,8 +82,8 @@ MonoBehaviour:
   _currentWeaponConfig: {fileID: 11400000, guid: 849b5560bac627e4fae1a2d1d9930fc8, type: 2}
   _firePoint: {fileID: 2673502855802272265}
   _firePoints:
-  - {fileID: 3864530326157895227}
-  - {fileID: 7273650910233538096}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 8218104319516740987}
   - {fileID: 3851899568437089537}
   - {fileID: 408807341103535418}
@@ -124,6 +124,7 @@ MonoBehaviour:
   _weaponMountPoint: {fileID: 0}
   _engineTrail: {fileID: 0}
   _shieldVisual: {fileID: 0}
+  _shieldVisualController: {fileID: 0}
 --- !u!114 &8479908390722580308
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -277,37 +278,6 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.00169, y: 0.00342, z: -0.00161}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2621303755450950533}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &4062606957085501654
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 7273650910233538096}
-  m_Layer: 0
-  m_Name: Weapon2
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &7273650910233538096
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4062606957085501654}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.00799, y: -0.00076, z: -0.00114}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -534,6 +504,7 @@ MonoBehaviour:
   _minTrailDuration: 0.1
   _maxTrailDuration: 0.2
   _recordInterval: 0.02
+  _minPointDistance: 0.05
   _startWidth: 0.4
   _endWidth: 0.02
   _maxShipSpeed: 10
@@ -569,37 +540,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2242435719637757755}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &6932018745946887820
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3864530326157895227}
-  m_Layer: 0
-  m_Name: Weapon1
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3864530326157895227
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6932018745946887820}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.00799, y: 0.00044, z: -0.00111}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2621303755450950533}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8319630695934004610
 GameObject:
@@ -760,6 +700,7 @@ MonoBehaviour:
   _minTrailDuration: 0.1
   _maxTrailDuration: 0.2
   _recordInterval: 0.02
+  _minPointDistance: 0.05
   _startWidth: 0.4
   _endWidth: 0.02
   _maxShipSpeed: 20
@@ -836,12 +777,6 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 1eb3b0b4b3734694bae3d64524691ee6, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3864530326157895227}
-    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 1eb3b0b4b3734694bae3d64524691ee6, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 7273650910233538096}
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 1eb3b0b4b3734694bae3d64524691ee6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8218104319516740987}
