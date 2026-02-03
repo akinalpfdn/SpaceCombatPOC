@@ -28,6 +28,14 @@ namespace SpaceCombat.ScriptableObjects
 
         [Header("Combat")]
         public WeaponConfig[] availableWeapons;
+
+        [Header("Shield Visual")]
+        [Tooltip("Shield visual config for DarkOrbit-style effects. If null, no shield visual is created.")]
+        public ShieldVisualConfig shieldVisualConfig;
+
+        [Tooltip("Shield scale specific to this ship. Overrides config default if not zero.")]
+        public Vector3 shieldScale = new Vector3(2f, 1.5f, 2.5f);
+
         [Header("Audio")]
         public string shieldHitSoundId = "shield_hit";
         public string hullHitSoundId = "hull_hit";

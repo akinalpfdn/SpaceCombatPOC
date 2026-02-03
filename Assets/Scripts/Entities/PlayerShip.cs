@@ -150,7 +150,63 @@ namespace SpaceCombat.Entities
                     _spriteRenderer.sprite = _config.shipSprite;
             }
 
+            // Create shield visual at runtime if config has one and we don't already have a controller
+            if (_useConfigSettings && _config != null && _config.shieldVisualConfig != null && _shieldVisualController == null)
+            {
+                CreateShieldVisual(_config.shieldVisualConfig);
+            }
+
             UpdateShieldVisual();
+        }
+
+        /// <summary>
+        /// Creates shield visual at runtime from config.
+        /// This allows all ships to share the same config without manual prefab setup.
+        /// </summary>
+        private void CreateShieldVisual(ShieldVisualConfig config)
+        {
+            // Create ShieldVisual child GameObject
+            var shieldGO = new GameObject("ShieldVisual");
+            shieldGO.transform.SetParent(transform);
+            shieldGO.transform.localPosition = Vector3.zero;
+            shieldGO.transform.localRotation = Quaternion.identity;
+
+            // Use ship-specific scale from ShipConfig, fallback to config default
+            Vector3 scale = (_config != null && _config.shieldScale != Vector3.zero)
+                ? _config.shieldScale
+                : config.MeshScale;
+            shieldGO.transform.localScale = scale;
+
+            // Add required components
+            var meshFilter = shieldGO.AddComponent<MeshFilter>();
+            var meshRenderer = shieldGO.AddComponent<MeshRenderer>();
+            var controller = shieldGO.AddComponent<ShieldVisualController>();
+
+            // Configure mesh - use config mesh or fallback to built-in sphere
+            if (config.ShieldMesh != null)
+            {
+                meshFilter.mesh = config.ShieldMesh;
+            }
+            else
+            {
+                // Fallback: create a sphere mesh if none provided
+                var sphereGO = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                meshFilter.mesh = sphereGO.GetComponent<MeshFilter>().sharedMesh;
+                Destroy(sphereGO);
+            }
+
+            // Configure renderer
+            if (config.ShieldMaterial != null)
+            {
+                meshRenderer.material = config.ShieldMaterial;
+            }
+            meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            meshRenderer.receiveShadows = false;
+
+            // Initialize controller with config
+            controller.InitializeWithConfig(config, this);
+
+            _shieldVisualController = controller;
         }
 
         // ============================================

@@ -125,21 +125,49 @@ Shader "SpaceCombat/ShieldURP"
                 return hexLine;
             }
 
-            float CalculateRipple(float3 localPos, float4 hitPoint, float rippleWidth, float maxRadius)
+            // Returns: x = ripple ring intensity, y = glow area (for localized hexagon)
+            // Uses angular distance on sphere surface for truly localized effect
+            float2 CalculateRippleAndGlow(float3 localPos, float4 hitPoint, float rippleWidth, float maxRadius)
             {
-                if (hitPoint.w < 0.0) return 0.0;
+                if (hitPoint.w < 0.0) return float2(0.0, 0.0);
 
                 float3 hitPos = hitPoint.xyz;
                 float normalizedTime = hitPoint.w;
-                float currentRadius = normalizedTime * maxRadius;
-                float dist = distance(localPos, hitPos);
 
-                float innerEdge = smoothstep(currentRadius - rippleWidth, currentRadius, dist);
-                float outerEdge = smoothstep(currentRadius + rippleWidth, currentRadius, dist);
+                // Use angular distance on sphere surface instead of 3D distance
+                // This keeps the effect localized to the hit area
+                float3 hitDir = normalize(hitPos);
+                float3 fragDir = normalize(localPos);
+
+                // Dot product gives cosine of angle between directions
+                // Convert to angular distance (0 = same point, PI = opposite side)
+                float cosAngle = dot(hitDir, fragDir);
+                float angularDist = acos(saturate(cosAngle)); // 0 to PI radians
+
+                // Scale angular distance to approximate surface distance
+                // Smaller multiplier = tighter/more localized effect
+                float surfaceDist = angularDist * 0.25; // Halved for tighter ripple
+
+                float currentRadius = normalizedTime * maxRadius * 0.25; // Halved for tighter spread
+
+                // Ripple ring effect on surface
+                float innerEdge = smoothstep(currentRadius - rippleWidth, currentRadius, surfaceDist);
+                float outerEdge = smoothstep(currentRadius + rippleWidth, currentRadius, surfaceDist);
                 float ring = innerEdge * outerEdge;
 
                 float fadeOut = 1.0 - normalizedTime;
-                return ring * fadeOut;
+                float ripple = ring * fadeOut;
+
+                // Glow area - localized around hit point
+                // Only visible on the hemisphere facing the hit
+                float glowArea = smoothstep(currentRadius + rippleWidth * 2.0, 0.0, surfaceDist) * fadeOut;
+
+                // Extra falloff for backside of sphere (prevents wrap-around)
+                float hemisphereClip = smoothstep(-0.2, 0.3, cosAngle);
+                ripple *= hemisphereClip;
+                glowArea *= hemisphereClip;
+
+                return float2(ripple, glowArea);
             }
 
             half4 frag(Varyings input) : SV_Target
@@ -152,21 +180,38 @@ Shader "SpaceCombat/ShieldURP"
 
                 float2 hexUV = input.positionOS.xy + input.positionOS.yz * 0.5;
                 float hexPattern = HexagonPattern(hexUV, _HexagonScale, _HexagonLineWidth);
-                float hexContribution = hexPattern * _HexagonVisibility;
 
+                // Calculate ripples and localized glow areas for each hit point
                 float rippleSum = 0.0;
-                rippleSum += CalculateRipple(input.positionOS, _HitPoint0, _RippleWidth, _RippleMaxRadius);
-                rippleSum += CalculateRipple(input.positionOS, _HitPoint1, _RippleWidth, _RippleMaxRadius);
-                rippleSum += CalculateRipple(input.positionOS, _HitPoint2, _RippleWidth, _RippleMaxRadius);
-                rippleSum += CalculateRipple(input.positionOS, _HitPoint3, _RippleWidth, _RippleMaxRadius);
-                rippleSum += CalculateRipple(input.positionOS, _HitPoint4, _RippleWidth, _RippleMaxRadius);
-                rippleSum += CalculateRipple(input.positionOS, _HitPoint5, _RippleWidth, _RippleMaxRadius);
-                rippleSum += CalculateRipple(input.positionOS, _HitPoint6, _RippleWidth, _RippleMaxRadius);
-                rippleSum += CalculateRipple(input.positionOS, _HitPoint7, _RippleWidth, _RippleMaxRadius);
+                float glowSum = 0.0;
+                float2 result;
+
+                result = CalculateRippleAndGlow(input.positionOS, _HitPoint0, _RippleWidth, _RippleMaxRadius);
+                rippleSum += result.x; glowSum += result.y;
+                result = CalculateRippleAndGlow(input.positionOS, _HitPoint1, _RippleWidth, _RippleMaxRadius);
+                rippleSum += result.x; glowSum += result.y;
+                result = CalculateRippleAndGlow(input.positionOS, _HitPoint2, _RippleWidth, _RippleMaxRadius);
+                rippleSum += result.x; glowSum += result.y;
+                result = CalculateRippleAndGlow(input.positionOS, _HitPoint3, _RippleWidth, _RippleMaxRadius);
+                rippleSum += result.x; glowSum += result.y;
+                result = CalculateRippleAndGlow(input.positionOS, _HitPoint4, _RippleWidth, _RippleMaxRadius);
+                rippleSum += result.x; glowSum += result.y;
+                result = CalculateRippleAndGlow(input.positionOS, _HitPoint5, _RippleWidth, _RippleMaxRadius);
+                rippleSum += result.x; glowSum += result.y;
+                result = CalculateRippleAndGlow(input.positionOS, _HitPoint6, _RippleWidth, _RippleMaxRadius);
+                rippleSum += result.x; glowSum += result.y;
+                result = CalculateRippleAndGlow(input.positionOS, _HitPoint7, _RippleWidth, _RippleMaxRadius);
+                rippleSum += result.x; glowSum += result.y;
+
                 rippleSum = saturate(rippleSum);
+                glowSum = saturate(glowSum);
+
+                // Hexagon only visible in the localized glow area around hits
+                // Also factor in the global _HexagonVisibility for fade-out control
+                float localizedHexagon = hexPattern * glowSum * _HexagonVisibility;
 
                 float baseVisibility = fresnel;
-                float hitVisibility = hexContribution + rippleSum;
+                float hitVisibility = localizedHexagon + rippleSum;
                 float totalIntensity = saturate(baseVisibility + hitVisibility * 2.0);
 
                 half4 finalColor = half4(_ShieldColor.rgb * totalIntensity, totalIntensity * _ShieldColor.a);

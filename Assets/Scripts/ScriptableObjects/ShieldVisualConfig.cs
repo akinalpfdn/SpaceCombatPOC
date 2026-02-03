@@ -38,22 +38,22 @@ namespace SpaceCombat.ScriptableObjects
         // IDLE STATE
         // ============================================
 
-        [Header("Idle State (Always Visible)")]
+        [Header("Idle State (Set to 0 for invisible until hit)")]
         [Tooltip("Fresnel power - higher = sharper edge glow")]
         [Range(1f, 8f)]
         [SerializeField] private float _idleFresnelPower = 4f;
 
-        [Tooltip("Fresnel intensity - how bright the edge glow is")]
+        [Tooltip("Fresnel intensity - 0 = invisible when idle, only visible on hit")]
         [Range(0f, 1f)]
-        [SerializeField] private float _idleFresnelIntensity = 0.3f;
+        [SerializeField] private float _idleFresnelIntensity = 0f;
 
         [Tooltip("Speed of subtle pulsing effect")]
         [Range(0f, 3f)]
-        [SerializeField] private float _idlePulseSpeed = 1f;
+        [SerializeField] private float _idlePulseSpeed = 0f;
 
         [Tooltip("Amount of pulsing (0 = no pulse)")]
         [Range(0f, 0.3f)]
-        [SerializeField] private float _idlePulseAmount = 0.1f;
+        [SerializeField] private float _idlePulseAmount = 0f;
 
         // ============================================
         // HIT EFFECT

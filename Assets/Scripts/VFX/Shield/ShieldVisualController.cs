@@ -150,6 +150,40 @@ namespace SpaceCombat.VFX.Shield
         // INITIALIZATION
         // ============================================
 
+        /// <summary>
+        /// Initializes the controller with a config at runtime.
+        /// Called by PlayerShip when creating shield visual dynamically.
+        /// </summary>
+        public void InitializeWithConfig(ShieldVisualConfig config, BaseEntity parentEntity)
+        {
+            _config = config;
+            _parentEntity = parentEntity;
+
+            // Reinitialize hit points array if needed
+            int hitCount = _config != null ? _config.MaxSimultaneousHits : 8;
+            if (_hitPoints == null || _hitPoints.Length != hitCount)
+            {
+                _hitPoints = new ShieldHitData[hitCount];
+            }
+
+            ApplyConfig();
+
+            // Subscribe to parent entity's shield changes
+            if (_parentEntity != null)
+            {
+                _parentEntity.OnShieldChanged += OnShieldHealthChanged;
+
+                // Initialize with current shield state
+                if (_parentEntity.MaxShield > 0)
+                {
+                    SetShieldHealth(_parentEntity.CurrentShield / _parentEntity.MaxShield);
+                }
+            }
+
+            // Subscribe to shield hit events (if not already)
+            EventBus.Subscribe<ShieldHitEvent>(OnShieldHitEvent);
+        }
+
         private void ApplyConfig()
         {
             if (_config == null)
@@ -170,8 +204,9 @@ namespace SpaceCombat.VFX.Shield
                 _meshRenderer.material = _config.ShieldMaterial;
             }
 
-            // Apply scale
-            transform.localScale = _config.MeshScale;
+            // NOTE: Scale is NOT applied here - it's handled by the parent (PlayerShip)
+            // which uses ship-specific scale from ShipConfig.shieldScale.
+            // This allows each ship to have different shield sizes while sharing the same config.
 
             // Set static shader properties
             _propertyBlock.SetFloat(FRESNEL_POWER_ID, _config.IdleFresnelPower);
