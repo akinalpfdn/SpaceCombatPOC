@@ -25,10 +25,11 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
+    - _DebugHexagon: 0
     - _FresnelIntensity: 0.5
     - _FresnelPower: 4
-    - _HexagonLineWidth: 0.05
-    - _HexagonScale: 10
+    - _HexagonLineWidth: 0.03
+    - _HexagonScale: 27.79
     - _HexagonVisibility: 0
     - _IdlePulse: 0
     - _RippleMaxRadius: 2

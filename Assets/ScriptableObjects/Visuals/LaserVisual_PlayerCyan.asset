@@ -20,6 +20,6 @@ MonoBehaviour:
   _trailMaterial: {fileID: 2100000, guid: c8b5c7b0853435c4b8786fb04e2683db, type: 2}
   _trailStartWidth: 0.154
   _trailEndWidth: 0.073
-  _trailTime: 0.077
+  _trailTime: 0.05
   _trailCornerVertices: 2
   _trailMinVertexDistance: 0.1

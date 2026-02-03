@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.ScriptableObjects.WeaponConfig
   weaponName: Laser
   damageType: 1
-  damage: 1220
+  damage: 10
   fireRate: 0.4
   projectileSpeed: 60
   range: 25

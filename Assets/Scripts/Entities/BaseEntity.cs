@@ -84,9 +84,18 @@ namespace SpaceCombat.Entities
                 damageToShield = Mathf.Min(_currentShield, amount);
                 _currentShield -= damageToShield;
                 damageToHealth = amount - damageToShield;
-                
+
                 OnShieldChanged?.Invoke(_currentShield, _maxShield);
                 OnShieldDamaged(damageToShield, damageType);
+
+                // Publish damage popup for shield damage
+                EventBus.Publish(new DamagePopupEvent(
+                    transform.position,
+                    damageToShield,
+                    isCritical: false,
+                    isShieldDamage: true,
+                    damageType
+                ));
             }
 
             if (damageToHealth > 0)
@@ -94,6 +103,15 @@ namespace SpaceCombat.Entities
                 _currentHealth = Mathf.Max(0, _currentHealth - damageToHealth);
                 OnHealthChanged?.Invoke(_currentHealth, _maxHealth);
                 OnHealthDamaged(damageToHealth, damageType);
+
+                // Publish damage popup for health damage
+                EventBus.Publish(new DamagePopupEvent(
+                    transform.position,
+                    damageToHealth,
+                    isCritical: false,
+                    isShieldDamage: false,
+                    damageType
+                ));
             }
 
             _lastDamageTime = Time.time;

@@ -286,4 +286,32 @@ namespace SpaceCombat.Events
             EnemyType = enemyType;
         }
     }
+
+    // ============================================
+    // UI EVENTS
+    // ============================================
+
+    /// <summary>
+    /// Published when damage is dealt and should be displayed as floating text.
+    /// DamagePopupManager subscribes to this and spawns popup at the position.
+    /// </summary>
+    public struct DamagePopupEvent : IGameEvent
+    {
+        public Vector3 WorldPosition;        // Where to spawn the popup
+        public float DamageAmount;           // Damage value to display
+        public bool IsCritical;              // Critical hits shown differently
+        public bool IsShieldDamage;          // Shield damage vs health damage
+        public Interfaces.DamageType DamageType;  // For color coding
+
+        public DamagePopupEvent(Vector3 worldPosition, float damage,
+            bool isCritical = false, bool isShieldDamage = false,
+            Interfaces.DamageType damageType = Interfaces.DamageType.Normal)
+        {
+            WorldPosition = worldPosition;
+            DamageAmount = damage;
+            IsCritical = isCritical;
+            IsShieldDamage = isShieldDamage;
+            DamageType = damageType;
+        }
+    }
 }
