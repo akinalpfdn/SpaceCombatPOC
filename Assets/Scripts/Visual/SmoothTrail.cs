@@ -25,13 +25,16 @@ namespace SpaceCombat.Visual
 
         [Header("Recording")]
         [Tooltip("Trail duration when idle/slow")]
-        [SerializeField] private float _minTrailDuration = 0.1f;
+        [SerializeField] private float _minTrailDuration = 0.15f;
 
         [Tooltip("Trail duration at full speed")]
         [SerializeField] private float _maxTrailDuration = 0.4f;
 
         [Tooltip("How often to record new positions (seconds)")]
         [SerializeField] private float _recordInterval = 0.01f;
+
+        [Tooltip("Minimum distance between points to avoid overlap")]
+        [SerializeField] private float _minPointDistance = 0.05f;
 
         [Header("Width")]
         [Tooltip("Trail width at the ship")]
@@ -110,7 +113,7 @@ namespace SpaceCombat.Visual
                 _maxShipSpeed = shipMovement.MaxSpeed;
             }
 
-            // Configure line renderer
+            // Configure line renderer for top-down view
             _lineRenderer.useWorldSpace = true;
             _lineRenderer.alignment = LineAlignment.View;
             _lineRenderer.textureMode = LineTextureMode.Stretch;
@@ -159,12 +162,25 @@ namespace SpaceCombat.Visual
 
         private void RecordPosition()
         {
-            // Always record - trail is always active (motor always on)
+            // Time-based throttle
             if (Time.time - _lastRecordTime < _recordInterval) return;
+
+            Vector3 currentPos = transform.position;
+
+            // Distance-based check: don't add point if too close to last one
+            // This prevents points stacking on top of each other when stopped
+            if (_points.Count > 0)
+            {
+                float distanceToLast = Vector3.Distance(_points[_points.Count - 1].Position, currentPos);
+                if (distanceToLast < _minPointDistance)
+                {
+                    return; // Skip adding point - ship hasn't moved enough
+                }
+            }
 
             _points.Add(new TrailPoint
             {
-                Position = transform.position,  // Use EngineTrail's position, not ship's
+                Position = currentPos,
                 TimeCreated = Time.time
             });
 
@@ -191,7 +207,10 @@ namespace SpaceCombat.Visual
 
         private void UpdateLineRenderer()
         {
-            if (_points.Count < 1)
+            Vector3 currentPos = transform.position;
+
+            // Need at least 2 points for a proper line
+            if (_points.Count < 2)
             {
                 _lineRenderer.positionCount = 0;
                 return;
@@ -207,7 +226,7 @@ namespace SpaceCombat.Visual
             }
 
             // Last point is ALWAYS current engine position (no lag)
-            _lineRenderer.SetPosition(_points.Count, transform.position);
+            _lineRenderer.SetPosition(_points.Count, currentPos);
         }
 
         // ============================================

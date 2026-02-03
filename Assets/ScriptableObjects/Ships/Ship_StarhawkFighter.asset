@@ -15,12 +15,12 @@ MonoBehaviour:
   shipName: Stellar Phoenix
   shipSprite: {fileID: 0}
   shipPrefab: {fileID: 0}
-  maxHealth: 2000
-  maxShield: 100
-  shieldRegenRate: 5
+  maxHealth: 500000
+  maxShield: 100000
+  shieldRegenRate: 500
   shieldRegenDelay: 2
   maxSpeed: 20
-  acceleration: 10
+  acceleration: 20
   deceleration: 3
   rotationSpeed: 180
   availableWeapons:
