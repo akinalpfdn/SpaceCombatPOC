@@ -22,6 +22,9 @@ Shader "SpaceCombat/ShieldURP"
         [Header(Idle Animation)]
         _IdlePulse ("Idle Pulse", Range(0, 1)) = 0.0
 
+        [Header(Debug)]
+        [Toggle] _DebugHexagon ("Debug: Always Show Hexagon", Float) = 0
+
         [Header(Hit Points)]
         _HitPoint0 ("Hit Point 0", Vector) = (0, 0, 0, -1)
         _HitPoint1 ("Hit Point 1", Vector) = (0, 0, 0, -1)
@@ -86,6 +89,7 @@ Shader "SpaceCombat/ShieldURP"
                 float _RippleWidth;
                 float _RippleMaxRadius;
                 float _IdlePulse;
+                float _DebugHexagon;
                 float4 _HitPoint0;
                 float4 _HitPoint1;
                 float4 _HitPoint2;
@@ -202,8 +206,10 @@ Shader "SpaceCombat/ShieldURP"
                 float NdotV = saturate(dot(normalWS, viewDirWS));
                 float fresnel = pow(1.0 - NdotV, _FresnelPower) * _FresnelIntensity;
 
-                float2 hexUV = input.positionOS.xy + input.positionOS.yz * 0.5;
-                float hexPattern = HexagonPattern(hexUV, _HexagonScale, _HexagonLineWidth);
+                // Use mesh UV coordinates for consistent hexagon pattern
+                // Unity's sphere primitive has proper spherical UVs
+                // NOTE: Scale hardcoded to 20 (smaller hexagons) since config value wasn't applying
+                float hexPattern = HexagonPattern(input.uv, 20.0, _HexagonLineWidth);
 
                 // Calculate ripples and localized glow areas for each hit point
                 float rippleSum = 0.0;
@@ -234,8 +240,11 @@ Shader "SpaceCombat/ShieldURP"
                 // Also factor in the global _HexagonVisibility for fade-out control
                 float localizedHexagon = hexPattern * glowSum * _HexagonVisibility;
 
+                // Debug mode: Show hexagon pattern always (for testing scale)
+                float debugHexagon = _DebugHexagon > 0.5 ? hexPattern * 0.5 : 0.0;
+
                 float baseVisibility = fresnel;
-                float hitVisibility = localizedHexagon + rippleSum;
+                float hitVisibility = localizedHexagon + rippleSum + debugHexagon;
                 float totalIntensity = saturate(baseVisibility + hitVisibility * 2.0);
 
                 half4 finalColor = half4(_ShieldColor.rgb * totalIntensity, totalIntensity * _ShieldColor.a);

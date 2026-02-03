@@ -22,7 +22,9 @@ namespace SpaceCombat.VFX.Shield
     /// - Observer: Subscribes to ShieldHitEvent via EventBus
     ///
     /// Performance Considerations:
-    /// - Uses MaterialPropertyBlock (no material instancing, SRP Batcher friendly)
+    /// - Uses material instance instead of MaterialPropertyBlock
+    ///   (MaterialPropertyBlock doesn't work with SRP Batcher for CBUFFER properties)
+    /// - Each shield gets its own material instance (required for per-shield colors/hits)
     /// - Fixed-size hit array (no runtime allocations)
     /// - Shader property IDs cached at startup
     /// </summary>
@@ -52,7 +54,7 @@ namespace SpaceCombat.VFX.Shield
         // RUNTIME STATE
         // ============================================
 
-        private MaterialPropertyBlock _propertyBlock;
+        private Material _materialInstance;
         private ShieldHitData[] _hitPoints;
         private int _nextHitIndex;
         private float _currentShieldHealth = 1f;
@@ -86,7 +88,6 @@ namespace SpaceCombat.VFX.Shield
         {
             _meshFilter = GetComponent<MeshFilter>();
             _meshRenderer = GetComponent<MeshRenderer>();
-            _propertyBlock = new MaterialPropertyBlock();
 
             // Cache hit point shader property IDs
             if (_hitPointIds == null)
@@ -135,6 +136,13 @@ namespace SpaceCombat.VFX.Shield
             }
 
             EventBus.Unsubscribe<ShieldHitEvent>(OnShieldHitEvent);
+
+            // Clean up material instance to prevent memory leak
+            if (_materialInstance != null)
+            {
+                Destroy(_materialInstance);
+                _materialInstance = null;
+            }
         }
 
         private void Update()
@@ -198,35 +206,40 @@ namespace SpaceCombat.VFX.Shield
                 _meshFilter.mesh = _config.ShieldMesh;
             }
 
-            // Apply material
+            // Apply material - creates a new instance for this shield
+            // NOTE: We use material instance instead of MaterialPropertyBlock because
+            // SRP Batcher ignores MaterialPropertyBlock for CBUFFER properties.
             if (_config.ShieldMaterial != null)
             {
-                _meshRenderer.material = _config.ShieldMaterial;
+                _materialInstance = new Material(_config.ShieldMaterial);
+                _meshRenderer.material = _materialInstance;
+            }
+            else
+            {
+                _materialInstance = _meshRenderer.material;
             }
 
             // NOTE: Scale is NOT applied here - it's handled by the parent (PlayerShip)
             // which uses ship-specific scale from ShipConfig.shieldScale.
             // This allows each ship to have different shield sizes while sharing the same config.
 
-            // Set static shader properties
-            _propertyBlock.SetFloat(FRESNEL_POWER_ID, _config.IdleFresnelPower);
-            _propertyBlock.SetFloat(FRESNEL_INTENSITY_ID, _config.IdleFresnelIntensity);
-            _propertyBlock.SetFloat(HEXAGON_SCALE_ID, _config.HexagonScale);
-            _propertyBlock.SetFloat(RIPPLE_SPEED_ID, _config.RippleSpeed);
-            _propertyBlock.SetFloat(RIPPLE_WIDTH_ID, _config.RippleWidth);
-            _propertyBlock.SetFloat(RIPPLE_MAX_RADIUS_ID, _config.RippleMaxRadius);
-            _propertyBlock.SetFloat(HEXAGON_VISIBILITY_ID, 0f);
+            // Set static shader properties on material instance
+            _materialInstance.SetFloat(FRESNEL_POWER_ID, _config.IdleFresnelPower);
+            _materialInstance.SetFloat(FRESNEL_INTENSITY_ID, _config.IdleFresnelIntensity);
+            _materialInstance.SetFloat(HEXAGON_SCALE_ID, _config.HexagonScale);
+            _materialInstance.SetFloat(RIPPLE_SPEED_ID, _config.RippleSpeed);
+            _materialInstance.SetFloat(RIPPLE_WIDTH_ID, _config.RippleWidth);
+            _materialInstance.SetFloat(RIPPLE_MAX_RADIUS_ID, _config.RippleMaxRadius);
+            _materialInstance.SetFloat(HEXAGON_VISIBILITY_ID, 0f);
 
             // Initialize color
-            _propertyBlock.SetColor(SHIELD_COLOR_ID, _config.ColorFull);
+            _materialInstance.SetColor(SHIELD_COLOR_ID, _config.ColorFull);
 
             // Initialize all hit points as inactive
             for (int i = 0; i < _hitPoints.Length && i < _hitPointIds.Length; i++)
             {
-                _propertyBlock.SetVector(_hitPointIds[i], new Vector4(0, 0, 0, -1));
+                _materialInstance.SetVector(_hitPointIds[i], new Vector4(0, 0, 0, -1));
             }
-
-            _meshRenderer.SetPropertyBlock(_propertyBlock);
         }
 
         // ============================================
@@ -292,10 +305,10 @@ namespace SpaceCombat.VFX.Shield
         {
             _currentShieldHealth = Mathf.Clamp01(normalizedHealth);
 
-            if (_config != null)
+            if (_config != null && _materialInstance != null)
             {
                 Color targetColor = _config.GetColorForHealth(_currentShieldHealth);
-                _propertyBlock.SetColor(SHIELD_COLOR_ID, targetColor);
+                _materialInstance.SetColor(SHIELD_COLOR_ID, targetColor);
             }
 
             // Auto-hide when depleted
@@ -327,9 +340,9 @@ namespace SpaceCombat.VFX.Shield
             _nextHitIndex = 0;
             ClearHitPoints();
 
-            if (_config != null)
+            if (_config != null && _materialInstance != null)
             {
-                _propertyBlock.SetColor(SHIELD_COLOR_ID, _config.ColorFull);
+                _materialInstance.SetColor(SHIELD_COLOR_ID, _config.ColorFull);
             }
 
             SetShieldActive(true);
@@ -353,7 +366,7 @@ namespace SpaceCombat.VFX.Shield
 
         private void UpdateHitPoints()
         {
-            if (_config == null) return;
+            if (_config == null || _materialInstance == null) return;
 
             float duration = _config.RippleDuration;
 
@@ -384,23 +397,29 @@ namespace SpaceCombat.VFX.Shield
                     hitData = new Vector4(0, 0, 0, -1);
                 }
 
-                _propertyBlock.SetVector(_hitPointIds[i], hitData);
+                _materialInstance.SetVector(_hitPointIds[i], hitData);
             }
         }
 
         private void UpdateIdlePulse()
         {
-            if (_config == null) return;
+            if (_config == null || _materialInstance == null) return;
 
             // Subtle sine wave pulse for idle state
             float pulse = Mathf.Sin(Time.time * _config.IdlePulseSpeed) * _config.IdlePulseAmount;
             float fresnelIntensity = _config.IdleFresnelIntensity + pulse;
-            _propertyBlock.SetFloat(FRESNEL_INTENSITY_ID, fresnelIntensity);
+            _materialInstance.SetFloat(FRESNEL_INTENSITY_ID, fresnelIntensity);
+
+            // Keep config values in sync (allows real-time tweaking in Play Mode)
+            _materialInstance.SetFloat(HEXAGON_SCALE_ID, _config.HexagonScale);
+            _materialInstance.SetFloat(RIPPLE_WIDTH_ID, _config.RippleWidth);
+            _materialInstance.SetFloat(RIPPLE_MAX_RADIUS_ID, _config.RippleMaxRadius);
         }
 
         private void ApplyMaterialProperties()
         {
-            _meshRenderer.SetPropertyBlock(_propertyBlock);
+            // No longer needed - we set properties directly on material instance
+            // Material changes are applied immediately without SetPropertyBlock
         }
 
         private void ClearHitPoints()
@@ -411,7 +430,10 @@ namespace SpaceCombat.VFX.Shield
             }
 
             _currentHexagonVisibility = 0f;
-            _propertyBlock.SetFloat(HEXAGON_VISIBILITY_ID, 0f);
+            if (_materialInstance != null)
+            {
+                _materialInstance.SetFloat(HEXAGON_VISIBILITY_ID, 0f);
+            }
         }
 
         // ============================================
@@ -420,15 +442,14 @@ namespace SpaceCombat.VFX.Shield
 
         private IEnumerator HexagonRevealCoroutine()
         {
-            if (_config == null) yield break;
+            if (_config == null || _materialInstance == null) yield break;
 
             float duration = _config.HexagonRevealDuration;
             float elapsed = 0f;
 
             // Quick flash in
             _currentHexagonVisibility = 1f;
-            _propertyBlock.SetFloat(HEXAGON_VISIBILITY_ID, _currentHexagonVisibility);
-            _meshRenderer.SetPropertyBlock(_propertyBlock);
+            _materialInstance.SetFloat(HEXAGON_VISIBILITY_ID, _currentHexagonVisibility);
 
             // Fade out
             while (elapsed < duration)
@@ -438,13 +459,13 @@ namespace SpaceCombat.VFX.Shield
 
                 // Smooth fade out curve
                 _currentHexagonVisibility = 1f - (t * t); // Quadratic ease out
-                _propertyBlock.SetFloat(HEXAGON_VISIBILITY_ID, _currentHexagonVisibility);
+                _materialInstance.SetFloat(HEXAGON_VISIBILITY_ID, _currentHexagonVisibility);
 
                 yield return null;
             }
 
             _currentHexagonVisibility = 0f;
-            _propertyBlock.SetFloat(HEXAGON_VISIBILITY_ID, 0f);
+            _materialInstance.SetFloat(HEXAGON_VISIBILITY_ID, 0f);
             _hexagonRevealCoroutine = null;
         }
     }
