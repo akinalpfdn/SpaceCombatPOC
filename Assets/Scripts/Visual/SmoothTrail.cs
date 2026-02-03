@@ -33,10 +33,6 @@ namespace SpaceCombat.Visual
         [Tooltip("How often to record new positions (seconds)")]
         [SerializeField] private float _recordInterval = 0.01f;
 
-        [Header("Smoothing")]
-        [Tooltip("Interpolation points between each recorded position")]
-        [SerializeField] private int _interpolationSteps = 5;
-
         [Header("Width")]
         [Tooltip("Trail width at the ship")]
         [SerializeField] private float _startWidth = 0.4f;
@@ -47,9 +43,6 @@ namespace SpaceCombat.Visual
         [Header("Speed Response")]
         [Tooltip("Ship's max speed for normalization")]
         [SerializeField] private float _maxShipSpeed = 10f;
-
-        [Header("Debug")]
-        [SerializeField] private bool _debugLog = false;
 
         [Header("Color")]
         [SerializeField] private Color _startColor = new Color(0.3f, 0.7f, 1f, 1f);
@@ -66,7 +59,6 @@ namespace SpaceCombat.Visual
         }
 
         private List<TrailPoint> _points = new List<TrailPoint>();
-        private List<Vector3> _smoothedPoints = new List<Vector3>();
         private Transform _shipTransform;
         private float _lastRecordTime;
         private Vector3 _lastPosition;
@@ -167,11 +159,6 @@ namespace SpaceCombat.Visual
 
         private void RecordPosition()
         {
-            if (_debugLog)
-            {
-                Debug.Log($"[SmoothTrail] Speed: {_currentSpeed:F2}, Points: {_points.Count}");
-            }
-
             // Always record - trail is always active (motor always on)
             if (Time.time - _lastRecordTime < _recordInterval) return;
 
@@ -204,58 +191,23 @@ namespace SpaceCombat.Visual
 
         private void UpdateLineRenderer()
         {
-            if (_points.Count < 2)
+            if (_points.Count < 1)
             {
                 _lineRenderer.positionCount = 0;
                 return;
             }
 
-            // Generate smoothed points using Catmull-Rom spline
-            _smoothedPoints.Clear();
+            // Points count + 1 for current position (always track the engine)
+            _lineRenderer.positionCount = _points.Count + 1;
 
-            for (int i = 0; i < _points.Count - 1; i++)
+            // Set historical points
+            for (int i = 0; i < _points.Count; i++)
             {
-                Vector3 p0 = (i == 0) ? _points[i].Position : _points[i - 1].Position;
-                Vector3 p1 = _points[i].Position;
-                Vector3 p2 = _points[i + 1].Position;
-                Vector3 p3 = (i + 2 < _points.Count) ? _points[i + 2].Position : _points[i + 1].Position;
-
-                for (int j = 0; j < _interpolationSteps; j++)
-                {
-                    float t = j / (float)_interpolationSteps;
-                    _smoothedPoints.Add(CatmullRom(p0, p1, p2, p3, t));
-                }
+                _lineRenderer.SetPosition(i, _points[i].Position);
             }
 
-            // Add the last point
-            if (_points.Count > 0)
-            {
-                _smoothedPoints.Add(_points[_points.Count - 1].Position);
-            }
-
-            // Apply to line renderer
-            _lineRenderer.positionCount = _smoothedPoints.Count;
-            _lineRenderer.SetPositions(_smoothedPoints.ToArray());
-        }
-
-        // ============================================
-        // CATMULL-ROM SPLINE
-        // ============================================
-
-        /// <summary>
-        /// Catmull-Rom spline interpolation for smooth curves.
-        /// </summary>
-        private Vector3 CatmullRom(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t)
-        {
-            float t2 = t * t;
-            float t3 = t2 * t;
-
-            return 0.5f * (
-                (2f * p1) +
-                (-p0 + p2) * t +
-                (2f * p0 - 5f * p1 + 4f * p2 - p3) * t2 +
-                (-p0 + 3f * p1 - 3f * p2 + p3) * t3
-            );
+            // Last point is ALWAYS current engine position (no lag)
+            _lineRenderer.SetPosition(_points.Count, transform.position);
         }
 
         // ============================================
@@ -268,7 +220,6 @@ namespace SpaceCombat.Visual
         public void ClearTrail()
         {
             _points.Clear();
-            _smoothedPoints.Clear();
             _lineRenderer.positionCount = 0;
         }
 

@@ -235,8 +235,6 @@ namespace SpaceCombat.Core
                 _container?.InjectGameObject(_player.gameObject);
                 _player.gameObject.tag = "Player";
                 _player.gameObject.layer = LayerMask.NameToLayer("Player");
-                
-                Debug.Log($"[GameManager] Player spawned at {spawnPos}");
             }
         }
 
@@ -252,8 +250,6 @@ namespace SpaceCombat.Core
             int enemyCount = _spawnConfig?.InitialEnemyCount ?? 10;
 
             _spawnServiceInterface.SpawnInitialEnemies(enemyCount, playerPosition);
-            
-            Debug.Log($"[GameManager] Spawned {enemyCount} initial enemies");
         }
 
         private void RespawnEnemy()
