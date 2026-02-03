@@ -52,9 +52,15 @@ namespace SpaceCombat.Movement
         // Banking state
         private float _currentTilt;
         private float _targetTilt;
+        private float _smoothedTargetTilt;      // Extra smoothing layer to prevent scatter
+        private float _targetTiltVelocity;      // For SmoothDamp
         private Quaternion _lastRotation;
         private float _angularVelocity;
         private float _pendingTurnAngle;  // Track how much we're turning this frame
+
+        // Tilt smoothing settings
+        private const float TILT_SMOOTH_TIME = 0.15f;        // How fast target tilt responds
+        private const float TILT_DEAD_ZONE = 0.5f;           // Ignore angle changes smaller than this
 
         // Properties
         public Vector2 Velocity => new Vector2(_rigidbody?.linearVelocity.x ?? 0, _rigidbody?.linearVelocity.z ?? 0);
@@ -161,6 +167,7 @@ namespace SpaceCombat.Movement
         /// <summary>
         /// Calculate rotation angle and apply both rotation + banking together
         /// This prevents jitter by calculating turn amount before applying it
+        /// Called from FixedUpdate (movement-based rotation)
         /// </summary>
         private void CalculateAndApplyRotation(Vector2 direction)
         {
@@ -182,13 +189,33 @@ namespace SpaceCombat.Movement
             // Calculate target tilt based on the turn we're about to make
             if (_enableBanking)
             {
-                // Turning left (negative actualTurn) = tilt left (negative Z)
-                // Turning right (positive actualTurn) = tilt right (positive Z)
-                _targetTilt = -actualTurn * _maxTiltAngle * _tiltPower / maxTurnThisFrame;
-                _targetTilt = Mathf.Clamp(_targetTilt, -_maxTiltAngle, _maxTiltAngle);
+                // Dead zone: Ignore very small angle changes
+                if (Mathf.Abs(angleDiff) < TILT_DEAD_ZONE)
+                {
+                    _targetTilt = 0f;
+                }
+                else
+                {
+                    // Turning left (negative actualTurn) = tilt left (negative Z)
+                    // Turning right (positive actualTurn) = tilt right (positive Z)
+                    _targetTilt = -actualTurn * _maxTiltAngle * _tiltPower / maxTurnThisFrame;
+                    _targetTilt = Mathf.Clamp(_targetTilt, -_maxTiltAngle, _maxTiltAngle);
+                }
 
-                // Smooth the tilt
-                SmoothTilt();
+                // Extra smoothing layer for target tilt
+                _smoothedTargetTilt = Mathf.SmoothDamp(
+                    _smoothedTargetTilt,
+                    _targetTilt,
+                    ref _targetTiltVelocity,
+                    TILT_SMOOTH_TIME
+                );
+
+                // Smooth interpolation from current to smoothed target
+                _currentTilt = Mathf.Lerp(
+                    _currentTilt,
+                    _smoothedTargetTilt,
+                    _tiltSmoothing * Time.fixedDeltaTime
+                );
             }
 
             // Apply the Y rotation + current Z tilt
@@ -201,12 +228,21 @@ namespace SpaceCombat.Movement
 
         /// <summary>
         /// Smoothly interpolate current tilt to target tilt
+        /// Uses the extra smoothing layer to prevent scatter
         /// </summary>
         private void SmoothTilt()
         {
+            // Extra smoothing layer for target tilt
+            _smoothedTargetTilt = Mathf.SmoothDamp(
+                _smoothedTargetTilt,
+                _targetTilt,
+                ref _targetTiltVelocity,
+                TILT_SMOOTH_TIME
+            );
+
             _currentTilt = Mathf.Lerp(
                 _currentTilt,
-                _targetTilt,
+                _smoothedTargetTilt,
                 _tiltSmoothing * Time.fixedDeltaTime
             );
 
@@ -300,24 +336,48 @@ namespace SpaceCombat.Movement
             {
                 Quaternion targetRotation = Quaternion.LookRotation(targetDir);
 
+                // Use Time.deltaTime since this is called from Update (TargetSelector)
+                float deltaTime = Time.deltaTime;
+
                 if (_enableBanking)
                 {
-                    // Use the same banking logic as CalculateAndApplyRotation
                     // Calculate turn amount first, then apply rotation + tilt together
                     float currentY = transform.rotation.eulerAngles.y;
                     float targetY = targetRotation.eulerAngles.y;
                     float angleDiff = Mathf.DeltaAngle(currentY, targetY);
 
                     // Limit rotation to what's possible this frame
-                    float maxTurnThisFrame = _rotationSpeed * Time.fixedDeltaTime;
+                    float maxTurnThisFrame = _rotationSpeed * deltaTime;
                     float actualTurn = Mathf.Clamp(angleDiff, -maxTurnThisFrame, maxTurnThisFrame);
 
-                    // Calculate target tilt based on the turn we're about to make
-                    _targetTilt = -actualTurn * _maxTiltAngle * _tiltPower / maxTurnThisFrame;
-                    _targetTilt = Mathf.Clamp(_targetTilt, -_maxTiltAngle, _maxTiltAngle);
+                    // Dead zone: Ignore very small angle changes to prevent scatter
+                    // This filters out micro-oscillations when orbiting a target
+                    if (Mathf.Abs(angleDiff) < TILT_DEAD_ZONE)
+                    {
+                        // Within dead zone - gradually return tilt to zero
+                        _targetTilt = 0f;
+                    }
+                    else
+                    {
+                        // Calculate target tilt based on the turn we're about to make
+                        _targetTilt = -actualTurn * _maxTiltAngle * _tiltPower / maxTurnThisFrame;
+                        _targetTilt = Mathf.Clamp(_targetTilt, -_maxTiltAngle, _maxTiltAngle);
+                    }
 
-                    // Smooth the tilt
-                    SmoothTilt();
+                    // Extra smoothing layer: smooth the target tilt itself to prevent scatter
+                    _smoothedTargetTilt = Mathf.SmoothDamp(
+                        _smoothedTargetTilt,
+                        _targetTilt,
+                        ref _targetTiltVelocity,
+                        TILT_SMOOTH_TIME
+                    );
+
+                    // Smooth interpolation from current to smoothed target
+                    _currentTilt = Mathf.Lerp(
+                        _currentTilt,
+                        _smoothedTargetTilt,
+                        _tiltSmoothing * deltaTime
+                    );
 
                     // Apply the Y rotation + current Z tilt
                     float newY = currentY + actualTurn;
@@ -330,7 +390,7 @@ namespace SpaceCombat.Movement
                     transform.rotation = Quaternion.Slerp(
                         transform.rotation,
                         targetRotation,
-                        _rotationSpeed * Time.fixedDeltaTime
+                        _rotationSpeed * deltaTime
                     );
                 }
             }
