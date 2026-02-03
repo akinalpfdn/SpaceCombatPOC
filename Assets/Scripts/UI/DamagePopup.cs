@@ -48,6 +48,9 @@ namespace SpaceCombat.UI
         private float _baseScale;
         private bool _isActive;
 
+        // Distance-based scaling
+        private const float REFERENCE_DISTANCE = 15f; // Distance at which _baseScale is "correct"
+
         // Callback when animation completes
         public System.Action<DamagePopup> OnComplete;
 
@@ -91,12 +94,22 @@ namespace SpaceCombat.UI
                 return;
             }
 
-            // Move upward
+            // Move in velocity direction (camera up)
             transform.position += _velocity * Time.deltaTime;
 
-            // Apply scale curve
-            float scale = _config.ScaleCurve.Evaluate(normalizedTime) * _baseScale;
-            transform.localScale = Vector3.one * scale;
+            // Calculate distance-based scale to maintain consistent screen size
+            // Popup appears same size regardless of distance from camera
+            float distanceScale = 1f;
+            if (_cameraTransform != null)
+            {
+                float distance = Vector3.Distance(transform.position, _cameraTransform.position);
+                distanceScale = distance / REFERENCE_DISTANCE;
+            }
+
+            // Apply scale curve with distance compensation
+            float curveScale = _config.ScaleCurve.Evaluate(normalizedTime);
+            float finalScale = curveScale * _baseScale * distanceScale;
+            transform.localScale = Vector3.one * finalScale;
 
             // Apply alpha curve
             float alpha = _config.AlphaCurve.Evaluate(normalizedTime);
@@ -127,17 +140,30 @@ namespace SpaceCombat.UI
             _duration = config.Duration;
             _isActive = true;
 
-            // Set position with random horizontal offset
+            // Cache camera if not yet cached
+            if (_cameraTransform == null && Camera.main != null)
+            {
+                _cameraTransform = Camera.main.transform;
+            }
+
+            // Set position with random horizontal offset (spread in XZ plane for top-down view)
+            // Use camera's right vector for horizontal spread so it spreads on screen
             float horizontalOffset = Random.Range(-config.HorizontalSpread, config.HorizontalSpread);
-            _startPosition = worldPosition + new Vector3(horizontalOffset, config.VerticalOffset, 0f);
+            Vector3 spreadDirection = _cameraTransform != null ? _cameraTransform.right : Vector3.right;
+
+            // Offset in camera's up direction (screen up) for vertical positioning
+            Vector3 upDirection = _cameraTransform != null ? _cameraTransform.up : Vector3.up;
+
+            _startPosition = worldPosition + (spreadDirection * horizontalOffset) + (upDirection * config.VerticalOffset);
             transform.position = _startPosition;
 
-            // Set velocity (rising upward in world space)
-            _velocity = Vector3.up * config.RiseSpeed;
+            // Set velocity to rise in camera's up direction (screen up)
+            // This makes the popup always rise "upward" on screen regardless of camera angle
+            _velocity = upDirection * config.RiseSpeed;
 
-            // Set text
+            // Set text with thousands separator (e.g., 2,146)
             int displayDamage = Mathf.RoundToInt(damage);
-            _textMesh.text = displayDamage.ToString();
+            _textMesh.text = displayDamage.ToString("N0");
 
             // Set font
             if (config.FontAsset != null)
@@ -145,9 +171,15 @@ namespace SpaceCombat.UI
                 _textMesh.font = config.FontAsset;
             }
 
-            // Set size
+            // Set size with distance compensation for consistent screen size
             _baseScale = config.GetFontSize(isCritical);
-            transform.localScale = Vector3.one * _baseScale;
+            float initialDistanceScale = 1f;
+            if (_cameraTransform != null)
+            {
+                float distance = Vector3.Distance(transform.position, _cameraTransform.position);
+                initialDistanceScale = distance / REFERENCE_DISTANCE;
+            }
+            transform.localScale = Vector3.one * _baseScale * initialDistanceScale;
 
             // Set color
             _baseColor = config.GetColorForDamage(damageType, isCritical, isShieldDamage);
@@ -167,7 +199,7 @@ namespace SpaceCombat.UI
             // Critical hit - add exclamation and bold
             if (isCritical)
             {
-                _textMesh.text = displayDamage + "!";
+                _textMesh.text = displayDamage.ToString("N0") + "!";
                 _textMesh.fontStyle = FontStyles.Bold;
             }
             else

@@ -29,13 +29,13 @@ namespace SpaceCombat.ScriptableObjects
         [Tooltip("TextMeshPro font asset (create from Bebas Neue TTF)")]
         [SerializeField] private TMP_FontAsset _fontAsset;
 
-        [Tooltip("Base font size for normal damage")]
-        [Range(2f, 10f)]
-        [SerializeField] private float _baseFontSize = 4f;
+        [Tooltip("Base font size for normal damage (world units, keep small!)")]
+        [Range(0.1f, 2f)]
+        [SerializeField] private float _baseFontSize = 0.4f;
 
         [Tooltip("Font size multiplier for critical hits")]
-        [Range(1f, 2f)]
-        [SerializeField] private float _criticalSizeMultiplier = 1.5f;
+        [Range(1f, 1.5f)]
+        [SerializeField] private float _criticalSizeMultiplier = 1.2f;
 
         // ============================================
         // ANIMATION SETTINGS
@@ -50,9 +50,9 @@ namespace SpaceCombat.ScriptableObjects
         [Range(0.5f, 5f)]
         [SerializeField] private float _riseSpeed = 2f;
 
-        [Tooltip("Random horizontal spread range")]
-        [Range(0f, 1f)]
-        [SerializeField] private float _horizontalSpread = 0.3f;
+        [Tooltip("Random horizontal spread range (screen-space units)")]
+        [Range(0f, 2f)]
+        [SerializeField] private float _horizontalSpread = 0.8f;
 
         [Tooltip("Vertical offset from hit position")]
         [Range(0f, 2f)]
