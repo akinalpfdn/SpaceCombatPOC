@@ -11,6 +11,7 @@ using SpaceCombat.Interfaces;
 using SpaceCombat.Events;
 using SpaceCombat.ScriptableObjects;
 using SpaceCombat.Utilities;
+using SpaceCombat.VFX;
 
 namespace SpaceCombat.Combat
 {
@@ -396,12 +397,11 @@ namespace SpaceCombat.Combat
         }
 
         /// <summary>
-        /// Spawn muzzle flash effect at all active fire points
+        /// Spawn muzzle flash effect at all active fire points.
+        /// If prefab is assigned, uses it; otherwise creates a default procedural flash.
         /// </summary>
         private void SpawnMuzzleFlash()
         {
-            if (_currentWeaponConfig?.muzzleFlashPrefab == null) return;
-
             bool hasMultipleFirePoints = _firePoints != null && _firePoints.Length > 1;
 
             if (hasMultipleFirePoints)
@@ -409,17 +409,59 @@ namespace SpaceCombat.Combat
                 foreach (var fp in _firePoints)
                 {
                     if (fp == null) continue;
-                    var flash = Instantiate(_currentWeaponConfig.muzzleFlashPrefab,
-                        fp.position, fp.rotation, fp);
-                    Destroy(flash, 0.5f);
+                    SpawnSingleMuzzleFlash(fp);
                 }
+            }
+            else if (_firePoint != null)
+            {
+                SpawnSingleMuzzleFlash(_firePoint);
+            }
+        }
+
+        /// <summary>
+        /// Spawns a single muzzle flash at the given fire point.
+        /// </summary>
+        private void SpawnSingleMuzzleFlash(Transform firePoint)
+        {
+            GameObject flashObj;
+
+            if (_currentWeaponConfig?.muzzleFlashPrefab != null)
+            {
+                // Use configured prefab
+                flashObj = Instantiate(_currentWeaponConfig.muzzleFlashPrefab,
+                    firePoint.position, firePoint.rotation, firePoint);
             }
             else
             {
-                var flash = Instantiate(_currentWeaponConfig.muzzleFlashPrefab,
-                    _firePoint.position, _firePoint.rotation, _firePoint);
-                Destroy(flash, 0.5f);
+                // Create procedural muzzle flash
+                flashObj = CreateProceduralMuzzleFlash(firePoint);
             }
+
+            // Set color to match weapon
+            var muzzleFlash = flashObj.GetComponent<MuzzleFlash>();
+            if (muzzleFlash != null && _currentWeaponConfig != null)
+            {
+                muzzleFlash.SetColor(_currentWeaponConfig.projectileColor,
+                    _currentWeaponConfig.projectileVisualConfig?.EmissionIntensity ?? 3f);
+            }
+
+            // Safety destroy (MuzzleFlash handles its own destruction, but just in case)
+            Destroy(flashObj, 0.5f);
+        }
+
+        /// <summary>
+        /// Creates a procedural muzzle flash when no prefab is assigned.
+        /// </summary>
+        private GameObject CreateProceduralMuzzleFlash(Transform firePoint)
+        {
+            var flashObj = new GameObject("MuzzleFlash");
+            flashObj.transform.SetParent(firePoint);
+            flashObj.transform.localPosition = Vector3.zero;
+            flashObj.transform.localRotation = Quaternion.identity;
+
+            var muzzleFlash = flashObj.AddComponent<MuzzleFlash>();
+
+            return flashObj;
         }
 
         /// <summary>
