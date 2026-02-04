@@ -39,6 +39,7 @@ namespace SpaceCombat.Combat
         [Header("Movement Settings")]
         [SerializeField] private float _stopDistance = 0.5f; // Stop moving when this close to cursor
         [SerializeField] private bool _requireMouseHoldToMove = true; // Require holding mouse to move
+        [SerializeField] private bool _enableMouseMovement = true; // Can be disabled for mobile
 
         [Header("References")]
         [SerializeField] private WeaponController _weaponController;
@@ -64,6 +65,7 @@ namespace SpaceCombat.Combat
         // Properties
         public Transform CurrentTarget => _currentTarget;
         public Vector2 MouseWorldPosition { get; private set; }
+        public bool IsFiringEnabled => _isFiringEnabled;
 
         private void Start()
         {
@@ -155,6 +157,7 @@ namespace SpaceCombat.Combat
         private void HandleMovement()
         {
             if (_shipMovement == null) return;
+            if (!_enableMouseMovement) return; // Disabled for mobile
 
             // Only move if mouse is held (or always if disabled)
             bool shouldMove = !_requireMouseHoldToMove || UnityEngine.Input.GetMouseButton(0);
@@ -333,6 +336,40 @@ namespace SpaceCombat.Combat
             // Re-enable auto-rotation when clearing target
             if (_shipMovement != null)
                 _shipMovement.SetAutoRotate(true);
+        }
+
+        /// <summary>
+        /// Toggle attack state for mobile attack button.
+        /// - Target yok → En yakın düşmanı seç + saldırıya başla
+        /// - Target var ama saldırmıyor → Saldırıya başla
+        /// - Zaten saldırıyorsa → Saldırıyı kes
+        /// </summary>
+        public void ToggleAttack()
+        {
+            if (_currentTarget == null)
+            {
+                // No target - select closest enemy and start attacking
+                SelectClosestEnemy();
+            }
+            else if (_isFiringEnabled)
+            {
+                // Already attacking - stop
+                _isFiringEnabled = false;
+            }
+            else
+            {
+                // Has target but not attacking - start
+                _isFiringEnabled = true;
+            }
+        }
+
+        /// <summary>
+        /// Enable or disable mouse-based movement.
+        /// Used by MobileInputManager to prevent conflicts with joystick.
+        /// </summary>
+        public void SetMouseMovementEnabled(bool enabled)
+        {
+            _enableMouseMovement = enabled;
         }
 
         private void SpawnTargetIndicator(Transform target)
