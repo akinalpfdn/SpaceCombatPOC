@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 using SpaceCombat.ScriptableObjects;
@@ -406,3 +407,4 @@ namespace SpaceCombat.Editor
         }
     }
 }
+#endif
