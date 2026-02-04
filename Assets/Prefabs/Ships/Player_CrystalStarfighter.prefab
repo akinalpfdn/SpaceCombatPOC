@@ -87,6 +87,7 @@ MonoBehaviour:
   _maxSpeed: 10
   _acceleration: 5
   _deceleration: 3
+  _instantRotation: 1
   _rotationSpeed: 180
   _velocitySmoothing: 0.1
   _rotateToMovement: 1
@@ -150,6 +151,7 @@ MonoBehaviour:
   _weaponMountPoint: {fileID: 0}
   _engineTrail: {fileID: 0}
   _shieldVisual: {fileID: 0}
+  _shieldVisualController: {fileID: 0}
 --- !u!114 &8479908390722580308
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -162,7 +164,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67e30c9c731891a4697cd150e9f966b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.Combat.TargetSelector
-  _maxTargetRange: 20
+  _maxTargetRange: 30
   _enemyLayer:
     serializedVersion: 2
     m_Bits: 128
