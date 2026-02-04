@@ -15,10 +15,12 @@ MonoBehaviour:
   weaponName: Laser
   damageType: 1
   damage: 10
-  fireRate: 0.4
+  fireRate: 0.7
   projectileSpeed: 60
   range: 25
   accuracy: 0.95
+  burstCount: 3
+  burstDelay: 0.1
   projectilePrefab: {fileID: 587130082223421870, guid: 237e92e04ff2cf64eb658f8436cbaffc, type: 3}
   projectilesPerShot: 1
   spreadAngle: 0

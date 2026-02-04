@@ -59,10 +59,9 @@ namespace SpaceCombat.UI
         private Dictionary<int, PendingDamage> _pendingDamage;
 
         /// <summary>
-        /// Time window for aggregating damage from the same source (seconds).
-        /// Projectiles from the same volley typically hit within 50-100ms.
+        /// Default aggregation window if config is not set.
         /// </summary>
-        private const float AGGREGATION_WINDOW = 0.1f;
+        private const float DEFAULT_AGGREGATION_WINDOW = 0.1f;
 
         /// <summary>
         /// Stores accumulated damage waiting to be displayed.
@@ -221,11 +220,12 @@ namespace SpaceCombat.UI
             if (_pendingDamage.Count == 0) return;
 
             float currentTime = Time.time;
+            float aggregationWindow = _config != null ? _config.AggregationWindow : DEFAULT_AGGREGATION_WINDOW;
             var keysToRemove = new List<int>();
 
             foreach (var kvp in _pendingDamage)
             {
-                if (currentTime - kvp.Value.Timestamp >= AGGREGATION_WINDOW)
+                if (currentTime - kvp.Value.Timestamp >= aggregationWindow)
                 {
                     // Aggregation window expired - spawn the popup
                     var pending = kvp.Value;

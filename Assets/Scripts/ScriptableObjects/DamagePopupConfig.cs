@@ -103,6 +103,15 @@ namespace SpaceCombat.ScriptableObjects
         [SerializeField] private float _outlineThickness = 0.2f;
 
         // ============================================
+        // AGGREGATION SETTINGS
+        // ============================================
+
+        [Header("Damage Aggregation")]
+        [Tooltip("Time window for combining damage from same source (seconds). Lower = faster popups, Higher = more combined damage.")]
+        [Range(0.05f, 0.5f)]
+        [SerializeField] private float _aggregationWindow = 0.1f;
+
+        // ============================================
         // POOLING SETTINGS
         // ============================================
 
@@ -144,6 +153,9 @@ namespace SpaceCombat.ScriptableObjects
         public bool EnableOutline => _enableOutline;
         public Color OutlineColor => _outlineColor;
         public float OutlineThickness => _outlineThickness;
+
+        // Aggregation
+        public float AggregationWindow => _aggregationWindow;
 
         // Pooling
         public int InitialPoolSize => _initialPoolSize;

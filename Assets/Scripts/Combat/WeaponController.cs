@@ -162,6 +162,10 @@ namespace SpaceCombat.Combat
             {
                 // Normal single fire
                 FireSingleVolley(1f);
+
+                // Effects for normal fire (burst handles its own effects)
+                SpawnMuzzleFlash();
+                PlayFireSound();
             }
 
             // Events - 3D: convert Vector3 firePoint position to Vector2 (x, z)

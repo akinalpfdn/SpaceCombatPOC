@@ -76,5 +76,6 @@ MonoBehaviour:
   _enableOutline: 1
   _outlineColor: {r: 0, g: 0, b: 0, a: 1}
   _outlineThickness: 0.2
+  _aggregationWindow: 0.4
   _initialPoolSize: 20
   _maxPoolSize: 50

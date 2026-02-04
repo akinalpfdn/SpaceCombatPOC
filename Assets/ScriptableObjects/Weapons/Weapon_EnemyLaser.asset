@@ -19,6 +19,8 @@ MonoBehaviour:
   projectileSpeed: 60
   range: 20
   accuracy: 0.85
+  burstCount: 1
+  burstDelay: 0.05
   projectilePrefab: {fileID: 587130082223421870, guid: 237e92e04ff2cf64eb658f8436cbaffc, type: 3}
   projectilesPerShot: 1
   spreadAngle: 0
@@ -26,5 +28,5 @@ MonoBehaviour:
   projectileColor: {r: 1, g: 0.3, b: 0.1, a: 1}
   projectileScale: 1
   projectileVisualConfig: {fileID: 11400000, guid: 6b6b3ebc08a15e14eb99400121dcdb82, type: 2}
-  fireSoundId: laser_fire
+  fireSoundId: enemy_laser
   hitSoundId: laser_hit
