@@ -2,6 +2,7 @@
 // TARGET SELECTION - Click to select enemies
 // Player auto-faces selected target, SPACE to toggle attack
 // DarkOrbit-style: mouse hold moves ship, click targets enemy
+// Uses new Input System (UnityEngine.InputSystem)
 //
 // Controls:
 // - Click enemy → Select target
@@ -13,6 +14,7 @@
 // ============================================
 
 using UnityEngine;
+using UnityEngine.InputSystem;
 using SpaceCombat.Entities;
 using SpaceCombat.Interfaces;
 using SpaceCombat.Movement;
@@ -85,10 +87,13 @@ namespace SpaceCombat.Combat
 
         private void Update()
         {
+            // Null check for new Input System devices
+            if (Mouse.current == null && Keyboard.current == null) return;
+
             UpdateMousePosition();
 
             // Handle mouse click to select target (only if clicking directly on enemy)
-            if (UnityEngine.Input.GetMouseButtonDown(0))
+            if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
             {
                 TrySelectTarget();
             }
@@ -97,7 +102,7 @@ namespace SpaceCombat.Combat
             HandleMovement();
 
             // Handle SPACE key toggle for firing
-            bool isSpacePressed = UnityEngine.Input.GetKey(_fireToggleKey);
+            bool isSpacePressed = Keyboard.current != null && Keyboard.current.spaceKey.isPressed;
             if (isSpacePressed && !_wasSpacePressed && _currentTarget != null)
             {
                 _isFiringEnabled = !_isFiringEnabled; // Toggle state
@@ -105,7 +110,7 @@ namespace SpaceCombat.Combat
             _wasSpacePressed = isSpacePressed;
 
             // Handle SHIFT key - select closest enemy and start attacking
-            if (UnityEngine.Input.GetKeyDown(_selectClosestKey))
+            if (Keyboard.current != null && Keyboard.current.leftShiftKey.wasPressedThisFrame)
             {
                 SelectClosestEnemy();
             }
@@ -142,8 +147,11 @@ namespace SpaceCombat.Combat
 
         private void UpdateMousePosition()
         {
+            if (Mouse.current == null || _mainCamera == null) return;
+
             // For 3D, raycast to find mouse position on XZ plane (Y=0)
-            Ray ray = _mainCamera.ScreenPointToRay(UnityEngine.Input.mousePosition);
+            Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
+            Ray ray = _mainCamera.ScreenPointToRay(mouseScreenPos);
             Plane xzPlane = new Plane(Vector3.up, Vector3.zero);
 
             float enterDistance;
@@ -160,7 +168,8 @@ namespace SpaceCombat.Combat
             if (!_enableMouseMovement) return; // Disabled for mobile
 
             // Only move if mouse is held (or always if disabled)
-            bool shouldMove = !_requireMouseHoldToMove || UnityEngine.Input.GetMouseButton(0);
+            bool mouseHeld = Mouse.current != null && Mouse.current.leftButton.isPressed;
+            bool shouldMove = !_requireMouseHoldToMove || mouseHeld;
 
             if (shouldMove)
             {
@@ -188,8 +197,11 @@ namespace SpaceCombat.Combat
 
         private void TrySelectTarget()
         {
+            if (Mouse.current == null || _mainCamera == null) return;
+
             // Raycast from mouse position for 3D
-            Ray ray = _mainCamera.ScreenPointToRay(UnityEngine.Input.mousePosition);
+            Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
+            Ray ray = _mainCamera.ScreenPointToRay(mouseScreenPos);
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, _enemyLayer))

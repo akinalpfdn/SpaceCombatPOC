@@ -1,10 +1,13 @@
 // ============================================
 // KEYBOARD INPUT PROVIDER
-// Keyboard and mouse input for desktop/testing
+// Mouse and keyboard input for desktop/testing
+// Uses new Input System (UnityEngine.InputSystem)
+// Movement removed - joystick only
 // ============================================
 
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using VContainer;
 using SpaceCombat.Interfaces;
 using SpaceCombat.Core;
@@ -12,29 +15,45 @@ using SpaceCombat.Core;
 namespace SpaceCombat.Input
 {
     /// <summary>
-    /// Keyboard and mouse input provider.
-    /// For desktop/testing.
+    /// Mouse and keyboard input provider for desktop/testing.
+    /// Movement is handled by VirtualJoystick, this handles:
+    /// - Mouse aim
+    /// - Fire (left click / space)
+    /// - Special ability (shift / right click)
+    /// - Weapon slot selection (1-4 keys)
     /// </summary>
     public class KeyboardInputProvider : MonoBehaviour, IInputProvider
     {
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+
         [Header("Settings")]
         [SerializeField] private bool _useMouseForAim = true;
         [SerializeField] private Camera _mainCamera;
 
-        // Properties
-        public Vector2 MovementInput => _movementInput;
+        // ============================================
+        // PROPERTIES
+        // ============================================
+
+        public Vector2 MovementInput => Vector2.zero; // Movement via joystick only
         public Vector2 AimDirection => _aimDirection;
         public bool IsFiring => _isFiring;
         public bool IsSpecialAbility => _isSpecialAbility;
 
-        // Events
+        // ============================================
+        // EVENTS
+        // ============================================
+
         public event Action OnFirePressed;
         public event Action OnFireReleased;
         public event Action OnSpecialAbilityPressed;
         public event Action<int> OnWeaponSlotSelected;
 
-        // State
-        private Vector2 _movementInput;
+        // ============================================
+        // RUNTIME STATE
+        // ============================================
+
         private Vector2 _aimDirection;
         private bool _isFiring;
         private bool _isSpecialAbility;
@@ -43,11 +62,19 @@ namespace SpaceCombat.Input
         private Transform _playerTransform;
         private GameManager _gameManager;
 
+        // ============================================
+        // DEPENDENCY INJECTION
+        // ============================================
+
         [Inject]
         public void Construct(GameManager gameManager)
         {
             _gameManager = gameManager;
         }
+
+        // ============================================
+        // UNITY LIFECYCLE
+        // ============================================
 
         private void Awake()
         {
@@ -57,51 +84,35 @@ namespace SpaceCombat.Input
 
         private void Update()
         {
-            UpdateMovementInput();
+            // Null checks for new Input System devices
+            if (Keyboard.current == null && Mouse.current == null) return;
+
             UpdateAimInput();
             UpdateFireInput();
             UpdateSpecialInput();
             UpdateWeaponSlotInput();
         }
 
-        private void UpdateMovementInput()
-        {
-            _movementInput = new Vector2(
-                UnityEngine.Input.GetAxisRaw("Horizontal"),
-                UnityEngine.Input.GetAxisRaw("Vertical")
-            );
-
-            // Normalize diagonal movement
-            if (_movementInput.magnitude > 1f)
-            {
-                _movementInput.Normalize();
-            }
-        }
+        // ============================================
+        // INPUT UPDATES
+        // ============================================
 
         private void UpdateAimInput()
         {
-            if (_useMouseForAim && _mainCamera != null)
-            {
-                // Cache player transform - only search once
-                if (_playerTransform == null)
-                {
-                    if (_gameManager != null && _gameManager.Player != null)
-                        _playerTransform = _gameManager.Player.transform;
-                }
+            if (!_useMouseForAim || _mainCamera == null || Mouse.current == null) return;
 
-                if (_playerTransform != null)
-                {
-                    Vector3 mousePos = _mainCamera.ScreenToWorldPoint(UnityEngine.Input.mousePosition);
-                    _aimDirection = ((Vector2)mousePos - (Vector2)_playerTransform.position).normalized;
-                }
-            }
-            else
+            // Cache player transform - only search once
+            if (_playerTransform == null)
             {
-                // Aim in movement direction
-                if (_movementInput.magnitude > 0.1f)
-                {
-                    _aimDirection = _movementInput.normalized;
-                }
+                if (_gameManager != null && _gameManager.Player != null)
+                    _playerTransform = _gameManager.Player.transform;
+            }
+
+            if (_playerTransform != null)
+            {
+                Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
+                Vector3 mouseWorldPos = _mainCamera.ScreenToWorldPoint(new Vector3(mouseScreenPos.x, mouseScreenPos.y, _mainCamera.nearClipPlane));
+                _aimDirection = ((Vector2)mouseWorldPos - (Vector2)_playerTransform.position).normalized;
             }
         }
 
@@ -110,7 +121,9 @@ namespace SpaceCombat.Input
             bool wasFiring = _isFiring;
 
             // Left mouse button or space
-            _isFiring = UnityEngine.Input.GetMouseButton(0) || UnityEngine.Input.GetKey(KeyCode.Space);
+            bool mousePressed = Mouse.current != null && Mouse.current.leftButton.isPressed;
+            bool spacePressed = Keyboard.current != null && Keyboard.current.spaceKey.isPressed;
+            _isFiring = mousePressed || spacePressed;
 
             // Fire events
             if (_isFiring && !wasFiring)
@@ -125,11 +138,14 @@ namespace SpaceCombat.Input
 
         private void UpdateSpecialInput()
         {
-            _isSpecialAbility = UnityEngine.Input.GetKey(KeyCode.LeftShift) ||
-                               UnityEngine.Input.GetMouseButton(1);
+            bool wasSpecial = _isSpecialAbility;
 
-            if (UnityEngine.Input.GetKeyDown(KeyCode.LeftShift) ||
-                UnityEngine.Input.GetMouseButtonDown(1))
+            bool shiftPressed = Keyboard.current != null && Keyboard.current.leftShiftKey.isPressed;
+            bool rightClickPressed = Mouse.current != null && Mouse.current.rightButton.isPressed;
+            _isSpecialAbility = shiftPressed || rightClickPressed;
+
+            // Event on press
+            if (_isSpecialAbility && !wasSpecial)
             {
                 OnSpecialAbilityPressed?.Invoke();
             }
@@ -141,27 +157,25 @@ namespace SpaceCombat.Input
         /// </summary>
         private void UpdateWeaponSlotInput()
         {
+            if (Keyboard.current == null) return;
+
             // Keys 1-4 select weapon slots 0-3
-            if (UnityEngine.Input.GetKeyDown(KeyCode.Alpha1) || UnityEngine.Input.GetKeyDown(KeyCode.Keypad1))
+            if (Keyboard.current.digit1Key.wasPressedThisFrame || Keyboard.current.numpad1Key.wasPressedThisFrame)
             {
                 OnWeaponSlotSelected?.Invoke(0);
             }
-            else if (UnityEngine.Input.GetKeyDown(KeyCode.Alpha2) || UnityEngine.Input.GetKeyDown(KeyCode.Keypad2))
+            else if (Keyboard.current.digit2Key.wasPressedThisFrame || Keyboard.current.numpad2Key.wasPressedThisFrame)
             {
                 OnWeaponSlotSelected?.Invoke(1);
             }
-            else if (UnityEngine.Input.GetKeyDown(KeyCode.Alpha3) || UnityEngine.Input.GetKeyDown(KeyCode.Keypad3))
+            else if (Keyboard.current.digit3Key.wasPressedThisFrame || Keyboard.current.numpad3Key.wasPressedThisFrame)
             {
                 OnWeaponSlotSelected?.Invoke(2);
             }
-            else if (UnityEngine.Input.GetKeyDown(KeyCode.Alpha4) || UnityEngine.Input.GetKeyDown(KeyCode.Keypad4))
+            else if (Keyboard.current.digit4Key.wasPressedThisFrame || Keyboard.current.numpad4Key.wasPressedThisFrame)
             {
                 OnWeaponSlotSelected?.Invoke(3);
             }
-        }
-
-        private void OnDestroy()
-        {
         }
     }
 }

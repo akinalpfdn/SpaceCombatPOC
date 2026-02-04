@@ -1,12 +1,14 @@
 // ============================================
 // SPAWN DEBUGGER - Editor tool for testing spawn distribution
 // Visualizes spawn positions and strategy behavior
+// Uses new Input System (UnityEngine.InputSystem)
 // ============================================
 
 using SpaceCombat.Interfaces;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace SpaceCombat.Spawning
 {
@@ -46,17 +48,19 @@ namespace SpaceCombat.Spawning
         private Bounds _testBounds;
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-        
+
         private void Update()
         {
+            if (Keyboard.current == null) return;
+
             // Press T to test spawn positions
-            if (UnityEngine.Input.GetKeyDown(KeyCode.T))
+            if (Keyboard.current.tKey.wasPressedThisFrame)
             {
                 TestSpawnPositions();
             }
-            
+
             // Press C to clear debug positions
-            if (UnityEngine.Input.GetKeyDown(KeyCode.C))
+            if (Keyboard.current.cKey.wasPressedThisFrame)
             {
                 ClearDebugPositions();
             }

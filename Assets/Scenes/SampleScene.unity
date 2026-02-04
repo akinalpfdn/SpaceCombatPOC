@@ -1116,7 +1116,7 @@ MonoBehaviour:
   _mobileControlsCanvas: {fileID: 2085230915}
   _attackButton: {fileID: 1841266750}
   _weaponSlotBar: {fileID: 1985346863}
-  _enableInEditor: 1
+  _enableInEditor: 0
   _inputMultiplier: 1
 --- !u!4 &512655078
 Transform:

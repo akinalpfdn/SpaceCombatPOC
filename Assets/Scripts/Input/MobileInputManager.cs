@@ -2,9 +2,11 @@
 // MOBILE INPUT MANAGER - Connects mobile UI to gameplay
 // Bridges virtual joystick to ship movement
 // Platform-aware: active on mobile, optional in editor
+// Uses new Input System for touch detection
 // ============================================
 
 using UnityEngine;
+using UnityEngine.InputSystem;
 using SpaceCombat.Combat;
 using SpaceCombat.Entities;
 using SpaceCombat.Movement;
@@ -183,8 +185,8 @@ namespace SpaceCombat.Input
 
                 // WebGL might be on mobile browser
                 case RuntimePlatform.WebGLPlayer:
-                    // Check for touch support
-                    return UnityEngine.Input.touchSupported;
+                    // Check for touch support (new Input System)
+                    return Touchscreen.current != null;
 
                 default:
                     return false;

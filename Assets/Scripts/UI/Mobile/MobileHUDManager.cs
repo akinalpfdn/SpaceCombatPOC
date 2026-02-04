@@ -1,9 +1,11 @@
 // ============================================
 // MOBILE HUD MANAGER - Main mobile UI controller
 // Coordinates all mobile HUD elements
+// Uses new Input System for touch detection
 // ============================================
 
 using UnityEngine;
+using UnityEngine.InputSystem;
 using SpaceCombat.Entities;
 using SpaceCombat.Combat;
 using SpaceCombat.Movement;
@@ -212,7 +214,8 @@ namespace SpaceCombat.UI.Mobile
                     return true;
 
                 case RuntimePlatform.WebGLPlayer:
-                    return UnityEngine.Input.touchSupported;
+                    // Check for touch support (new Input System)
+                    return Touchscreen.current != null;
 
                 default:
                     return false;

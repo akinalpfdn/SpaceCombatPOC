@@ -1,20 +1,30 @@
 // ============================================
 // TOUCH INPUT PROVIDER
 // Touch input for mobile devices
+// Uses new Input System (EnhancedTouch)
 // ============================================
 
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.EnhancedTouch;
 using SpaceCombat.Interfaces;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
+using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 
 namespace SpaceCombat.Input
 {
     /// <summary>
     /// Touch input provider for mobile.
     /// Supports virtual joystick and tap to fire.
+    /// Uses new Input System's EnhancedTouch API.
     /// </summary>
     public class TouchInputProvider : MonoBehaviour, IInputProvider
     {
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+
         [Header("Joystick Settings")]
         [SerializeField] private float _joystickRadius = 100f;
         [SerializeField] private RectTransform _joystickBase;
@@ -24,19 +34,28 @@ namespace SpaceCombat.Input
         [SerializeField] private bool _autoFire = false;
         [SerializeField] private float _autoFireDelay = 0.5f;
 
-        // Properties
+        // ============================================
+        // PROPERTIES
+        // ============================================
+
         public Vector2 MovementInput => _movementInput;
         public Vector2 AimDirection => _aimDirection;
         public bool IsFiring => _isFiring;
         public bool IsSpecialAbility => _isSpecialAbility;
 
-        // Events
+        // ============================================
+        // EVENTS
+        // ============================================
+
         public event Action OnFirePressed;
         public event Action OnFireReleased;
         public event Action OnSpecialAbilityPressed;
-        public event Action<int> OnWeaponSlotSelected;  // Not used on mobile yet
+        public event Action<int> OnWeaponSlotSelected;
 
-        // State
+        // ============================================
+        // RUNTIME STATE
+        // ============================================
+
         private Vector2 _movementInput;
         private Vector2 _aimDirection = Vector2.up;
         private bool _isFiring;
@@ -47,8 +66,20 @@ namespace SpaceCombat.Input
         private Vector2 _joystickStartPos;
         private float _autoFireTimer;
 
+        // ============================================
+        // UNITY LIFECYCLE
+        // ============================================
+
         private void Awake()
         {
+            // Enable EnhancedTouch for new Input System
+            EnhancedTouchSupport.Enable();
+        }
+
+        private void OnDestroy()
+        {
+            // Disable when not needed (optional, can leave enabled)
+            EnhancedTouchSupport.Disable();
         }
 
         private void Update()
@@ -57,12 +88,16 @@ namespace SpaceCombat.Input
             UpdateAutoFire();
         }
 
+        // ============================================
+        // TOUCH PROCESSING
+        // ============================================
+
         private void ProcessTouches()
         {
-            // Reset fire state each frame (will be set by touches)
             bool wasFiring = _isFiring;
 
-            foreach (Touch touch in UnityEngine.Input.touches)
+            // Process all active touches using new Input System
+            foreach (var touch in Touch.activeTouches)
             {
                 switch (touch.phase)
                 {
@@ -80,8 +115,8 @@ namespace SpaceCombat.Input
                 }
             }
 
-            // Handle desktop mouse for testing
-            if (UnityEngine.Input.touchCount == 0)
+            // Handle desktop mouse for testing (using new Input System)
+            if (Touch.activeTouches.Count == 0)
             {
                 HandleMouseInput();
             }
@@ -99,17 +134,19 @@ namespace SpaceCombat.Input
 
         private void HandleTouchBegan(Touch touch)
         {
+            Vector2 position = touch.screenPosition;
+
             // Left half of screen = movement
-            if (touch.position.x < Screen.width * 0.5f)
+            if (position.x < Screen.width * 0.5f)
             {
                 if (_movementFingerId == -1)
                 {
-                    _movementFingerId = touch.fingerId;
-                    _joystickStartPos = touch.position;
+                    _movementFingerId = touch.touchId;
+                    _joystickStartPos = position;
 
                     if (_joystickBase != null)
                     {
-                        _joystickBase.position = touch.position;
+                        _joystickBase.position = position;
                         _joystickBase.gameObject.SetActive(true);
                     }
                 }
@@ -119,7 +156,7 @@ namespace SpaceCombat.Input
             {
                 if (_fireFingerId == -1)
                 {
-                    _fireFingerId = touch.fingerId;
+                    _fireFingerId = touch.touchId;
                     _isFiring = true;
                 }
             }
@@ -127,9 +164,9 @@ namespace SpaceCombat.Input
 
         private void HandleTouchMoved(Touch touch)
         {
-            if (touch.fingerId == _movementFingerId)
+            if (touch.touchId == _movementFingerId)
             {
-                Vector2 delta = touch.position - _joystickStartPos;
+                Vector2 delta = touch.screenPosition - _joystickStartPos;
 
                 // Clamp to joystick radius
                 if (delta.magnitude > _joystickRadius)
@@ -146,7 +183,7 @@ namespace SpaceCombat.Input
                     _joystickHandle.position = _joystickStartPos + delta;
                 }
             }
-            else if (touch.fingerId == _fireFingerId)
+            else if (touch.touchId == _fireFingerId)
             {
                 _isFiring = true;
             }
@@ -154,7 +191,7 @@ namespace SpaceCombat.Input
 
         private void HandleTouchEnded(Touch touch)
         {
-            if (touch.fingerId == _movementFingerId)
+            if (touch.touchId == _movementFingerId)
             {
                 _movementFingerId = -1;
                 _movementInput = Vector2.zero;
@@ -168,7 +205,7 @@ namespace SpaceCombat.Input
                     _joystickHandle.localPosition = Vector3.zero;
                 }
             }
-            else if (touch.fingerId == _fireFingerId)
+            else if (touch.touchId == _fireFingerId)
             {
                 _fireFingerId = -1;
                 _isFiring = false;
@@ -177,18 +214,13 @@ namespace SpaceCombat.Input
 
         private void HandleMouseInput()
         {
-            // WASD for movement
-            _movementInput = new Vector2(
-                UnityEngine.Input.GetAxisRaw("Horizontal"),
-                UnityEngine.Input.GetAxisRaw("Vertical")
-            );
+            if (Mouse.current == null) return;
 
-            if (_movementInput.magnitude > 0.1f)
-            {
-                _aimDirection = _movementInput.normalized;
-            }
+            // No WASD movement - joystick only
+            _movementInput = Vector2.zero;
 
-            _isFiring = UnityEngine.Input.GetMouseButton(0);
+            // Mouse click for fire (testing on desktop)
+            _isFiring = Mouse.current.leftButton.isPressed;
         }
 
         private void UpdateAutoFire()
@@ -205,10 +237,6 @@ namespace SpaceCombat.Input
             {
                 _autoFireTimer = 0f;
             }
-        }
-
-        private void OnDestroy()
-        {
         }
     }
 }
