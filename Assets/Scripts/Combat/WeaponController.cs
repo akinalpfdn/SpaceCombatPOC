@@ -4,6 +4,7 @@
 // ============================================
 
 using System;
+using System.Collections;
 using UnityEngine;
 using VContainer;
 using SpaceCombat.Interfaces;
@@ -36,9 +37,11 @@ namespace SpaceCombat.Combat
         [SerializeField] private float _lastFireTime;
         [SerializeField] private Vector2 _aimDirection = Vector2.up;
         private Vector3? _targetPosition;
+        private bool _isBurstFiring;
+        private Coroutine _burstCoroutine;
 
         // Properties
-        public bool CanFire => Time.time >= _lastFireTime + (_currentWeaponConfig?.fireRate ?? 0.2f);
+        public bool CanFire => !_isBurstFiring && Time.time >= _lastFireTime + (_currentWeaponConfig?.fireRate ?? 0.2f);
         public WeaponConfig CurrentWeapon => _currentWeaponConfig;
 
         // Events
@@ -137,6 +140,7 @@ namespace SpaceCombat.Combat
         /// <summary>
         /// Force fire (ignores cooldown).
         /// Spawns projectiles from all active fire points.
+        /// Supports burst fire mode for DarkOrbit-style multi-shot lasers.
         /// </summary>
         public void Fire()
         {
@@ -144,6 +148,76 @@ namespace SpaceCombat.Combat
 
             _lastFireTime = Time.time;
 
+            // Check if burst fire mode
+            if (_currentWeaponConfig.IsBurstFire)
+            {
+                // Stop any existing burst
+                if (_burstCoroutine != null)
+                {
+                    StopCoroutine(_burstCoroutine);
+                }
+                _burstCoroutine = StartCoroutine(FireBurstCoroutine());
+            }
+            else
+            {
+                // Normal single fire
+                FireSingleVolley(1f);
+            }
+
+            // Events - 3D: convert Vector3 firePoint position to Vector2 (x, z)
+            Vector2 fireDirection = _aimDirection.magnitude > 0.1f
+                ? _aimDirection
+                : new Vector2(transform.forward.x, transform.forward.z);
+            Vector3 firePos = _firePoint.position;
+            EventBus.Publish(new ProjectileFiredEvent(
+                new Vector2(firePos.x, firePos.z),
+                fireDirection,
+                _currentWeaponConfig.weaponName,
+                _isPlayerWeapon
+            ));
+            OnWeaponFired?.Invoke();
+        }
+
+        /// <summary>
+        /// Coroutine for burst fire mode.
+        /// Fires multiple volleys with delay between each.
+        /// </summary>
+        private IEnumerator FireBurstCoroutine()
+        {
+            _isBurstFiring = true;
+
+            int burstCount = _currentWeaponConfig.burstCount;
+            float burstDelay = _currentWeaponConfig.burstDelay;
+
+            // Damage multiplier: split damage across burst shots
+            // (fire points already split damage further if multiple)
+            float burstDamageMultiplier = 1f / burstCount;
+
+            for (int i = 0; i < burstCount; i++)
+            {
+                FireSingleVolley(burstDamageMultiplier);
+
+                // Effects for each burst shot
+                SpawnMuzzleFlash();
+                PlayFireSound();
+
+                // Wait between burst shots (except after last one)
+                if (i < burstCount - 1)
+                {
+                    yield return new WaitForSeconds(burstDelay);
+                }
+            }
+
+            _isBurstFiring = false;
+            _burstCoroutine = null;
+        }
+
+        /// <summary>
+        /// Fires a single volley from all fire points.
+        /// damageMultiplier is applied for burst fire (e.g., 0.33 for 3-shot burst).
+        /// </summary>
+        private void FireSingleVolley(float damageMultiplier)
+        {
             // Calculate fire direction (use ship's forward if no specific aim)
             // 3D XZ plane: transform.forward gives ship facing direction (x, 0, z) -> convert to (x, z) for Vector2
             Vector2 fireDirection = _aimDirection.magnitude > 0.1f
@@ -160,7 +234,8 @@ namespace SpaceCombat.Combat
                 foreach (var fp in _firePoints)
                     if (fp != null) activeCount++;
 
-                float damageMultiplier = activeCount > 0 ? 1f / activeCount : 1f;
+                // Combined multiplier: burst split * fire point split
+                float combinedMultiplier = damageMultiplier * (activeCount > 0 ? 1f / activeCount : 1f);
 
                 // Calculate aim point: use actual target position if available,
                 // otherwise use fallback convergence distance ahead of ship
@@ -183,7 +258,7 @@ namespace SpaceCombat.Combat
                     Vector3 toTarget = aimPoint - fp.position;
                     Vector2 dir = new Vector2(toTarget.x, toTarget.z).normalized;
 
-                    SpawnProjectileAt(fp, dir, damageMultiplier);
+                    SpawnProjectileAt(fp, dir, combinedMultiplier);
                 }
             }
             else
@@ -195,23 +270,9 @@ namespace SpaceCombat.Combat
                 for (int i = 0; i < projectileCount; i++)
                 {
                     Vector2 direction = CalculateSpreadDirection(fireDirection, i, projectileCount, spreadAngle);
-                    SpawnProjectileAt(_firePoint, direction);
+                    SpawnProjectileAt(_firePoint, direction, damageMultiplier);
                 }
             }
-
-            // Effects
-            SpawnMuzzleFlash();
-            PlayFireSound();
-
-            // Events - 3D: convert Vector3 firePoint position to Vector2 (x, z)
-            Vector3 firePos = _firePoint.position;
-            EventBus.Publish(new ProjectileFiredEvent(
-                new Vector2(firePos.x, firePos.z),
-                fireDirection,
-                _currentWeaponConfig.weaponName,
-                _isPlayerWeapon
-            ));
-            OnWeaponFired?.Invoke();
         }
 
         /// <summary>

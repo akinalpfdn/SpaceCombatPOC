@@ -17,6 +17,26 @@ namespace SpaceCombat.ScriptableObjects
         public float range = 15f;
         public float accuracy = 0.95f;
 
+        [Header("Burst Fire")]
+        [Tooltip("Number of shots per burst. 1 = no burst, 3 = DarkOrbit-style triple shot")]
+        [Range(1, 10)]
+        public int burstCount = 1;
+
+        [Tooltip("Delay between each shot in a burst (seconds). Lower = faster burst.")]
+        [Range(0.01f, 0.2f)]
+        public float burstDelay = 0.05f;
+
+        /// <summary>
+        /// Whether this weapon uses burst fire mode.
+        /// </summary>
+        public bool IsBurstFire => burstCount > 1;
+
+        /// <summary>
+        /// Damage per individual projectile in a burst.
+        /// Total damage is split across burst shots.
+        /// </summary>
+        public float DamagePerBurstShot => burstCount > 1 ? damage / burstCount : damage;
+
         [Header("Projectile")]
         public GameObject projectilePrefab;
         public int projectilesPerShot = 1;
