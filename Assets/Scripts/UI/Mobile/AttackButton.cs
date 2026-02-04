@@ -35,9 +35,25 @@ namespace SpaceCombat.UI.Mobile
 
         [Header("Visual Feedback")]
         [SerializeField] private Image _buttonImage;
-        [SerializeField] private Color _normalColor = new Color(0.8f, 0.2f, 0.2f, 0.8f);
+        [SerializeField] private Image _iconImage;
+        [SerializeField] private Image _glowImage;
+
+        [Header("Sprites (Optional)")]
+        [SerializeField] private Sprite _normalSprite;
+        [SerializeField] private Sprite _attackingSprite;
+        [SerializeField] private Sprite _pressedSprite;
+
+        [Header("Colors")]
+        [SerializeField] private Color _normalColor = new Color(1f, 0.2f, 0.25f, 0.9f);
         [SerializeField] private Color _attackingColor = new Color(1f, 0.4f, 0.1f, 1f);
         [SerializeField] private Color _pressedColor = new Color(0.6f, 0.1f, 0.1f, 1f);
+        [SerializeField] private Color _glowNormalColor = new Color(1f, 0.2f, 0.2f, 0f);
+        [SerializeField] private Color _glowAttackingColor = new Color(1f, 0.5f, 0.2f, 0.5f);
+
+        [Header("Animation")]
+        [SerializeField] private bool _enablePulse = true;
+        [SerializeField] private float _pulseSpeed = 2f;
+        [SerializeField] private float _pulseAmount = 0.1f;
 
         [Header("Optional")]
         [Tooltip("Icon to show when attacking")]
@@ -49,6 +65,8 @@ namespace SpaceCombat.UI.Mobile
 
         private Button _button;
         private bool _isPressed;
+        private float _pulseTimer;
+        private Vector3 _originalScale;
 
         // ============================================
         // UNITY LIFECYCLE
@@ -57,6 +75,7 @@ namespace SpaceCombat.UI.Mobile
         private void Awake()
         {
             _button = GetComponent<Button>();
+            _originalScale = transform.localScale;
 
             if (_buttonImage == null)
             {
@@ -80,6 +99,19 @@ namespace SpaceCombat.UI.Mobile
             if (!_isPressed)
             {
                 UpdateVisuals();
+            }
+
+            // Pulse animation when attacking
+            if (_enablePulse && _targetSelector != null && _targetSelector.IsFiringEnabled)
+            {
+                _pulseTimer += Time.deltaTime * _pulseSpeed;
+                float pulse = 1f + Mathf.Sin(_pulseTimer) * _pulseAmount;
+                transform.localScale = _originalScale * pulse;
+            }
+            else
+            {
+                transform.localScale = _originalScale;
+                _pulseTimer = 0f;
             }
         }
 
@@ -115,6 +147,12 @@ namespace SpaceCombat.UI.Mobile
             if (_buttonImage != null)
             {
                 _buttonImage.color = _pressedColor;
+
+                // Update sprite if available
+                if (_pressedSprite != null)
+                {
+                    _buttonImage.sprite = _pressedSprite;
+                }
             }
         }
 
@@ -135,11 +173,25 @@ namespace SpaceCombat.UI.Mobile
         {
             bool isAttacking = _targetSelector != null && _targetSelector.IsFiringEnabled;
 
+            // Update button color
             if (_buttonImage != null)
             {
                 _buttonImage.color = isAttacking ? _attackingColor : _normalColor;
+
+                // Update sprite if available
+                if (_normalSprite != null && _attackingSprite != null)
+                {
+                    _buttonImage.sprite = isAttacking ? _attackingSprite : _normalSprite;
+                }
             }
 
+            // Update glow effect
+            if (_glowImage != null)
+            {
+                _glowImage.color = isAttacking ? _glowAttackingColor : _glowNormalColor;
+            }
+
+            // Update attacking indicator
             if (_attackingIndicator != null)
             {
                 _attackingIndicator.SetActive(isAttacking);

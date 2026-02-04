@@ -53,6 +53,7 @@ namespace SpaceCombat.Entities
         // Public properties for UI
         public int CurrentWeaponSlot => _currentWeaponSlot;
         public WeaponConfig CurrentWeaponConfig => _weaponController?.CurrentWeapon;
+        public ShipConfig Config => _config;
 
         protected override void Awake()
         {
@@ -298,6 +299,15 @@ namespace SpaceCombat.Entities
             // Play switch sound
             Vector3 pos = transform.position;
             EventBus.Publish(new PlaySFXEvent("weapon_switch", new Vector2(pos.x, pos.z)));
+        }
+
+        /// <summary>
+        /// Public method for UI to trigger weapon slot selection.
+        /// Called by mobile WeaponSlotButton.
+        /// </summary>
+        public void SelectWeaponSlot(int slotIndex)
+        {
+            OnWeaponSlotSelected(slotIndex);
         }
 
         // ============================================

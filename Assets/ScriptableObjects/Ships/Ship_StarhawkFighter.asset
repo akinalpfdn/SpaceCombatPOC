@@ -21,7 +21,7 @@ MonoBehaviour:
   shieldRegenDelay: 2
   maxSpeed: 20
   acceleration: 20
-  deceleration: 3
+  deceleration: 20
   rotationSpeed: 360
   availableWeapons:
   - {fileID: 11400000, guid: 2bbf8f29f20969f4592c5c78e16cb52c, type: 2}

@@ -6,6 +6,7 @@
 
 using UnityEngine;
 using SpaceCombat.Combat;
+using SpaceCombat.Entities;
 using SpaceCombat.Movement;
 using SpaceCombat.UI.Mobile;
 
@@ -35,6 +36,7 @@ namespace SpaceCombat.Input
         [SerializeField] private ShipMovement _shipMovement;
         [SerializeField] private GameObject _mobileControlsCanvas;
         [SerializeField] private AttackButton _attackButton;
+        [SerializeField] private WeaponSlotBar _weaponSlotBar;
 
         [Header("Platform Settings")]
         [Tooltip("Enable mobile controls in Unity Editor for testing")]
@@ -120,6 +122,16 @@ namespace SpaceCombat.Input
                 if (_attackButton != null)
                 {
                     _attackButton.SetTargetSelector(_targetSelector);
+                }
+
+                // Set up WeaponSlotBar with PlayerShip reference
+                if (_weaponSlotBar != null)
+                {
+                    var playerShip = player.GetComponent<PlayerShip>();
+                    if (playerShip != null)
+                    {
+                        _weaponSlotBar.Initialize(playerShip);
+                    }
                 }
 
                 // Disable mouse movement when mobile controls are active
