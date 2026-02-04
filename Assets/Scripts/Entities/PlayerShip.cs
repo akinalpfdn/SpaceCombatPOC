@@ -298,8 +298,6 @@ namespace SpaceCombat.Entities
             // Play switch sound
             Vector3 pos = transform.position;
             EventBus.Publish(new PlaySFXEvent("weapon_switch", new Vector2(pos.x, pos.z)));
-
-            Debug.Log($"[PlayerShip] Weapon switched: {oldWeapon?.weaponName ?? "none"} -> {newWeapon.weaponName} (Slot {slotIndex + 1})");
         }
 
         // ============================================

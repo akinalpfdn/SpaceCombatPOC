@@ -56,6 +56,8 @@ namespace SpaceCombat.VFX
         private int _trailActivationFrame;
 
         private static readonly int BASE_COLOR_ID = Shader.PropertyToID("_BaseColor");
+        private static readonly int COLOR_ID = Shader.PropertyToID("_Color");
+        private static readonly int EMISSION_COLOR_ID = Shader.PropertyToID("_EmissionColor");
 
         // ============================================
         // UNITY LIFECYCLE
@@ -96,20 +98,32 @@ namespace SpaceCombat.VFX
 
         /// <summary>
         /// Apply HDR color to mesh body and trail.
-        /// Color is multiplied by emission intensity for bloom glow.
+        /// Uses HSV to preserve color hue while boosting brightness for bloom.
+        /// Sets multiple shader properties for compatibility with different shaders.
         /// </summary>
         public void SetColor(Color color, float emissionIntensity)
         {
             _currentColor = color;
             _currentEmissionIntensity = emissionIntensity;
 
-            // HDR color for bloom: multiply base color by intensity
-            Color hdrColor = color * emissionIntensity;
+            // Convert to HSV to preserve hue while boosting brightness
+            Color.RGBToHSV(color, out float h, out float s, out float v);
+
+            // Boost value (brightness) by intensity, keeping hue and saturation intact
+            // This prevents bright colors from washing out to white
+            float boostedValue = Mathf.Min(v * emissionIntensity, emissionIntensity);
+            Color hdrColor = Color.HSVToRGB(h, s, boostedValue);
+
+            // Apply additional intensity multiplier for HDR bloom
+            hdrColor *= Mathf.Max(1f, emissionIntensity * 0.5f);
             hdrColor.a = 1f;
 
             // Apply to mesh via MaterialPropertyBlock (no material instancing)
+            // Set multiple color properties for shader compatibility
             _meshRenderer.GetPropertyBlock(_propertyBlock);
-            _propertyBlock.SetColor(BASE_COLOR_ID, hdrColor);
+            _propertyBlock.SetColor(BASE_COLOR_ID, hdrColor);      // URP shaders
+            _propertyBlock.SetColor(COLOR_ID, hdrColor);           // Legacy/Standard shaders
+            _propertyBlock.SetColor(EMISSION_COLOR_ID, hdrColor);  // Emission property
             _meshRenderer.SetPropertyBlock(_propertyBlock);
 
             // Apply to trail with alpha fade
@@ -172,6 +186,7 @@ namespace SpaceCombat.VFX
 
         /// <summary>
         /// Full state reset for pool reuse.
+        /// Note: Does NOT reset color - color will be set by WeaponConfig on next spawn.
         /// </summary>
         public void ResetVisual()
         {
@@ -180,10 +195,9 @@ namespace SpaceCombat.VFX
                 _trailRenderer.Clear();
             }
 
-            // Reset to config defaults if available
+            // Reset scale only - color will be set by WeaponController on next spawn
             if (_config != null)
             {
-                SetColor(_config.EmissionColor, _config.EmissionIntensity);
                 _baseScale = _config.MeshScale;
                 transform.localScale = _baseScale;
             }
@@ -195,6 +209,8 @@ namespace SpaceCombat.VFX
 
         /// <summary>
         /// Apply a visual config asset. Can be called at runtime to swap visual style.
+        /// Note: Does NOT set color - color is controlled by WeaponConfig.projectileColor
+        /// and should be set via SetColor() after ApplyConfig().
         /// </summary>
         public void ApplyConfig(ProjectileVisualConfig config)
         {
@@ -231,10 +247,9 @@ namespace SpaceCombat.VFX
                 _trailRenderer.minVertexDistance = config.TrailMinVertexDistance;
             }
 
-            // Apply default visual state
+            // Apply scale only - color is set separately by WeaponConfig
             _baseScale = config.MeshScale;
             transform.localScale = _baseScale;
-            SetColor(config.EmissionColor, config.EmissionIntensity);
         }
 
         // ============================================

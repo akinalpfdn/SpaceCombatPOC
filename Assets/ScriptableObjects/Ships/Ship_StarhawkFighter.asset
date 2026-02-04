@@ -22,8 +22,11 @@ MonoBehaviour:
   maxSpeed: 20
   acceleration: 20
   deceleration: 3
-  rotationSpeed: 180
+  rotationSpeed: 360
   availableWeapons:
+  - {fileID: 11400000, guid: 2bbf8f29f20969f4592c5c78e16cb52c, type: 2}
+  - {fileID: 11400000, guid: 5834487cf6ac7564a8666bcdffbffab8, type: 2}
+  - {fileID: 11400000, guid: 2f30cdeda5a80694081a537b05d8a7a9, type: 2}
   - {fileID: 11400000, guid: 849b5560bac627e4fae1a2d1d9930fc8, type: 2}
   shieldVisualConfig: {fileID: 11400000, guid: ff0fa188696e1734db8b4cdccea8486d, type: 2}
   shieldScale: {x: 4, y: 4, z: 4}

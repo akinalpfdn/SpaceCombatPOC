@@ -15,18 +15,18 @@ MonoBehaviour:
   weaponName: Laser
   damageType: 1
   damage: 10
-  fireRate: 0.2
-  projectileSpeed: 30
-  range: 15
+  fireRate: 0.7
+  projectileSpeed: 60
+  range: 18
   accuracy: 0.95
   burstCount: 1
   burstDelay: 0.05
-  projectilePrefab: {fileID: 0}
+  projectilePrefab: {fileID: 587130082223421870, guid: 237e92e04ff2cf64eb658f8436cbaffc, type: 3}
   projectilesPerShot: 1
   spreadAngle: 0
   muzzleFlashPrefab: {fileID: 0}
   projectileColor: {r: 1, g: 0, b: 0, a: 1}
   projectileScale: 1
-  projectileVisualConfig: {fileID: 0}
+  projectileVisualConfig: {fileID: 11400000, guid: 611759343f654414488f45d2b3aed9b9, type: 2}
   fireSoundId: laser_fire
   hitSoundId: laser_hit
