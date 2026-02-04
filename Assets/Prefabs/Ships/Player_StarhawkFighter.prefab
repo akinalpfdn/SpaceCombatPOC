@@ -54,10 +54,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c977e5b0f15a5b34abc9b2367d1beac2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.Movement.ShipMovement
-  _maxSpeed: 10
-  _acceleration: 5
-  _deceleration: 3
-  _rotationSpeed: 180
   _velocitySmoothing: 0.1
   _rotateToMovement: 1
   _rotationThreshold: 0.1
@@ -149,7 +145,7 @@ MonoBehaviour:
   _shipMovement: {fileID: 0}
   _mainCamera: {fileID: 0}
   _doubleClickTime: 0.3
-  _targetIndicatorPrefab: {fileID: 3787043342725239422, guid: 3632ac2bf675ef94e805a43e7b9ee1b6, type: 3}
+  _targetIndicatorPrefab: {fileID: 6499859876777865177, guid: 8494167dd73be694cbda318fef7aa4c1, type: 3}
   _healthBarPrefab: {fileID: 4674260991152052681, guid: a908d1210d1c54c4ab61070c37258f08, type: 3}
 --- !u!114 &362525359733449936
 MonoBehaviour:

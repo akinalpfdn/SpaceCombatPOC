@@ -14,6 +14,7 @@
 
 using UnityEngine;
 using SpaceCombat.Entities;
+using SpaceCombat.Interfaces;
 using SpaceCombat.Movement;
 using SpaceCombat.UI;
 
@@ -53,7 +54,7 @@ namespace SpaceCombat.Combat
 
         // State
         private Transform _currentTarget;
-        private TargetIndicator _currentIndicator;
+        private ITargetIndicator _currentIndicator;
         private HealthBar _targetHealthBar;
         private bool _isFiringEnabled = false;
         private bool _wasSpacePressed = false;
@@ -339,7 +340,9 @@ namespace SpaceCombat.Combat
             if (_targetIndicatorPrefab == null) return;
 
             var indicatorObj = Instantiate(_targetIndicatorPrefab, target.position, Quaternion.identity);
-            _currentIndicator = indicatorObj.GetComponent<TargetIndicator>();
+
+            // Try to get indicator component (supports both 2D and 3D versions)
+            _currentIndicator = indicatorObj.GetComponent<ITargetIndicator>();
 
             // Get target indicator scale from enemy config
             var enemy = target.GetComponent<Enemy>();
