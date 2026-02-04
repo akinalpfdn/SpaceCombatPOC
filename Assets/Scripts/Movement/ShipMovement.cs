@@ -22,7 +22,7 @@ namespace SpaceCombat.Movement
         [SerializeField] private float _maxSpeed = 10f;
         [SerializeField] private float _acceleration = 5f;
         [SerializeField] private float _deceleration = 3f;
-        [SerializeField] private float _rotationSpeed = 720f;
+        [SerializeField] private float _rotationSpeed = 20000f;
 
         [Header("Movement Smoothing")]
         [SerializeField] private float _velocitySmoothing = 0.1f;

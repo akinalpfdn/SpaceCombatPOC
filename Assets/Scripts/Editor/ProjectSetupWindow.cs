@@ -144,7 +144,7 @@ namespace SpaceCombat.Editor
             shipConfig.maxShield = 50;
             shipConfig.maxSpeed = 10;
             shipConfig.acceleration = 5;
-            shipConfig.rotationSpeed = 180;
+            shipConfig.rotationSpeed = 3000;
             AssetDatabase.CreateAsset(shipConfig, "Assets/ScriptableObjects/Ships/PlayerShip_Fighter.asset");
 
             // Create Weapon Config

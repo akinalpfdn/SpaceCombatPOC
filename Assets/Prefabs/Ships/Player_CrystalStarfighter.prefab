@@ -87,8 +87,7 @@ MonoBehaviour:
   _maxSpeed: 10
   _acceleration: 5
   _deceleration: 3
-  _instantRotation: 1
-  _rotationSpeed: 180
+  _rotationSpeed: 3000
   _velocitySmoothing: 0.1
   _rotateToMovement: 1
   _rotationThreshold: 0.1

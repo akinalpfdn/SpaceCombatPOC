@@ -24,7 +24,7 @@ namespace SpaceCombat.ScriptableObjects
         public float maxSpeed = 10f;
         public float acceleration = 5f;
         public float deceleration = 3f;
-        public float rotationSpeed = 180f;
+        public float rotationSpeed = 3000f;
 
         [Header("Combat")]
         public WeaponConfig[] availableWeapons;
