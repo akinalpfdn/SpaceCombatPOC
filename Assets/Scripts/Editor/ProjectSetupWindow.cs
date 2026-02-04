@@ -335,10 +335,6 @@ namespace SpaceCombat.Editor
             if (mainCam != null)
             {
                 mainCam.gameObject.AddComponent<Environment.CameraFollow>();
-                
-                var shakeObj = new GameObject("ScreenShake");
-                shakeObj.transform.SetParent(mainCam.transform);
-                shakeObj.AddComponent<VFX.ScreenShake>();
             }
             
             // Create star field

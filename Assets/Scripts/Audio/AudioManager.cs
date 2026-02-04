@@ -33,19 +33,8 @@ namespace SpaceCombat.Audio
         private List<AudioSource> _sfxPool;
         private int _currentSfxIndex;
 
-        private static AudioManager _instance;
-
         private void Awake()
         {
-            // DontDestroyOnLoad guard - prevent duplicates across scene reloads
-            if (_instance != null && _instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-            _instance = this;
-            DontDestroyOnLoad(gameObject);
-
             InitializeAudioSources();
             SubscribeToEvents();
         }

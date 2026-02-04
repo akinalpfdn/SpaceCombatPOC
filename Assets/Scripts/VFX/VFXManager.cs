@@ -3,7 +3,6 @@
 // Handles explosions, particles, and screen effects
 // ============================================
 
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
@@ -36,9 +35,6 @@ namespace SpaceCombat.VFX
         [Header("Pool Settings")]
         [SerializeField] private int _explosionPoolSize = 10;
         [SerializeField] private int _hitEffectPoolSize = 20;
-
-        [Header("Screen Effects")]
-        [SerializeField] private ScreenShake _screenShake;
 
         // VFX pools - keyed by prefab instance ID
         private readonly Dictionary<int, ObjectPool<PoolableVFX>> _vfxPools = new();
@@ -107,16 +103,6 @@ namespace SpaceCombat.VFX
         private void OnExplosion(ExplosionEvent evt)
         {
             SpawnExplosion(evt.Position, evt.Size);
-
-            float shakeIntensity = evt.Size switch
-            {
-                ExplosionSize.Small => 0.1f,
-                ExplosionSize.Medium => 0.2f,
-                ExplosionSize.Large => 0.4f,
-                _ => 0.1f
-            };
-
-            _screenShake?.Shake(shakeIntensity, 0.2f);
         }
 
         private void OnDamage(DamageEvent evt)
@@ -128,11 +114,6 @@ namespace SpaceCombat.VFX
         {
             var size = evt.IsPlayer ? ExplosionSize.Large : ExplosionSize.Medium;
             SpawnExplosion(evt.Position, size);
-
-            if (evt.IsPlayer)
-            {
-                _screenShake?.Shake(0.5f, 0.5f);
-            }
         }
 
         public void SpawnExplosion(Vector2 position, ExplosionSize size)
@@ -183,138 +164,6 @@ namespace SpaceCombat.VFX
                 var instance = Instantiate(prefab, position, Quaternion.identity);
                 Destroy(instance, fallbackDestroyTime);
             }
-        }
-    }
-
-    /// <summary>
-    /// Camera screen shake effect
-    /// </summary>
-    public class ScreenShake : MonoBehaviour
-    {
-        [SerializeField] private float _defaultIntensity = 0.2f;
-        [SerializeField] private float _defaultDuration = 0.3f;
-
-        private Vector3 _originalPosition;
-        private Coroutine _shakeCoroutine;
-
-        private void Awake()
-        {
-            _originalPosition = transform.localPosition;
-        }
-
-        public void Shake(float intensity = -1f, float duration = -1f)
-        {
-            if (intensity < 0) intensity = _defaultIntensity;
-            if (duration < 0) duration = _defaultDuration;
-
-            if (_shakeCoroutine != null)
-            {
-                StopCoroutine(_shakeCoroutine);
-            }
-
-            _shakeCoroutine = StartCoroutine(ShakeCoroutine(intensity, duration));
-        }
-
-        private IEnumerator ShakeCoroutine(float intensity, float duration)
-        {
-            float elapsed = 0f;
-
-            while (elapsed < duration)
-            {
-                float currentIntensity = intensity * (1f - (elapsed / duration));
-                
-                Vector2 offset = Random.insideUnitCircle * currentIntensity;
-                transform.localPosition = _originalPosition + new Vector3(offset.x, offset.y, 0);
-
-                elapsed += Time.deltaTime;
-                yield return null;
-            }
-
-            transform.localPosition = _originalPosition;
-            _shakeCoroutine = null;
-        }
-    }
-
-    /// <summary>
-    /// Auto-destroys particle system when complete
-    /// Attach to particle effect prefabs
-    /// </summary>
-    public class AutoDestroyParticle : MonoBehaviour
-    {
-        private ParticleSystem _particleSystem;
-
-        private void Awake()
-        {
-            _particleSystem = GetComponent<ParticleSystem>();
-        }
-
-        private void Update()
-        {
-            if (_particleSystem != null && !_particleSystem.IsAlive())
-            {
-                Destroy(gameObject);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Poolable visual effect for reuse
-    /// </summary>
-    public class PoolableEffect : MonoBehaviour, IVisualEffect
-    {
-        [SerializeField] private ParticleSystem _particleSystem;
-        [SerializeField] private float _duration = 1f;
-
-        public bool IsActive => gameObject.activeInHierarchy;
-
-        private float _timer;
-
-        private void Update()
-        {
-            if (IsActive)
-            {
-                _timer -= Time.deltaTime;
-                if (_timer <= 0)
-                {
-                    gameObject.SetActive(false);
-                }
-            }
-        }
-
-        public void Play(Vector2 position, float scale = 1f)
-        {
-            transform.position = position;
-            transform.localScale = Vector3.one * scale;
-            _timer = _duration;
-
-            if (_particleSystem != null)
-            {
-                _particleSystem.Play();
-            }
-        }
-
-        public void Stop()
-        {
-            if (_particleSystem != null)
-            {
-                _particleSystem.Stop();
-            }
-        }
-
-        public void OnSpawn()
-        {
-            _timer = _duration;
-        }
-
-        public void OnDespawn()
-        {
-            Stop();
-        }
-
-        public void ResetState()
-        {
-            _timer = 0;
-            transform.localScale = Vector3.one;
         }
     }
 }

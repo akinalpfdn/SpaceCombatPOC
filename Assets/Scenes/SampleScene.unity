@@ -2521,7 +2521,6 @@ MonoBehaviour:
   _muzzleFlashDefault: {fileID: 0}
   _explosionPoolSize: 10
   _hitEffectPoolSize: 20
-  _screenShake: {fileID: 0}
 --- !u!4 &1796119252
 Transform:
   m_ObjectHideFlags: 0

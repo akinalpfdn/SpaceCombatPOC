@@ -36,7 +36,19 @@ namespace SpaceCombat.Core
             builder.RegisterComponent(_spawnService).As<ISpawnService>();
             builder.RegisterComponent(_audioManager).As<IAudioService>();
 
-            // Input - platform based
+            // Input - platform based with auto-find fallback
+            RegisterInputProvider(builder);
+        }
+
+        private void RegisterInputProvider(IContainerBuilder builder)
+        {
+            // Try to find input providers if not assigned in inspector
+            if (_keyboardInput == null)
+                _keyboardInput = FindFirstObjectByType<KeyboardInputProvider>();
+            if (_touchInput == null)
+                _touchInput = FindFirstObjectByType<TouchInputProvider>();
+
+            // Register based on platform
             if (Application.isMobilePlatform && _touchInput != null)
             {
                 builder.RegisterComponent(_touchInput).As<IInputProvider>();
@@ -44,6 +56,10 @@ namespace SpaceCombat.Core
             else if (_keyboardInput != null)
             {
                 builder.RegisterComponent(_keyboardInput).As<IInputProvider>();
+            }
+            else
+            {
+                Debug.LogError("[GameLifetimeScope] No IInputProvider found! Assign KeyboardInputProvider or TouchInputProvider in inspector.");
             }
         }
 
