@@ -28,5 +28,5 @@ MonoBehaviour:
   projectileColor: {r: 0.39215687, g: 0.023529412, b: 0.5764706, a: 1}
   projectileScale: 1
   projectileVisualConfig: {fileID: 11400000, guid: 611759343f654414488f45d2b3aed9b9, type: 2}
-  fireSoundId: laser_fire
+  fireSoundId: la2_laser
   hitSoundId: laser_hit

@@ -14,15 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.ScriptableObjects.ShipConfig
   shipName: Fighter
   shipSprite: {fileID: 0}
+  shipPrefab: {fileID: 0}
   maxHealth: 200000
   maxShield: 50
   shieldRegenRate: 2
   shieldRegenDelay: 3
-  maxSpeed: 11
-  acceleration: 7
+  maxSpeed: 22
+  acceleration: 22
   deceleration: 3
-  rotationSpeed: 180
+  rotationSpeed: 10
   availableWeapons: []
+  shieldVisualConfig: {fileID: 0}
+  shieldScale: {x: 2, y: 1.5, z: 2.5}
   shieldHitSoundId: shield_hit
   hullHitSoundId: hull_hit
   explosionSoundId: explosion_medium

@@ -16,30 +16,29 @@ namespace SpaceCombat.Audio
             public string id;
             public AudioClip clip;
 
-            [Tooltip("Volume percentage: 0 = silent, 100 = normal, 200 = double volume")]
-            [Range(0, 200)] public int volume = 100;
+            [Tooltip("Volume: 0 = silent, 100 = full volume")]
+            [Range(0, 100)] public int volume = 100;
 
-            [Tooltip("Pitch multiplier: 1 = normal, 0.5 = half speed, 2 = double speed")]
+            [Tooltip("Pitch: 1 = normal, <1 = slower/deeper, >1 = faster/higher")]
             [Range(0.5f, 2f)] public float pitch = 1f;
 
             [Tooltip("Add random pitch variation for variety")]
             public bool randomizePitch = false;
 
-            [Range(0f, 0.3f)] public float pitchVariation = 0.1f;
+            [Range(0f, 0.2f)] public float pitchVariation = 0.05f;
 
             /// <summary>
-            /// Returns volume as a multiplier (0-2 range).
-            /// Handles migration from old 0-1 float values (treats values < 10 as old format).
+            /// Returns volume as 0-1 multiplier for AudioSource.
+            /// Note: AudioSource.volume is capped at 1.0 by Unity.
             /// </summary>
             public float VolumeMultiplier
             {
                 get
                 {
-                    // Migration: if volume is suspiciously low (< 10), treat as unmigrated
-                    // Old values were 0-1 float, which become 0 or 1 as int
+                    // Handle migration: old float values (0-1) become 0 or 1 as int
                     if (volume <= 1)
-                        return 1f; // Default to normal volume for unmigrated entries
-                    return volume / 100f;
+                        return 1f; // Treat as full volume for unmigrated entries
+                    return Mathf.Clamp01(volume / 100f);
                 }
             }
         }

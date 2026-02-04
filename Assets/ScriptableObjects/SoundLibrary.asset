@@ -13,28 +13,40 @@ MonoBehaviour:
   m_Name: SoundLibrary
   m_EditorClassIdentifier: SpaceCombat:SpaceCombat.Audio:SoundLibrary
   soundEffects:
-  - id: laser_fire
+  - id: la4_laser
     clip: {fileID: 8300000, guid: 5f12c59ee0e58a042b7539131608b8a3, type: 3}
-    volume: 0
+    volume: 97
     pitch: 0
     randomizePitch: 0
     pitchVariation: 0
   - id: enemy_laser
     clip: {fileID: 8300000, guid: 9240f0a11f65b954f9392e7e34a0d28a, type: 3}
-    volume: 0
-    pitch: 0
+    volume: 18
+    pitch: 1
     randomizePitch: 0
     pitchVariation: 0
-  - id: explosion_medium
-    clip: {fileID: 8300000, guid: a69013a872d95904494f4925298ccc8d, type: 3}
-    volume: 0
-    pitch: 0.1
+  - id: la2_laser
+    clip: {fileID: 8300000, guid: 614f11d07d9ff1f47a6bac9ba03e72c7, type: 3}
+    volume: 100
+    pitch: 1
+    randomizePitch: 0
+    pitchVariation: 0
+  - id: la1_laser
+    clip: {fileID: 8300000, guid: 9843407b7b6b2a949ad1c36289138cfb, type: 3}
+    volume: 99
+    pitch: 1
     randomizePitch: 0
     pitchVariation: 0
   - id: explosion_small
     clip: {fileID: 8300000, guid: 6ca518f52ce96fb4794a205892ed8b14, type: 3}
-    volume: 0
-    pitch: 0.1
+    volume: 100
+    pitch: 1
+    randomizePitch: 0
+    pitchVariation: 0
+  - id: la3_laser
+    clip: {fileID: 8300000, guid: 02ec8a7f08941774fa748a3d32e40875, type: 3}
+    volume: 100
+    pitch: 1
     randomizePitch: 0
     pitchVariation: 0
   musicTracks: []
