@@ -85,6 +85,19 @@ namespace SpaceCombat.Entities
 
             // Subscribe to events
             SubscribeToEvents();
+
+            // Publish initial health/shield values for UI
+            PublishHealthAndShieldEvents();
+        }
+
+        /// <summary>
+        /// Publishes current health and shield values to EventBus for UI updates.
+        /// Called on Start and after any health/shield change.
+        /// </summary>
+        private void PublishHealthAndShieldEvents()
+        {
+            EventBus.Publish(new PlayerHealthChangedEvent(_currentHealth, _maxHealth));
+            EventBus.Publish(new PlayerShieldChangedEvent(_currentShield, _maxShield));
         }
 
         private void OnDestroy()
@@ -402,6 +415,7 @@ namespace SpaceCombat.Entities
                 Vector3 pos = transform.position;
                 EventBus.Publish(new PlaySFXEvent(_config.shieldHitSoundId, new Vector2(pos.x, pos.z)));
             }
+            // Note: Shield event is published via HandleShieldChanged subscription
         }
 
         protected override void OnHealthDamaged(float amount, DamageType damageType)
@@ -448,6 +462,9 @@ namespace SpaceCombat.Entities
             NotifyHealthChanged();
             NotifyShieldChanged();
 
+            // Publish events for UI
+            PublishHealthAndShieldEvents();
+
             // Reset shield visual
             _shieldVisualController?.OnSpawn();
 
@@ -484,17 +501,29 @@ namespace SpaceCombat.Entities
 
         private void SubscribeToEvents()
         {
-            // Subscribe to game events if needed
+            // Subscribe to BaseEntity Actions to forward to EventBus
+            OnShieldChanged += HandleShieldChanged;
         }
 
         private void UnsubscribeFromEvents()
         {
+            // Unsubscribe from BaseEntity Actions
+            OnShieldChanged -= HandleShieldChanged;
+
             if (_inputProvider != null)
             {
                 _inputProvider.OnFirePressed -= OnFirePressed;
                 _inputProvider.OnFireReleased -= OnFireReleased;
                 _inputProvider.OnWeaponSlotSelected -= OnWeaponSlotSelected;
             }
+        }
+
+        /// <summary>
+        /// Handles shield changes from BaseEntity (including regen) and publishes to EventBus.
+        /// </summary>
+        private void HandleShieldChanged(float current, float max)
+        {
+            EventBus.Publish(new PlayerShieldChangedEvent(current, max));
         }
     }
 }

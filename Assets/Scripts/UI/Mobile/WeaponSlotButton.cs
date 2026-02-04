@@ -73,8 +73,8 @@ namespace SpaceCombat.UI.Mobile
             _button = GetComponent<Button>();
             _button.onClick.AddListener(OnButtonClicked);
 
-            // Set slot number text
-            if (_slotNumberText != null)
+            // Set slot number text only if empty (allows custom text in Inspector)
+            if (_slotNumberText != null && string.IsNullOrEmpty(_slotNumberText.text))
             {
                 _slotNumberText.text = (_slotIndex + 1).ToString();
             }
@@ -113,8 +113,20 @@ namespace SpaceCombat.UI.Mobile
 
         /// <summary>
         /// Set the weapon name to display (optional).
+        /// Only sets if current text is empty, preserving Inspector values.
         /// </summary>
         public void SetWeaponName(string name)
+        {
+            if (_weaponNameText != null && string.IsNullOrEmpty(_weaponNameText.text))
+            {
+                _weaponNameText.text = name;
+            }
+        }
+
+        /// <summary>
+        /// Force set the weapon name, overwriting any existing value.
+        /// </summary>
+        public void ForceSetWeaponName(string name)
         {
             if (_weaponNameText != null)
             {
