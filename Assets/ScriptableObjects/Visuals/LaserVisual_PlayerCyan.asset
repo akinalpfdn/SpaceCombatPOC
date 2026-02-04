@@ -18,8 +18,8 @@ MonoBehaviour:
   _emissionColor: {r: 0, g: 0, b: 0, a: 1}
   _emissionIntensity: 5
   _trailMaterial: {fileID: 2100000, guid: c8b5c7b0853435c4b8786fb04e2683db, type: 2}
-  _trailStartWidth: 0.154
+  _trailStartWidth: 0.151
   _trailEndWidth: 0.073
   _trailTime: 0.05
   _trailCornerVertices: 2
-  _trailMinVertexDistance: 0.1
+  _trailMinVertexDistance: 0.201

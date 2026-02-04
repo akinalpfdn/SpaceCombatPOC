@@ -265,6 +265,9 @@ namespace SpaceCombat.VFX
 
             _particleSystem = sparkObj.AddComponent<ParticleSystem>();
 
+            // Stop the particle system before configuring (Unity auto-plays on AddComponent)
+            _particleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+
             // Main module - configure lifetime and simulation
             var main = _particleSystem.main;
             main.duration = _duration;
