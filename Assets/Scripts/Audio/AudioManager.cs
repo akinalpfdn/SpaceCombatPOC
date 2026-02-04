@@ -97,26 +97,40 @@ namespace SpaceCombat.Audio
                 return;
             }
 
-            var clip = _soundLibrary.GetClip(sfxId);
-            if (clip == null)
+            var entry = _soundLibrary.GetSoundEntry(sfxId);
+            if (entry == null || entry.clip == null)
             {
                 Debug.LogWarning($"Sound not found: {sfxId}");
                 return;
             }
 
-            PlaySFXClip(clip, position);
+            // Use the entry's volume multiplier (0 = silent, 100 = normal, 200 = 2x)
+            PlaySFXClip(entry.clip, position, entry.VolumeMultiplier, entry.pitch, entry.randomizePitch, entry.pitchVariation);
         }
 
-        public void PlaySFXClip(AudioClip clip, Vector2? position = null, float volumeScale = 1f)
+        public void PlaySFXClip(AudioClip clip, Vector2? position = null, float volumeScale = 1f,
+            float pitch = 1f, bool randomizePitch = false, float pitchVariation = 0f)
         {
             if (clip == null) return;
 
             // Get next available source from pool
             var source = GetNextSFXSource();
-            
+
+            // Reset source state (important for pooled sources)
+            source.Stop();
             source.clip = clip;
             source.volume = _sfxVolume * _masterVolume * volumeScale;
-            
+
+            // Apply pitch - always reset to avoid leftover values from pool
+            // Only apply randomization if explicitly enabled
+            float finalPitch = pitch;
+            if (randomizePitch && pitchVariation > 0f)
+            {
+                finalPitch = pitch + UnityEngine.Random.Range(-pitchVariation, pitchVariation);
+            }
+            // Clamp pitch to safe range
+            source.pitch = Mathf.Clamp(finalPitch, 0.5f, 2f);
+
             // Position for 3D sound (if needed)
             if (position.HasValue)
             {
