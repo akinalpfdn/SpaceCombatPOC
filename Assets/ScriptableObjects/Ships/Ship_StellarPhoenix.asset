@@ -25,6 +25,8 @@ MonoBehaviour:
   rotationSpeed: 180
   availableWeapons:
   - {fileID: 11400000, guid: 849b5560bac627e4fae1a2d1d9930fc8, type: 2}
+  shieldVisualConfig: {fileID: 11400000, guid: ff0fa188696e1734db8b4cdccea8486d, type: 2}
+  shieldScale: {x: 2, y: 1.5, z: 2.5}
   shieldHitSoundId: shield_hit
   hullHitSoundId: hull_hit
   explosionSoundId: explosion_medium

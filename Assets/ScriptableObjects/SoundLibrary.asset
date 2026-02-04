@@ -26,7 +26,7 @@ MonoBehaviour:
     randomizePitch: 0
     pitchVariation: 0
   - id: la2_laser
-    clip: {fileID: 8300000, guid: 614f11d07d9ff1f47a6bac9ba03e72c7, type: 3}
+    clip: {fileID: 8300000, guid: 850c9d02b475d5e4a8751008bd342c95, type: 3}
     volume: 100
     pitch: 1
     randomizePitch: 0

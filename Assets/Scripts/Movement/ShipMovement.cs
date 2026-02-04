@@ -18,11 +18,11 @@ namespace SpaceCombat.Movement
     [RequireComponent(typeof(Rigidbody))]
     public class ShipMovement : MonoBehaviour, IMovable
     {
-        [Header("Movement Settings")]
-        [SerializeField] private float _maxSpeed = 10f;
-        [SerializeField] private float _acceleration = 5f;
-        [SerializeField] private float _deceleration = 3f;
-        [SerializeField] private float _rotationSpeed = 20000f;
+        // Movement values - Set by ShipConfig via Initialize()
+        private float _maxSpeed;
+        private float _acceleration;
+        private float _deceleration;
+        private float _rotationSpeed;
 
         [Header("Movement Smoothing")]
         [SerializeField] private float _velocitySmoothing = 0.1f;
