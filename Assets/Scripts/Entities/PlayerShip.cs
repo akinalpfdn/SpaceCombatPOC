@@ -48,6 +48,11 @@ namespace SpaceCombat.Entities
         // State
         private bool _isFiring;
         private float _invincibilityEndTime;
+        private int _currentWeaponSlot;  // 0-3 for LA-1 to LA-4
+
+        // Public properties for UI
+        public int CurrentWeaponSlot => _currentWeaponSlot;
+        public WeaponConfig CurrentWeaponConfig => _weaponController?.CurrentWeapon;
 
         protected override void Awake()
         {
@@ -219,6 +224,7 @@ namespace SpaceCombat.Entities
             {
                 _inputProvider.OnFirePressed -= OnFirePressed;
                 _inputProvider.OnFireReleased -= OnFireReleased;
+                _inputProvider.OnWeaponSlotSelected -= OnWeaponSlotSelected;
             }
 
             _inputProvider = provider;
@@ -227,6 +233,7 @@ namespace SpaceCombat.Entities
             {
                 _inputProvider.OnFirePressed += OnFirePressed;
                 _inputProvider.OnFireReleased += OnFireReleased;
+                _inputProvider.OnWeaponSlotSelected += OnWeaponSlotSelected;
             }
         }
 
@@ -259,6 +266,40 @@ namespace SpaceCombat.Entities
         private void OnFireReleased()
         {
             _isFiring = false;
+        }
+
+        /// <summary>
+        /// Handles weapon slot selection (keys 1-4 for LA-1 to LA-4).
+        /// Switches weapon and publishes WeaponSwitchedEvent for UI.
+        /// </summary>
+        private void OnWeaponSlotSelected(int slotIndex)
+        {
+            // Validate slot index and config
+            if (_config == null || _config.availableWeapons == null) return;
+            if (slotIndex < 0 || slotIndex >= _config.availableWeapons.Length) return;
+
+            // Don't switch if already on this slot
+            if (slotIndex == _currentWeaponSlot) return;
+
+            var newWeapon = _config.availableWeapons[slotIndex];
+            if (newWeapon == null) return;
+
+            // Store old weapon for event
+            var oldWeapon = _weaponController?.CurrentWeapon;
+            int oldSlot = _currentWeaponSlot;
+
+            // Switch weapon
+            _currentWeaponSlot = slotIndex;
+            _weaponController?.SwitchWeapon(newWeapon);
+
+            // Publish event for UI and other systems
+            EventBus.Publish(new WeaponSwitchedEvent(slotIndex, newWeapon, oldWeapon));
+
+            // Play switch sound
+            Vector3 pos = transform.position;
+            EventBus.Publish(new PlaySFXEvent("weapon_switch", new Vector2(pos.x, pos.z)));
+
+            Debug.Log($"[PlayerShip] Weapon switched: {oldWeapon?.weaponName ?? "none"} -> {newWeapon.weaponName} (Slot {slotIndex + 1})");
         }
 
         // ============================================
@@ -444,6 +485,7 @@ namespace SpaceCombat.Entities
             {
                 _inputProvider.OnFirePressed -= OnFirePressed;
                 _inputProvider.OnFireReleased -= OnFireReleased;
+                _inputProvider.OnWeaponSlotSelected -= OnWeaponSlotSelected;
             }
         }
     }

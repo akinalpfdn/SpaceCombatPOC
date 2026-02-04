@@ -31,6 +31,7 @@ namespace SpaceCombat.Input
         public event Action OnFirePressed;
         public event Action OnFireReleased;
         public event Action OnSpecialAbilityPressed;
+        public event Action<int> OnWeaponSlotSelected;
 
         // State
         private Vector2 _movementInput;
@@ -60,6 +61,7 @@ namespace SpaceCombat.Input
             UpdateAimInput();
             UpdateFireInput();
             UpdateSpecialInput();
+            UpdateWeaponSlotInput();
         }
 
         private void UpdateMovementInput()
@@ -130,6 +132,31 @@ namespace SpaceCombat.Input
                 UnityEngine.Input.GetMouseButtonDown(1))
             {
                 OnSpecialAbilityPressed?.Invoke();
+            }
+        }
+
+        /// <summary>
+        /// Weapon slot selection via number keys 1-4.
+        /// Maps to LA-1, LA-2, LA-3, LA-4 (Laser Ammo types).
+        /// </summary>
+        private void UpdateWeaponSlotInput()
+        {
+            // Keys 1-4 select weapon slots 0-3
+            if (UnityEngine.Input.GetKeyDown(KeyCode.Alpha1) || UnityEngine.Input.GetKeyDown(KeyCode.Keypad1))
+            {
+                OnWeaponSlotSelected?.Invoke(0);
+            }
+            else if (UnityEngine.Input.GetKeyDown(KeyCode.Alpha2) || UnityEngine.Input.GetKeyDown(KeyCode.Keypad2))
+            {
+                OnWeaponSlotSelected?.Invoke(1);
+            }
+            else if (UnityEngine.Input.GetKeyDown(KeyCode.Alpha3) || UnityEngine.Input.GetKeyDown(KeyCode.Keypad3))
+            {
+                OnWeaponSlotSelected?.Invoke(2);
+            }
+            else if (UnityEngine.Input.GetKeyDown(KeyCode.Alpha4) || UnityEngine.Input.GetKeyDown(KeyCode.Keypad4))
+            {
+                OnWeaponSlotSelected?.Invoke(3);
             }
         }
 

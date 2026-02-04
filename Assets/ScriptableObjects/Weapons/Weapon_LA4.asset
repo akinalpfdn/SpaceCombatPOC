@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9a195a186b32a0540ada2e5871d1811d, type: 3}
-  m_Name: Weapon_Laser
+  m_Name: Weapon_LA4
   m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.ScriptableObjects.WeaponConfig
   weaponName: Laser
   damageType: 1

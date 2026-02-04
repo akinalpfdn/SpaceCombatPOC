@@ -34,6 +34,7 @@ namespace SpaceCombat.Input
         public event Action OnFirePressed;
         public event Action OnFireReleased;
         public event Action OnSpecialAbilityPressed;
+        public event Action<int> OnWeaponSlotSelected;  // Not used on mobile yet
 
         // State
         private Vector2 _movementInput;

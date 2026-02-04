@@ -288,6 +288,30 @@ namespace SpaceCombat.Events
     }
 
     // ============================================
+    // WEAPON EVENTS
+    // ============================================
+
+    /// <summary>
+    /// Published when player switches to a different weapon/laser type.
+    /// UI can subscribe to update weapon indicator.
+    /// LA = Laser Ammo (LA-1, LA-2, LA-3, LA-4)
+    /// </summary>
+    public struct WeaponSwitchedEvent : IGameEvent
+    {
+        public int SlotIndex;                           // 0-3 for LA-1 to LA-4
+        public ScriptableObjects.WeaponConfig NewWeapon;
+        public ScriptableObjects.WeaponConfig OldWeapon;
+
+        public WeaponSwitchedEvent(int slotIndex, ScriptableObjects.WeaponConfig newWeapon,
+            ScriptableObjects.WeaponConfig oldWeapon = null)
+        {
+            SlotIndex = slotIndex;
+            NewWeapon = newWeapon;
+            OldWeapon = oldWeapon;
+        }
+    }
+
+    // ============================================
     // UI EVENTS
     // ============================================
 

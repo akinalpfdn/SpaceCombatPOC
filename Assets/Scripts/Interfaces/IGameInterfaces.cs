@@ -127,10 +127,16 @@ namespace SpaceCombat.Interfaces
         Vector2 AimDirection { get; }
         bool IsFiring { get; }
         bool IsSpecialAbility { get; }
-        
+
         event Action OnFirePressed;
         event Action OnFireReleased;
         event Action OnSpecialAbilityPressed;
+
+        /// <summary>
+        /// Fired when player presses weapon slot keys (1-4).
+        /// Parameter is slot index (0-3 for LA-1 to LA-4).
+        /// </summary>
+        event Action<int> OnWeaponSlotSelected;
     }
 
     // ============================================
