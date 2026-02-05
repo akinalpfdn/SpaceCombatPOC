@@ -16,8 +16,8 @@ MonoBehaviour:
   enemySprite: {fileID: 0}
   maxHealth: 150
   maxShield: 50
-  maxSpeed: 12
-  acceleration: 6
+  maxSpeed: 18
+  acceleration: 18
   rotationSpeed: 150
   weapon: {fileID: 11400000, guid: 1c8cc8d045e6f7b4ba4066e70c37b27a, type: 2}
   attackRange: 18

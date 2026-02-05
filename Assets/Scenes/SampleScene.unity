@@ -5914,6 +5914,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb1610ac2f3cc314e8954a2f6f0e139e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.Spawning.EnemySpawnService
+  _mapConfig: {fileID: 11400000, guid: 10175c6311bb61b4faaebafffc5a3270, type: 2}
   _config: {fileID: 11400000, guid: bfa573f513d00924e8a76c740d997b1b, type: 2}
   _enemyPrefab: {fileID: 142680459996147334, guid: 4079a51bffb24744683c86ca9b69b63a, type: 3}
   _mapBounds: {fileID: 927220044}
