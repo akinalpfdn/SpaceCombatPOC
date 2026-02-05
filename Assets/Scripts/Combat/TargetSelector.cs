@@ -15,6 +15,7 @@
 
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 using StarReapers.Entities;
 using StarReapers.Interfaces;
 using StarReapers.Movement;
@@ -88,7 +89,7 @@ namespace StarReapers.Combat
         private void Update()
         {
             // Null check for new Input System devices
-            if (Mouse.current == null && Keyboard.current == null) return;
+            if (Mouse.current == null && Keyboard.current == null && Touchscreen.current == null) return;
 
             UpdateMousePosition();
 
@@ -96,6 +97,12 @@ namespace StarReapers.Combat
             if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
             {
                 TrySelectTarget();
+            }
+
+            // Handle touch input for mobile target selection
+            if (Touchscreen.current != null)
+            {
+                TrySelectTargetFromTouch();
             }
 
             // Handle movement toward mouse (when holding mouse button)
@@ -256,6 +263,108 @@ namespace StarReapers.Combat
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Handle touch input for target selection on mobile.
+        /// Tap on enemy to select, double-tap to select and attack.
+        /// Ignores touches on UI elements (joystick, buttons).
+        /// </summary>
+        private void TrySelectTargetFromTouch()
+        {
+            if (Touchscreen.current == null || _mainCamera == null) return;
+
+            var touches = Touchscreen.current.touches;
+
+            foreach (var touch in touches)
+            {
+                // Only process on touch began (tap)
+                if (!touch.press.wasPressedThisFrame) continue;
+
+                Vector2 touchPosition = touch.position.ReadValue();
+
+                // Skip if touch is over UI (joystick, buttons, etc.)
+                if (IsPointerOverUI(touchPosition)) continue;
+
+                // Raycast from touch position
+                Ray ray = _mainCamera.ScreenPointToRay(touchPosition);
+                RaycastHit hit;
+
+                if (Physics.Raycast(ray, out hit, Mathf.Infinity, _enemyLayer))
+                {
+                    var enemy = hit.collider.GetComponent<Enemy>();
+                    if (enemy != null && IsInRange(enemy.transform))
+                    {
+                        // Detect double-tap on same target
+                        bool isDoubleTap = (Time.unscaledTime - _lastClickTime < _doubleClickTime)
+                            && _lastClickedTarget == enemy.transform;
+
+                        _lastClickTime = Time.unscaledTime;
+                        _lastClickedTarget = enemy.transform;
+
+                        if (isDoubleTap)
+                        {
+                            // Double-tap: toggle firing
+                            if (_currentTarget == enemy.transform)
+                            {
+                                _isFiringEnabled = !_isFiringEnabled;
+                            }
+                            else
+                            {
+                                // Double-tap on new enemy: select & start attacking
+                                ClearIndicator();
+                                _currentTarget = enemy.transform;
+                                _isFiringEnabled = true;
+
+                                if (_shipMovement != null)
+                                    _shipMovement.SetAutoRotate(false);
+
+                                SpawnTargetIndicator(_currentTarget);
+                            }
+                        }
+                        else
+                        {
+                            // Single tap: select target (toggle if same)
+                            if (_currentTarget == enemy.transform)
+                            {
+                                ClearTarget();
+                            }
+                            else
+                            {
+                                ClearIndicator();
+
+                                _currentTarget = enemy.transform;
+                                if (_shipMovement != null)
+                                    _shipMovement.SetAutoRotate(false);
+
+                                SpawnTargetIndicator(_currentTarget);
+                            }
+                        }
+
+                        // Only process first valid touch
+                        break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Check if a screen position is over a UI element.
+        /// Uses EventSystem to detect UI raycast hits.
+        /// </summary>
+        private bool IsPointerOverUI(Vector2 screenPosition)
+        {
+            if (EventSystem.current == null) return false;
+
+            var eventData = new PointerEventData(EventSystem.current)
+            {
+                position = screenPosition
+            };
+
+            var results = new System.Collections.Generic.List<RaycastResult>();
+            EventSystem.current.RaycastAll(eventData, results);
+
+            return results.Count > 0;
         }
 
         private void SelectClosestEnemy()
