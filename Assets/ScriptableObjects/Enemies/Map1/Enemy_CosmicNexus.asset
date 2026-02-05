@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3551bfe57c153a438d29c95f574bb64, type: 3}
+  m_Name: Enemy_CosmicNexus
+  m_EditorClassIdentifier: Assembly-CSharp::StarReapers.ScriptableObjects.EnemyConfig
+  enemyName: Cosmic Nexus
+  enemySprite: {fileID: 0}
+  maxHealth: 4000
+  maxShield: 1500
+  maxSpeed: 7
+  acceleration: 3
+  rotationSpeed: 90
+  weapon: {fileID: 11400000, guid: 1c8cc8d045e6f7b4ba4066e70c37b27a, type: 2}
+  attackRange: 25
+  detectionRange: 40
+  fireRateMultiplier: 5
+  patrolRadius: 4
+  idleTime: 2.5
+  fleeHealthThreshold: 0.1
+  canFlee: 0
+  scoreValue: 300
+  targetIndicatorScale: 1.5
+  deathSoundId: explosion_large

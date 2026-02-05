@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3551bfe57c153a438d29c95f574bb64, type: 3}
+  m_Name: Enemy_Ethereal
+  m_EditorClassIdentifier: Assembly-CSharp::StarReapers.ScriptableObjects.EnemyConfig
+  enemyName: Ethereal
+  enemySprite: {fileID: 0}
+  maxHealth: 500
+  maxShield: 200
+  maxSpeed: 14
+  acceleration: 8
+  rotationSpeed: 180
+  weapon: {fileID: 11400000, guid: 1c8cc8d045e6f7b4ba4066e70c37b27a, type: 2}
+  attackRange: 22
+  detectionRange: 35
+  fireRateMultiplier: 2.5
+  patrolRadius: 10
+  idleTime: 1
+  fleeHealthThreshold: 0.25
+  canFlee: 1
+  scoreValue: 200
+  targetIndicatorScale: 1.1
+  deathSoundId: explosion_medium
