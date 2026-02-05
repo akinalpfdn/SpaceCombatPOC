@@ -37,6 +37,30 @@ namespace SpaceCombat.Audio
         {
             InitializeAudioSources();
             SubscribeToEvents();
+
+            // Fallback: Load SoundLibrary from Resources if not assigned
+            if (_soundLibrary == null)
+            {
+                Debug.LogWarning("[AudioManager] SoundLibrary not assigned, trying to load from Resources...");
+                _soundLibrary = Resources.Load<SoundLibrary>("SoundLibrary");
+
+                if (_soundLibrary != null)
+                {
+                    Debug.Log("[AudioManager] SoundLibrary loaded from Resources!");
+                }
+                else
+                {
+                    Debug.LogError("[AudioManager] SoundLibrary not found in Resources folder!");
+                }
+            }
+
+            // Diagnostic logging
+            Debug.Log($"[AudioManager] Awake - SoundLibrary: {(_soundLibrary != null ? _soundLibrary.name : "NULL!")}");
+            if (_soundLibrary != null)
+            {
+                var testEntry = _soundLibrary.GetSoundEntry("laser_player");
+                Debug.Log($"[AudioManager] Test entry 'laser_player': {(testEntry != null ? (testEntry.clip != null ? testEntry.clip.name : "clip NULL") : "entry NULL")}");
+            }
         }
 
         private void OnDestroy()
@@ -93,14 +117,20 @@ namespace SpaceCombat.Audio
         {
             if (_soundLibrary == null)
             {
-                Debug.LogWarning($"Sound library not assigned!");
+                Debug.LogWarning($"[AudioManager] PlaySFX({sfxId}) - SoundLibrary is NULL!");
                 return;
             }
 
             var entry = _soundLibrary.GetSoundEntry(sfxId);
-            if (entry == null || entry.clip == null)
+            if (entry == null)
             {
-                Debug.LogWarning($"Sound not found: {sfxId}");
+                Debug.LogWarning($"[AudioManager] PlaySFX({sfxId}) - Entry not found in SoundLibrary!");
+                return;
+            }
+
+            if (entry.clip == null)
+            {
+                Debug.LogWarning($"[AudioManager] PlaySFX({sfxId}) - Entry found but clip is NULL!");
                 return;
             }
 
@@ -111,17 +141,23 @@ namespace SpaceCombat.Audio
         public void PlaySFXClip(AudioClip clip, Vector2? position = null, float volumeScale = 1f,
             float pitch = 1f, bool randomizePitch = false, float pitchVariation = 0f)
         {
-            if (clip == null) return;
+            if (clip == null)
+            {
+                Debug.LogWarning("[AudioManager] PlaySFXClip - clip is NULL!");
+                return;
+            }
 
             // Android: Ensure clip is loaded (important for mobile!)
             if (clip.loadState == AudioDataLoadState.Unloaded)
             {
+                Debug.Log($"[AudioManager] Loading clip: {clip.name}");
                 clip.LoadAudioData();
             }
 
             // Skip if clip isn't ready yet
             if (clip.loadState != AudioDataLoadState.Loaded)
             {
+                Debug.LogWarning($"[AudioManager] Clip not ready: {clip.name}, state: {clip.loadState}");
                 return;
             }
 
