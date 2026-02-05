@@ -41,8 +41,10 @@ namespace SpaceCombat.UI.Mobile
         [Header("Floating Mode")]
         [Tooltip("When enabled, joystick moves to where user touches")]
         [SerializeField] private bool _floatingMode = true;
-        [Tooltip("Hide joystick visuals when not in use")]
-        [SerializeField] private bool _hideWhenInactive = true;
+        [Tooltip("Hide joystick visuals when not in use (fade out)")]
+        [SerializeField] private bool _hideWhenInactive = false;
+        [Tooltip("Default position when inactive (only used if not hidden)")]
+        [SerializeField] private Vector2 _defaultPosition = new Vector2(200f, -290f);
         [Tooltip("Fade duration for show/hide animation")]
         [SerializeField] private float _fadeDuration = 0.15f;
 
@@ -109,6 +111,13 @@ namespace SpaceCombat.UI.Mobile
                 {
                     _canvasGroup.alpha = 0f;
                     _targetAlpha = 0f;
+                }
+                else
+                {
+                    // Set to default position when visible but inactive
+                    _joystickContainer.anchoredPosition = _defaultPosition;
+                    _canvasGroup.alpha = 1f;
+                    _targetAlpha = 1f;
                 }
             }
 
@@ -187,9 +196,18 @@ namespace SpaceCombat.UI.Mobile
                 _handle.anchoredPosition = Vector2.zero;
             }
 
-            if (_floatingMode && _hideWhenInactive && _canvasGroup != null)
+            if (_floatingMode && _joystickContainer != null)
             {
-                _targetAlpha = 0f;
+                if (_hideWhenInactive && _canvasGroup != null)
+                {
+                    // Fade out
+                    _targetAlpha = 0f;
+                }
+                else
+                {
+                    // Return to default position
+                    _joystickContainer.anchoredPosition = _defaultPosition;
+                }
             }
         }
 
@@ -259,9 +277,16 @@ namespace SpaceCombat.UI.Mobile
                 _handle.anchoredPosition = Vector2.zero;
             }
 
-            if (_floatingMode && _hideWhenInactive && _canvasGroup != null)
+            if (_floatingMode && _joystickContainer != null)
             {
-                _targetAlpha = 0f;
+                if (_hideWhenInactive && _canvasGroup != null)
+                {
+                    _targetAlpha = 0f;
+                }
+                else
+                {
+                    _joystickContainer.anchoredPosition = _defaultPosition;
+                }
             }
         }
 
@@ -288,6 +313,14 @@ namespace SpaceCombat.UI.Mobile
                 _canvasGroup.alpha = 1f;
                 _targetAlpha = 1f;
             }
+        }
+
+        /// <summary>
+        /// Set the default position for when joystick is inactive (visible mode only).
+        /// </summary>
+        public void SetDefaultPosition(Vector2 position)
+        {
+            _defaultPosition = position;
         }
     }
 }
