@@ -53,6 +53,7 @@ namespace SpaceCombat.UI.Mobile
         // ============================================
 
         private Button _button;
+        private Image _buttonImage; // Fallback if _background not assigned
         private PlayerShip _playerShip;
         private bool _isSelected;
         private bool _isPressed;
@@ -72,6 +73,17 @@ namespace SpaceCombat.UI.Mobile
         {
             _button = GetComponent<Button>();
             _button.onClick.AddListener(OnButtonClicked);
+
+            // CRITICAL: Disable Button's ColorTint transition
+            // Without this, EventSystem state changes (e.g., clicking joystick)
+            // will override our manual colors via Button's color animation
+            _button.transition = Selectable.Transition.None;
+
+            // If _background not assigned, use Button's own Image component
+            if (_background == null)
+            {
+                _buttonImage = GetComponent<Image>();
+            }
 
             // Set slot number text only if empty (allows custom text in Inspector)
             if (_slotNumberText != null && string.IsNullOrEmpty(_slotNumberText.text))
@@ -176,20 +188,23 @@ namespace SpaceCombat.UI.Mobile
 
         private void UpdateVisuals()
         {
+            // Determine which Image to use for background color
+            Image targetImage = _background != null ? _background : _buttonImage;
+
             // Background color
-            if (_background != null)
+            if (targetImage != null)
             {
                 if (_isPressed)
                 {
-                    _background.color = _pressedColor;
+                    targetImage.color = _pressedColor;
                 }
                 else if (_isSelected)
                 {
-                    _background.color = _selectedColor;
+                    targetImage.color = _selectedColor;
                 }
                 else
                 {
-                    _background.color = _normalColor;
+                    targetImage.color = _normalColor;
                 }
             }
 
