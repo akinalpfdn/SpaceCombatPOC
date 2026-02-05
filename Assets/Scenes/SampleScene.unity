@@ -1706,6 +1706,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpaceCombat.Core.GameManager
   _balanceConfig: {fileID: 11400000, guid: 12816a3e73a4d5b43bd520a8a74ba810, type: 2}
+  _mapConfig: {fileID: 11400000, guid: 10175c6311bb61b4faaebafffc5a3270, type: 2}
   _spawnConfig: {fileID: 11400000, guid: bfa573f513d00924e8a76c740d997b1b, type: 2}
   _playerSpawnPoint: {fileID: 975207472}
   _playerPrefab: {fileID: 596049113606997257, guid: 9fc1cfb91fbc2474ea0455ed52c95633, type: 3}

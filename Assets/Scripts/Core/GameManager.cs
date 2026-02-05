@@ -12,6 +12,7 @@ using StarReapers.Events;
 using StarReapers.Utilities;
 using StarReapers.Interfaces;
 using StarReapers.Spawning;
+using StarReapers.Maps;
 
 namespace StarReapers.Core
 {
@@ -29,6 +30,7 @@ namespace StarReapers.Core
     {
         [Header("Game Settings")]
         [SerializeField] private ScriptableObjects.GameBalanceConfig _balanceConfig;
+        [SerializeField] private MapConfig _mapConfig;
         [SerializeField] private SpawnConfig _spawnConfig;
 
         [Header("References")]
@@ -51,6 +53,11 @@ namespace StarReapers.Core
         private ISpawnService _spawnServiceInterface;
         private Coroutine _respawnCoroutine;
         private IObjectResolver _container;
+
+        // Boss spawning state
+        private bool _bossSpawned = false;
+        private int _killCount = 0;
+        private float _gameTimer = 0f;
 
         [Inject]
         public void Construct(ISpawnService spawnService, IObjectResolver container)
@@ -76,6 +83,15 @@ namespace StarReapers.Core
         private void Start()
         {
             InitializeGame();
+        }
+
+        private void Update()
+        {
+            if (_currentState == GameState.Playing)
+            {
+                _gameTimer += Time.deltaTime;
+                CheckBossSpawnTrigger();
+            }
         }
 
         private void OnDestroy()
@@ -113,8 +129,13 @@ namespace StarReapers.Core
                 return;
             }
 
-            // Initialize with config
-            if (_spawnConfig != null)
+            // Initialize with MapConfig (preferred) or SpawnConfig (legacy)
+            if (_mapConfig != null && _mapConfig.IsValid)
+            {
+                _spawnService.Initialize(_mapConfig);
+                _spawnConfig = _mapConfig.spawnConfig; // Keep reference for spawn counts
+            }
+            else if (_spawnConfig != null)
             {
                 _spawnServiceInterface.Initialize(_spawnConfig);
             }
@@ -201,6 +222,9 @@ namespace StarReapers.Core
         public void RestartGame()
         {
             _score = 0;
+            _killCount = 0;
+            _gameTimer = 0f;
+            _bossSpawned = false;
 
             // Reset enemies via spawn service
             _spawnServiceInterface?.ReturnAllEnemies();
@@ -250,6 +274,67 @@ namespace StarReapers.Core
             int enemyCount = _spawnConfig?.InitialEnemyCount ?? 10;
 
             _spawnServiceInterface.SpawnInitialEnemies(enemyCount, playerPosition);
+
+            // Check for immediate boss spawn (None trigger)
+            if (_mapConfig?.bossSettings != null &&
+                _mapConfig.bossSettings.enabled &&
+                _mapConfig.bossSettings.spawnTrigger == BossSpawnTrigger.None)
+            {
+                SpawnBoss();
+            }
+        }
+
+        // ============================================
+        // BOSS SPAWNING
+        // ============================================
+
+        private void CheckBossSpawnTrigger()
+        {
+            if (_bossSpawned) return;
+            if (_mapConfig?.bossSettings == null || !_mapConfig.bossSettings.enabled) return;
+
+            var settings = _mapConfig.bossSettings;
+
+            switch (settings.spawnTrigger)
+            {
+                case BossSpawnTrigger.Timer:
+                    if (_gameTimer >= settings.triggerValue)
+                    {
+                        SpawnBoss();
+                    }
+                    break;
+
+                case BossSpawnTrigger.KillCount:
+                    if (_killCount >= (int)settings.triggerValue)
+                    {
+                        SpawnBoss();
+                    }
+                    break;
+
+                // None is handled in SpawnInitialEnemies
+                // WaveComplete and Manual are triggered externally
+            }
+        }
+
+        private void SpawnBoss()
+        {
+            if (_bossSpawned) return;
+            if (_spawnService == null) return;
+
+            var boss = _spawnService.SpawnBoss();
+            if (boss != null)
+            {
+                _bossSpawned = true;
+                Debug.Log($"[GameManager] Boss spawned! Kill count: {_killCount}, Timer: {_gameTimer:F1}s");
+            }
+        }
+
+        /// <summary>
+        /// Manually trigger boss spawn (for Manual trigger type or testing).
+        /// </summary>
+        public void TriggerBossSpawn()
+        {
+            SpawnBoss();
         }
 
         private void RespawnEnemy()
@@ -301,9 +386,12 @@ namespace StarReapers.Core
                 _spawnServiceInterface?.ReturnEnemy(evt.Entity);
             }
 
+            // Track kill count for boss trigger
+            _killCount++;
+
             // Schedule respawn if enabled
             bool shouldRespawn = _spawnConfig?.EnableRespawn ?? _enableRespawn;
-            
+
             if (_currentState == GameState.Playing && shouldRespawn)
             {
                 if (_respawnCoroutine != null)

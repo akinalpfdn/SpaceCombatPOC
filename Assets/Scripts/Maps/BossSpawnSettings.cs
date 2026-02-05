@@ -26,6 +26,9 @@ namespace StarReapers.Maps
     /// </summary>
     public enum BossSpawnTrigger
     {
+        /// <summary>Boss spawns immediately when the map starts.</summary>
+        None,
+
         /// <summary>Boss spawns after X seconds into the map.</summary>
         Timer,
 
