@@ -27,7 +27,8 @@
       "mcp__mcp-unity__set_transform",
       "Bash(wc:*)",
       "mcp__mcp-unity__save_scene",
-      "mcp__mcp-unity__create_prefab"
+      "mcp__mcp-unity__create_prefab",
+      "mcp__mcp-unity__duplicate_gameobject"
     ]
   }
 }
