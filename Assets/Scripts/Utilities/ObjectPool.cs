@@ -162,7 +162,19 @@ namespace StarReapers.Utilities
 
         private T CreateNewObject()
         {
-            var obj = UnityEngine.Object.Instantiate(_prefab, _parent);
+            // IL2CPP fix: Use non-generic Instantiate to avoid cast issues
+            var clone = UnityEngine.Object.Instantiate(_prefab as UnityEngine.Object, _parent);
+
+            // Try direct cast first, fallback to GetComponent if clone is GameObject
+            T obj = clone as T;
+            if (obj == null)
+            {
+                var go = clone as GameObject;
+                if (go != null) obj = go.GetComponent<T>();
+            }
+
+            if (obj == null) return null;
+
             obj.gameObject.SetActive(false);
             obj.ResetState();
             _allObjects.Add(obj);

@@ -19,16 +19,16 @@ MonoBehaviour:
   enemies:
   - enemyPrefab: {fileID: 1000000000000000004, guid: 54b430038ec6d6b4780596992e1c27ac, type: 3}
     spawnWeight: 30
-    maxConcurrent: 0
+    maxConcurrent: 12
   - enemyPrefab: {fileID: 4000000000000000004, guid: a5e6204d9c1565d46b3216e96e86a381, type: 3}
     spawnWeight: 25
-    maxConcurrent: 0
+    maxConcurrent: 12
   - enemyPrefab: {fileID: 2000000000000000004, guid: e7ef6149a137b2240838820dec405581, type: 3}
     spawnWeight: 25
-    maxConcurrent: 5
+    maxConcurrent: 12
   - enemyPrefab: {fileID: 3000000000000000001, guid: 7729cd750e7e2fd45adf75ee7927d792, type: 3}
     spawnWeight: 20
-    maxConcurrent: 3
+    maxConcurrent: 1
   bossSettings:
     enabled: 1
     bossPrefab: {fileID: 3000000000000000004, guid: 7729cd750e7e2fd45adf75ee7927d792, type: 3}
