@@ -150,21 +150,28 @@ namespace SpaceCombat.Movement
             }
 
             // Calculate rotation and banking together (prevents jitter)
-            if (_autoRotateEnabled && _rotateToMovement && _currentSpeed > _rotationThreshold)
+            // IMPORTANT: Only handle rotation when auto-rotate is enabled
+            // When targeting (auto-rotate disabled), TargetSelector.RotateTowards handles rotation
+            if (_autoRotateEnabled)
             {
-                Vector3 moveDir = _currentVelocity.normalized;
-                Vector2 moveDir2D = new Vector2(moveDir.x, moveDir.z);
-                CalculateAndApplyRotation(moveDir2D);
+                if (_rotateToMovement && _currentSpeed > _rotationThreshold)
+                {
+                    Vector3 moveDir = _currentVelocity.normalized;
+                    Vector2 moveDir2D = new Vector2(moveDir.x, moveDir.z);
+                    CalculateAndApplyRotation(moveDir2D);
+                }
+                else if (_enableBanking)
+                {
+                    // Still smooth out tilt when not rotating
+                    _targetTilt = 0;
+                    SmoothTilt();
+                }
             }
-            else if (_enableBanking)
-            {
-                // Still smooth out tilt when not rotating
-                _targetTilt = 0;
-                SmoothTilt();
-            }
+            // When auto-rotate is disabled, don't touch rotation at all
+            // RotateTowards() handles everything including banking
         }
 
-        /// <summary>
+            /// <summary>
         /// Calculate rotation angle and apply both rotation + banking together
         /// This prevents jitter by calculating turn amount before applying it
         /// Called from FixedUpdate (movement-based rotation)
@@ -178,12 +185,14 @@ namespace SpaceCombat.Movement
             Quaternion targetRotation = Quaternion.LookRotation(targetDir);
 
             // Calculate how much we need to turn this frame
-            float currentY = transform.rotation.eulerAngles.y;
+            float currentY = _rigidbody.rotation.eulerAngles.y;  // Read from Rigidbody
             float targetY = targetRotation.eulerAngles.y;
             float angleDiff = Mathf.DeltaAngle(currentY, targetY);
 
             // Limit rotation to what's possible this frame
             float maxTurnThisFrame = _rotationSpeed * Time.fixedDeltaTime;
+            if (maxTurnThisFrame < 0.001f) return;  // Safety check
+
             float actualTurn = Mathf.Clamp(angleDiff, -maxTurnThisFrame, maxTurnThisFrame);
 
             // Calculate target tilt based on the turn we're about to make
@@ -196,8 +205,6 @@ namespace SpaceCombat.Movement
                 }
                 else
                 {
-                    // Turning left (negative actualTurn) = tilt left (negative Z)
-                    // Turning right (positive actualTurn) = tilt right (positive Z)
                     _targetTilt = -actualTurn * _maxTiltAngle * _tiltPower / maxTurnThisFrame;
                     _targetTilt = Mathf.Clamp(_targetTilt, -_maxTiltAngle, _maxTiltAngle);
                 }
@@ -218,12 +225,11 @@ namespace SpaceCombat.Movement
                 );
             }
 
-            // Apply the Y rotation + current Z tilt
+            // Apply rotation using Rigidbody.MoveRotation (works properly with physics)
             float newY = currentY + actualTurn;
-            transform.rotation = Quaternion.Euler(0, newY, _currentTilt);
-
-            // Update last rotation for next frame
-            _lastRotation = transform.rotation;
+            Quaternion newRotation = Quaternion.Euler(0, newY, _currentTilt);
+            _rigidbody.MoveRotation(newRotation);
+            _lastRotation = newRotation;
         }
 
         /// <summary>
@@ -246,10 +252,11 @@ namespace SpaceCombat.Movement
                 _tiltSmoothing * Time.fixedDeltaTime
             );
 
-            // Apply current tilt without changing Y rotation
-            Vector3 currentEuler = transform.rotation.eulerAngles;
-            transform.rotation = Quaternion.Euler(0, currentEuler.y, _currentTilt);
-            _lastRotation = transform.rotation;
+            // Apply current tilt without changing Y rotation (using Rigidbody)
+            float currentY = _rigidbody.rotation.eulerAngles.y;
+            Quaternion newRotation = Quaternion.Euler(0, currentY, _currentTilt);
+            _rigidbody.MoveRotation(newRotation);
+            _lastRotation = newRotation;
         }
 
         /// <summary>
@@ -329,71 +336,68 @@ namespace SpaceCombat.Movement
         public void RotateTowards(Vector2 direction)
         {
             if (direction.magnitude < 0.1f) return;
+            if (_rigidbody == null) return;
 
             // Convert 2D direction to 3D XZ plane
             Vector3 targetDir = new Vector3(direction.x, 0, direction.y);
-            if (targetDir != Vector3.zero)
+            if (targetDir == Vector3.zero) return;
+
+            Quaternion targetRotation = Quaternion.LookRotation(targetDir);
+
+            // Use Time.deltaTime since this is called from Update (TargetSelector)
+            float deltaTime = Time.deltaTime;
+            if (deltaTime <= 0f) return;
+
+            // Ensure rotation speed has a sensible minimum (fallback if not initialized)
+            float rotSpeed = _rotationSpeed > 0f ? _rotationSpeed : 180f;
+
+            // Calculate turn amount
+            float currentY = _rigidbody.rotation.eulerAngles.y;  // Read from Rigidbody, not transform
+            float targetY = targetRotation.eulerAngles.y;
+            float angleDiff = Mathf.DeltaAngle(currentY, targetY);
+
+            // Limit rotation to what's possible this frame
+            float maxTurnThisFrame = rotSpeed * deltaTime;
+            float actualTurn = Mathf.Clamp(angleDiff, -maxTurnThisFrame, maxTurnThisFrame);
+
+            // Calculate new Y rotation
+            float newY = currentY + actualTurn;
+
+            // Calculate tilt if banking is enabled
+            float tiltToApply = 0f;
+            if (_enableBanking && maxTurnThisFrame > 0.001f)
             {
-                Quaternion targetRotation = Quaternion.LookRotation(targetDir);
-
-                // Use Time.deltaTime since this is called from Update (TargetSelector)
-                float deltaTime = Time.deltaTime;
-
-                if (_enableBanking)
+                if (Mathf.Abs(angleDiff) < TILT_DEAD_ZONE)
                 {
-                    // Calculate turn amount first, then apply rotation + tilt together
-                    float currentY = transform.rotation.eulerAngles.y;
-                    float targetY = targetRotation.eulerAngles.y;
-                    float angleDiff = Mathf.DeltaAngle(currentY, targetY);
-
-                    // Limit rotation to what's possible this frame
-                    float maxTurnThisFrame = _rotationSpeed * deltaTime;
-                    float actualTurn = Mathf.Clamp(angleDiff, -maxTurnThisFrame, maxTurnThisFrame);
-
-                    // Dead zone: Ignore very small angle changes to prevent scatter
-                    // This filters out micro-oscillations when orbiting a target
-                    if (Mathf.Abs(angleDiff) < TILT_DEAD_ZONE)
-                    {
-                        // Within dead zone - gradually return tilt to zero
-                        _targetTilt = 0f;
-                    }
-                    else
-                    {
-                        // Calculate target tilt based on the turn we're about to make
-                        _targetTilt = -actualTurn * _maxTiltAngle * _tiltPower / maxTurnThisFrame;
-                        _targetTilt = Mathf.Clamp(_targetTilt, -_maxTiltAngle, _maxTiltAngle);
-                    }
-
-                    // Extra smoothing layer: smooth the target tilt itself to prevent scatter
-                    _smoothedTargetTilt = Mathf.SmoothDamp(
-                        _smoothedTargetTilt,
-                        _targetTilt,
-                        ref _targetTiltVelocity,
-                        TILT_SMOOTH_TIME
-                    );
-
-                    // Smooth interpolation from current to smoothed target
-                    _currentTilt = Mathf.Lerp(
-                        _currentTilt,
-                        _smoothedTargetTilt,
-                        _tiltSmoothing * deltaTime
-                    );
-
-                    // Apply the Y rotation + current Z tilt
-                    float newY = currentY + actualTurn;
-                    transform.rotation = Quaternion.Euler(0, newY, _currentTilt);
-                    _lastRotation = transform.rotation;
+                    _targetTilt = 0f;
                 }
                 else
                 {
-                    // No banking - normal rotation
-                    transform.rotation = Quaternion.Slerp(
-                        transform.rotation,
-                        targetRotation,
-                        _rotationSpeed * deltaTime
-                    );
+                    _targetTilt = -actualTurn * _maxTiltAngle * _tiltPower / maxTurnThisFrame;
+                    _targetTilt = Mathf.Clamp(_targetTilt, -_maxTiltAngle, _maxTiltAngle);
                 }
+
+                // Extra smoothing layer
+                _smoothedTargetTilt = Mathf.SmoothDamp(
+                    _smoothedTargetTilt,
+                    _targetTilt,
+                    ref _targetTiltVelocity,
+                    TILT_SMOOTH_TIME
+                );
+
+                _currentTilt = Mathf.Lerp(
+                    _currentTilt,
+                    _smoothedTargetTilt,
+                    _tiltSmoothing * deltaTime
+                );
+
+                tiltToApply = _currentTilt;
             }
+
+            // Apply rotation using Rigidbody.MoveRotation (works properly with physics)
+            Quaternion newRotation = Quaternion.Euler(0, newY, tiltToApply);
+            _rigidbody.MoveRotation(newRotation);
+            _lastRotation = newRotation;
         }
 
         /// <summary>

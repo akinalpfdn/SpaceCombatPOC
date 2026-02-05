@@ -49,4 +49,10 @@ MonoBehaviour:
     pitch: 1
     randomizePitch: 0
     pitchVariation: 0
+  - id: explosion_medium
+    clip: {fileID: 8300000, guid: a69013a872d95904494f4925298ccc8d, type: 3}
+    volume: 100
+    pitch: 1
+    randomizePitch: 0
+    pitchVariation: 0
   musicTracks: []

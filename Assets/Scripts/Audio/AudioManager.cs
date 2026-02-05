@@ -113,22 +113,34 @@ namespace SpaceCombat.Audio
         {
             if (clip == null) return;
 
+            // Android: Ensure clip is loaded (important for mobile!)
+            if (clip.loadState == AudioDataLoadState.Unloaded)
+            {
+                clip.LoadAudioData();
+            }
+
+            // Skip if clip isn't ready yet
+            if (clip.loadState != AudioDataLoadState.Loaded)
+            {
+                return;
+            }
+
             // Get next available source from pool
             var source = GetNextSFXSource();
 
             // Reset source state (important for pooled sources)
             source.Stop();
             source.clip = clip;
-            source.volume = _sfxVolume * _masterVolume * volumeScale;
+
+            // Calculate final volume
+            float finalVolume = _sfxVolume * _masterVolume * volumeScale;
 
             // Apply pitch - always reset to avoid leftover values from pool
-            // Only apply randomization if explicitly enabled
             float finalPitch = pitch;
             if (randomizePitch && pitchVariation > 0f)
             {
                 finalPitch = pitch + UnityEngine.Random.Range(-pitchVariation, pitchVariation);
             }
-            // Clamp pitch to safe range
             source.pitch = Mathf.Clamp(finalPitch, 0.5f, 2f);
 
             // Position for 3D sound (if needed)
@@ -137,7 +149,9 @@ namespace SpaceCombat.Audio
                 source.transform.position = position.Value;
             }
 
-            source.Play();
+            // Use PlayOneShot - more reliable on mobile
+            source.volume = finalVolume;
+            source.PlayOneShot(clip, finalVolume);
         }
 
         public void PlayMusic(string musicId, bool loop = true)

@@ -21,7 +21,7 @@ AudioImporter:
       compressionFormat: 1
       quality: 0.5
       conversionMode: 0
-      preloadAudioData: 0
+      preloadAudioData: 1
   forceToMono: 0
   normalize: 1
   loadInBackground: 0
