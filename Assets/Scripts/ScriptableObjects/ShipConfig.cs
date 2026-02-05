@@ -1,9 +1,9 @@
-using UnityEngine;
-using SpaceCombat.Interfaces;
+﻿using UnityEngine;
+using StarReapers.Interfaces;
 
-namespace SpaceCombat.ScriptableObjects
+namespace StarReapers.ScriptableObjects
 {
-    [CreateAssetMenu(fileName = "NewShipConfig", menuName = "SpaceCombat/Ship Configuration")]
+    [CreateAssetMenu(fileName = "NewShipConfig", menuName = "StarReapers/Ship Configuration")]
     public class ShipConfig : ScriptableObject
     {
         [Header("Identity")]

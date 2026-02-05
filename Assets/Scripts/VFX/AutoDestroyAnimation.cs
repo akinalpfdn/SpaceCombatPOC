@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // AUTO DESTROY ANIMATION
 // Destroys GameObject when animation finishes
 // Attach to animated VFX prefabs
@@ -6,7 +6,7 @@
 
 using UnityEngine;
 
-namespace SpaceCombat.VFX
+namespace StarReapers.VFX
 {
     /// <summary>
     /// Automatically destroys this GameObject when the attached animation finishes.

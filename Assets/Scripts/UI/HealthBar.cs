@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // HEALTH BAR - Shows health above/below entities
 // Works with BaseEntity or any entity with health
 // ============================================
@@ -10,9 +10,9 @@
 // ============================================
 
 using UnityEngine;
-using SpaceCombat.Entities;
+using StarReapers.Entities;
 
-namespace SpaceCombat.UI
+namespace StarReapers.UI
 {
     /// <summary>
     /// Configuration data for health bar appearance.

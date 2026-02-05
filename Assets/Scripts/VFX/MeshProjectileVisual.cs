@@ -1,14 +1,14 @@
-// ============================================
+﻿// ============================================
 // MESH PROJECTILE VISUAL - Strategy Pattern Implementation
 // Renders projectile as 3D mesh with emission glow + trail
 // DarkOrbit-style energy bolt visual
 // ============================================
 
 using UnityEngine;
-using SpaceCombat.Interfaces;
-using SpaceCombat.ScriptableObjects;
+using StarReapers.Interfaces;
+using StarReapers.ScriptableObjects;
 
-namespace SpaceCombat.VFX
+namespace StarReapers.VFX
 {
     /// <summary>
     /// Mesh-based projectile visual using MeshRenderer + TrailRenderer.

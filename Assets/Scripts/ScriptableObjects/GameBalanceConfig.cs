@@ -1,8 +1,8 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace SpaceCombat.ScriptableObjects
+namespace StarReapers.ScriptableObjects
 {
-    [CreateAssetMenu(fileName = "GameBalanceConfig", menuName = "SpaceCombat/Game Balance")]
+    [CreateAssetMenu(fileName = "GameBalanceConfig", menuName = "StarReapers/Game Balance")]
     public class GameBalanceConfig : ScriptableObject
     {
         [Header("Wave Settings")]

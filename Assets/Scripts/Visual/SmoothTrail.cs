@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // SmoothTrail.cs
 // Buttery smooth engine trail using Line Renderer + Catmull-Rom spline
 // Interpolates between recorded positions for smooth curves
@@ -7,7 +7,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SpaceCombat.Visual
+namespace StarReapers.Visual
 {
     /// <summary>
     /// Creates smooth trails using Line Renderer with Catmull-Rom spline interpolation.
@@ -107,7 +107,7 @@ namespace SpaceCombat.Visual
             _lastRecordTime = Time.time;
 
             // Try to get max speed from ShipMovement
-            var shipMovement = _shipTransform.GetComponent<SpaceCombat.Movement.ShipMovement>();
+            var shipMovement = _shipTransform.GetComponent<StarReapers.Movement.ShipMovement>();
             if (shipMovement != null)
             {
                 _maxShipSpeed = shipMovement.MaxSpeed;

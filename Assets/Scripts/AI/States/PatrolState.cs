@@ -1,6 +1,6 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace SpaceCombat.AI.States
+namespace StarReapers.AI.States
 {
     public class PatrolState : IEnemyState
     {

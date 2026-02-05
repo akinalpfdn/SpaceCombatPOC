@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // ATTACK BUTTON - Mobile attack toggle button
 // Triggers attack on/off based on TargetSelector state
 // ============================================
@@ -6,9 +6,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using SpaceCombat.Combat;
+using StarReapers.Combat;
 
-namespace SpaceCombat.UI.Mobile
+namespace StarReapers.UI.Mobile
 {
     /// <summary>
     /// Mobile attack button that toggles attack state.

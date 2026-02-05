@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // DamagePopupManager.cs
 // Manages spawning and pooling of damage popups
 // Subscribes to DamagePopupEvent via EventBus
@@ -8,10 +8,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
-using SpaceCombat.Events;
-using SpaceCombat.ScriptableObjects;
+using StarReapers.Events;
+using StarReapers.ScriptableObjects;
 
-namespace SpaceCombat.UI
+namespace StarReapers.UI
 {
     /// <summary>
     /// Service that manages damage popup spawning and object pooling.

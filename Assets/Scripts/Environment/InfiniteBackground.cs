@@ -1,11 +1,11 @@
-// ============================================
+﻿// ============================================
 // INFINITE BACKGROUND - Scrolling tile
 // Repositions when moving out of view
 // ============================================
 
 using UnityEngine;
 
-namespace SpaceCombat.Environment
+namespace StarReapers.Environment
 {
     /// <summary>
     /// Infinite scrolling background tile

@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // GAME MANAGER - Facade Pattern (Refactored)
 // Coordinates all game systems
 // Delegates spawning to ISpawnService (SRP)
@@ -8,12 +8,12 @@ using System.Collections;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
-using SpaceCombat.Events;
-using SpaceCombat.Utilities;
-using SpaceCombat.Interfaces;
-using SpaceCombat.Spawning;
+using StarReapers.Events;
+using StarReapers.Utilities;
+using StarReapers.Interfaces;
+using StarReapers.Spawning;
 
-namespace SpaceCombat.Core
+namespace StarReapers.Core
 {
     /// <summary>
     /// Main game manager - Facade for all subsystems.

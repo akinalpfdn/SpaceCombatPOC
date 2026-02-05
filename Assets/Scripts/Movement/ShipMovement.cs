@@ -1,14 +1,14 @@
-// ============================================
+﻿// ============================================
 // SHIP MOVEMENT - Strategy Pattern Ready
 // Handles all movement logic independently
 // Can be swapped for different movement behaviors
 // ============================================
 
 using UnityEngine;
-using SpaceCombat.Interfaces;
-using SpaceCombat.Environment;
+using StarReapers.Interfaces;
+using StarReapers.Environment;
 
-namespace SpaceCombat.Movement
+namespace StarReapers.Movement
 {
     /// <summary>
     /// Handles ship movement with smooth acceleration/deceleration

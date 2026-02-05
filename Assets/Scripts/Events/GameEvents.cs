@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // EVENT SYSTEM - Observer Pattern Implementation
 // Decouples systems completely, enables scalability
 // ============================================
@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SpaceCombat.Events
+namespace StarReapers.Events
 {
     /// <summary>
     /// Central event bus for game-wide communication

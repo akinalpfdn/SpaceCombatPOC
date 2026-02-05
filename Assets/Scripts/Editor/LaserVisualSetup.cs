@@ -1,10 +1,10 @@
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using SpaceCombat.ScriptableObjects;
-using SpaceCombat.VFX;
+using StarReapers.ScriptableObjects;
+using StarReapers.VFX;
 
-namespace SpaceCombat.Editor
+namespace StarReapers.Editor
 {
     /// <summary>
     /// One-click setup tool for laser visual upgrade.
@@ -13,7 +13,7 @@ namespace SpaceCombat.Editor
     /// </summary>
     public static class LaserVisualSetup
     {
-        [MenuItem("Tools/SpaceCombat/Setup Laser Visuals")]
+        [MenuItem("Tools/StarReapers/Setup Laser Visuals")]
         public static void SetupLaserVisuals()
         {
             SetupProjectilePrefab();
@@ -215,7 +215,7 @@ namespace SpaceCombat.Editor
         // PHASE 2: VISUAL VARIANTS (Player Blue + Enemy Red)
         // ============================================
 
-        [MenuItem("Tools/SpaceCombat/Setup Laser Visual Variants")]
+        [MenuItem("Tools/StarReapers/Setup Laser Visual Variants")]
         public static void SetupLaserVisualVariants()
         {
             if (!AssetDatabase.IsValidFolder("Assets/ScriptableObjects/Visuals"))
@@ -397,7 +397,7 @@ namespace SpaceCombat.Editor
             }
         }
 
-        [MenuItem("Tools/SpaceCombat/Setup Laser Visuals - Preview (No Save)")]
+        [MenuItem("Tools/StarReapers/Setup Laser Visuals - Preview (No Save)")]
         public static void PreviewLaserVisuals()
         {
             Debug.Log("[LaserVisualSetup] This would configure:");

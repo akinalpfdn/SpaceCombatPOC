@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // ENEMY - Entity Data + Pooling + Config
 // AI behavior delegated to EnemyStateMachine
 // Movement delegated to AI.EnemyMovement
@@ -6,12 +6,12 @@
 
 using UnityEngine;
 using VContainer;
-using SpaceCombat.Interfaces;
-using SpaceCombat.Events;
-using SpaceCombat.ScriptableObjects;
-using SpaceCombat.AI;
+using StarReapers.Interfaces;
+using StarReapers.Events;
+using StarReapers.ScriptableObjects;
+using StarReapers.AI;
 
-namespace SpaceCombat.Entities
+namespace StarReapers.Entities
 {
     /// <summary>
     /// Enemy entity - handles health, config, pooling and death.

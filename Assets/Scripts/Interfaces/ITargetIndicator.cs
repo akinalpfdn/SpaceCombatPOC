@@ -1,11 +1,11 @@
-// ============================================
+﻿// ============================================
 // TARGET INDICATOR INTERFACE
 // Common interface for 2D and 3D target indicators
 // ============================================
 
 using UnityEngine;
 
-namespace SpaceCombat.Interfaces
+namespace StarReapers.Interfaces
 {
     /// <summary>
     /// Interface for target indicator implementations.

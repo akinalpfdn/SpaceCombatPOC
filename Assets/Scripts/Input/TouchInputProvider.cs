@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // TOUCH INPUT PROVIDER
 // Touch input for mobile devices
 // Uses new Input System (EnhancedTouch)
@@ -8,11 +8,11 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
-using SpaceCombat.Interfaces;
+using StarReapers.Interfaces;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 
-namespace SpaceCombat.Input
+namespace StarReapers.Input
 {
     /// <summary>
     /// Touch input provider for mobile.

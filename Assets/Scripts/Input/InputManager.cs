@@ -1,11 +1,11 @@
-// ============================================
+﻿// ============================================
 // INPUT MANAGER
 // Handles switching between input types
 // ============================================
 
 using UnityEngine;
 
-namespace SpaceCombat.Input
+namespace StarReapers.Input
 {
     /// <summary>
     /// Input manager that handles switching between input types.

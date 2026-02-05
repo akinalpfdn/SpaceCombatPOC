@@ -1,16 +1,16 @@
-// ============================================
+﻿// ============================================
 // SPAWN DEBUGGER - Editor tool for testing spawn distribution
 // Visualizes spawn positions and strategy behavior
 // Uses new Input System (UnityEngine.InputSystem)
 // ============================================
 
-using SpaceCombat.Interfaces;
+using StarReapers.Interfaces;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace SpaceCombat.Spawning
+namespace StarReapers.Spawning
 {
     /// <summary>
     /// Debug tool for visualizing and testing spawn strategies.

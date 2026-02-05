@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // VIRTUAL JOYSTICK - Mobile touch joystick
 // UI EventSystem-based virtual joystick for mobile input
 // Supports floating mode (joystick moves to touch position)
@@ -7,7 +7,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace SpaceCombat.UI.Mobile
+namespace StarReapers.UI.Mobile
 {
     /// <summary>
     /// Virtual joystick for mobile touch input.

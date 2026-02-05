@@ -1,6 +1,6 @@
-{
-    "name": "SpaceCombat",
-    "rootNamespace": "SpaceCombat",
+﻿{
+    "name": "StarReapers",
+    "rootNamespace": "StarReapers",
     "references": [
         "Unity.InputSystem",
         "Unity.TextMeshPro",

@@ -1,13 +1,13 @@
-// ============================================
+﻿// ============================================
 // SPAWN STRATEGY FACTORY - Factory Pattern
 // Creates spawn strategies based on configuration
 // Centralizes strategy instantiation logic
 // ============================================
 
 using UnityEngine;
-using SpaceCombat.Interfaces;
+using StarReapers.Interfaces;
 
-namespace SpaceCombat.Spawning
+namespace StarReapers.Spawning
 {
     /// <summary>
     /// Types of spawn distribution strategies available.

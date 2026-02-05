@@ -1,9 +1,9 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using SpaceCombat.Interfaces;
+using StarReapers.Interfaces;
 using Component = UnityEngine.Component;
 
-namespace SpaceCombat.Utilities
+namespace StarReapers.Utilities
 {
     /// <summary>
     /// Manager for multiple object pools

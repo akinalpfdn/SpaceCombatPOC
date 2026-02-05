@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // AUTO DESTROY PARTICLE
 // Auto-destroys particle system when complete
 // Attach to particle effect prefabs
@@ -6,7 +6,7 @@
 
 using UnityEngine;
 
-namespace SpaceCombat.VFX
+namespace StarReapers.VFX
 {
     /// <summary>
     /// Auto-destroys particle system when complete.

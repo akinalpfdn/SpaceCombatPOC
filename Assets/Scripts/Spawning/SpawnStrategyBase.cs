@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // SPAWN STRATEGY BASE - Template Method Pattern
 // Provides common functionality for spawn strategies
 // Concrete strategies override specific algorithms
@@ -6,9 +6,9 @@
 
 using System.Collections.Generic;
 using UnityEngine;
-using SpaceCombat.Interfaces;
+using StarReapers.Interfaces;
 
-namespace SpaceCombat.Spawning
+namespace StarReapers.Spawning
 {
     /// <summary>
     /// Base class for spawn strategies implementing Template Method Pattern.

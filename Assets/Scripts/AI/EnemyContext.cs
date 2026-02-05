@@ -1,8 +1,8 @@
-using UnityEngine;
-using SpaceCombat.Combat;
-using SpaceCombat.ScriptableObjects;
+﻿using UnityEngine;
+using StarReapers.Combat;
+using StarReapers.ScriptableObjects;
 
-namespace SpaceCombat.AI
+namespace StarReapers.AI
 {
     /// <summary>
     /// Shared data container for enemy AI states.

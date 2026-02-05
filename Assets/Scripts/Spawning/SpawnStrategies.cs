@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // SPAWN STRATEGIES - Concrete Strategy Implementations
 // Different algorithms for enemy distribution
 // ============================================
@@ -6,7 +6,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SpaceCombat.Spawning
+namespace StarReapers.Spawning
 {
     // ============================================
     // UNIFORM RANDOM STRATEGY

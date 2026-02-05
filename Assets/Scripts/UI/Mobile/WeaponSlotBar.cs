@@ -1,13 +1,13 @@
-// ============================================
+﻿// ============================================
 // WEAPON SLOT BAR - Container for weapon slots
 // Manages 4 weapon slot buttons (LA-1 to LA-4)
 // ============================================
 
 using UnityEngine;
-using SpaceCombat.Events;
-using SpaceCombat.Entities;
+using StarReapers.Events;
+using StarReapers.Entities;
 
-namespace SpaceCombat.UI.Mobile
+namespace StarReapers.UI.Mobile
 {
     /// <summary>
     /// Container that manages 4 weapon slot buttons.

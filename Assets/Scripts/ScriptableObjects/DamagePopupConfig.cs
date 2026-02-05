@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // DamagePopupConfig.cs
 // Configuration for floating damage numbers
 // DarkOrbit/RPG style damage popup settings
@@ -7,18 +7,18 @@
 using UnityEngine;
 using TMPro;
 
-namespace SpaceCombat.ScriptableObjects
+namespace StarReapers.ScriptableObjects
 {
     /// <summary>
     /// Configuration asset for damage popup visual effects.
     /// Contains all tunable parameters for popup appearance and animation.
     ///
     /// Usage:
-    /// 1. Create asset: Right-click > Create > SpaceCombat > Damage Popup Config
+    /// 1. Create asset: Right-click > Create > StarReapers > Damage Popup Config
     /// 2. Assign font asset (create from Bebas Neue TTF via TextMeshPro)
     /// 3. Assign to DamagePopupManager
     /// </summary>
-    [CreateAssetMenu(fileName = "NewDamagePopup", menuName = "SpaceCombat/Damage Popup Config")]
+    [CreateAssetMenu(fileName = "NewDamagePopup", menuName = "StarReapers/Damage Popup Config")]
     public class DamagePopupConfig : ScriptableObject
     {
         // ============================================

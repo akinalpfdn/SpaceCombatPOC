@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // MuzzleFlash.cs
 // Laser/weapon muzzle flash visual effect
 // Multi-layer star burst with rotation animation
@@ -7,7 +7,7 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace SpaceCombat.VFX
+namespace StarReapers.VFX
 {
     /// <summary>
     /// Professional muzzle flash effect for weapons.

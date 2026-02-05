@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // MOBILE HEALTH BAR - HP and Shield display
 // DarkOrbit-style health/shield bars for mobile HUD
 // ============================================
@@ -6,9 +6,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using SpaceCombat.Events;
+using StarReapers.Events;
 
-namespace SpaceCombat.UI.Mobile
+namespace StarReapers.UI.Mobile
 {
     /// <summary>
     /// Mobile HUD health and shield bar display.

@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // MINIMAP - Shows nearby enemies and player position
 // Icon-based minimap for top-down space combat
 // ============================================
@@ -6,9 +6,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using SpaceCombat.Entities;
+using StarReapers.Entities;
 
-namespace SpaceCombat.UI.Mobile
+namespace StarReapers.UI.Mobile
 {
     /// <summary>
     /// Simple icon-based minimap that shows:

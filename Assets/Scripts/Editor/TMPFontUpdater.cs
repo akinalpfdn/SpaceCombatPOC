@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // TMP FONT UPDATER - Editor utility to batch update fonts
 // Updates all TMP Text components to use the default font
 // ============================================
@@ -11,15 +11,15 @@ using TMPro;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SpaceCombat.Editor
+namespace StarReapers.Editor
 {
     /// <summary>
     /// Editor utility to update all TextMeshPro components to use the default font.
-    /// Access via: Tools → SpaceCombat → Update All TMP Fonts
+    /// Access via: Tools → StarReapers → Update All TMP Fonts
     /// </summary>
     public static class TMPFontUpdater
     {
-        [MenuItem("Tools/SpaceCombat/Update All TMP Fonts")]
+        [MenuItem("Tools/StarReapers/Update All TMP Fonts")]
         public static void UpdateAllFonts()
         {
             // Get the default TMP font from settings
@@ -195,7 +195,7 @@ namespace SpaceCombat.Editor
         // ADDITIONAL UTILITIES
         // ============================================
 
-        [MenuItem("Tools/SpaceCombat/Count TMP Texts in Scene")]
+        [MenuItem("Tools/StarReapers/Count TMP Texts in Scene")]
         public static void CountTMPTexts()
         {
             var allTexts = Object.FindObjectsByType<TMP_Text>(FindObjectsInactive.Include, FindObjectsSortMode.None);

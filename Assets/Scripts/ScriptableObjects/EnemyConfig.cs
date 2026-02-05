@@ -1,8 +1,8 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace SpaceCombat.ScriptableObjects
+namespace StarReapers.ScriptableObjects
 {
-    [CreateAssetMenu(fileName = "NewEnemyConfig", menuName = "SpaceCombat/Enemy Configuration")]
+    [CreateAssetMenu(fileName = "NewEnemyConfig", menuName = "StarReapers/Enemy Configuration")]
     public class EnemyConfig : ScriptableObject
     {
         [Header("Identity")]

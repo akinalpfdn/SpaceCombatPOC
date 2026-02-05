@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // MINIMAL HUD - POC UI Elements
 // Health bar, shield bar, score display
 // ============================================
@@ -7,9 +7,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using VContainer;
-using SpaceCombat.Events;
+using StarReapers.Events;
 
-namespace SpaceCombat.UI
+namespace StarReapers.UI
 {
     /// <summary>
     /// Minimal HUD for POC demonstration

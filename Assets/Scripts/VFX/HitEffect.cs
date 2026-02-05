@@ -1,6 +1,6 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace SpaceCombat.VFX
+namespace StarReapers.VFX
 {
     public class HitEffect : MonoBehaviour
     {

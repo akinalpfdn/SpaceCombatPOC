@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // OBJECT POOL - Performance Optimization
 // Generic, reusable pool for projectiles, enemies, effects
 // ============================================
@@ -6,10 +6,10 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using SpaceCombat.Interfaces;
-using SpaceCombat.Core;
+using StarReapers.Interfaces;
+using StarReapers.Core;
 
-namespace SpaceCombat.Utilities
+namespace StarReapers.Utilities
 {
     /// <summary>
     /// Non-generic interface for pool operations.

@@ -1,7 +1,7 @@
-using UnityEngine;
+﻿using UnityEngine;
 using VContainer;
 
-namespace SpaceCombat.Environment
+namespace StarReapers.Environment
 {
     public class CameraFollow : MonoBehaviour
     {

@@ -1,11 +1,11 @@
-// ============================================
+﻿// ============================================
 // MAP BOUNDS - Limits player movement to map area
 // Extended with Bounds3D for spawn system compatibility
 // ============================================
 
 using UnityEngine;
 
-namespace SpaceCombat.Environment
+namespace StarReapers.Environment
 {
     /// <summary>
     /// Defines map boundaries and clamps player position

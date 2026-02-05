@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // ShieldVisualConfig.cs
 // Data-driven configuration for shield visual effects
 // Allows artists to tweak without code changes
@@ -6,18 +6,18 @@
 
 using UnityEngine;
 
-namespace SpaceCombat.ScriptableObjects
+namespace StarReapers.ScriptableObjects
 {
     /// <summary>
     /// Configuration asset for DarkOrbit-style shield visual effects.
     /// Contains all tunable parameters for shield appearance and behavior.
     ///
     /// Usage:
-    /// 1. Create asset: Right-click > Create > SpaceCombat > Shield Visual Config
+    /// 1. Create asset: Right-click > Create > StarReapers > Shield Visual Config
     /// 2. Assign to ShieldVisualController component
     /// 3. Tweak values in inspector for desired effect
     /// </summary>
-    [CreateAssetMenu(fileName = "NewShieldVisual", menuName = "SpaceCombat/Shield Visual Config")]
+    [CreateAssetMenu(fileName = "NewShieldVisual", menuName = "StarReapers/Shield Visual Config")]
     public class ShieldVisualConfig : ScriptableObject
     {
         // ============================================

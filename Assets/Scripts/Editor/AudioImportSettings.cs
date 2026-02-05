@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 // ============================================
 // AUDIO IMPORT SETTINGS - Batch configure audio for Android
 // Fixes common Android audio playback issues
@@ -8,17 +8,17 @@ using UnityEditor;
 using UnityEngine;
 using System.IO;
 
-namespace SpaceCombat.Editor
+namespace StarReapers.Editor
 {
     /// <summary>
     /// Editor utility to configure audio import settings for Android.
     /// Fixes common issues like audio not playing on mobile.
     ///
-    /// Access via: Tools → SpaceCombat → Configure Audio for Android
+    /// Access via: Tools → StarReapers → Configure Audio for Android
     /// </summary>
     public static class AudioImportSettings
     {
-        [MenuItem("Tools/SpaceCombat/Configure Audio for Android")]
+        [MenuItem("Tools/StarReapers/Configure Audio for Android")]
         public static void ConfigureAudioForAndroid()
         {
             string[] audioGuids = AssetDatabase.FindAssets("t:AudioClip", new[] { "Assets/Sounds" });
@@ -125,7 +125,7 @@ namespace SpaceCombat.Editor
             Debug.Log($"[AudioImportSettings] Configured {updated}/{audioGuids.Length} audio files for Android");
         }
 
-        [MenuItem("Tools/SpaceCombat/Check AudioListener")]
+        [MenuItem("Tools/StarReapers/Check AudioListener")]
         public static void CheckAudioListener()
         {
             var listeners = Object.FindObjectsByType<AudioListener>(FindObjectsSortMode.None);
@@ -184,7 +184,7 @@ namespace SpaceCombat.Editor
             }
         }
 
-        [MenuItem("Tools/SpaceCombat/List Audio Files Info")]
+        [MenuItem("Tools/StarReapers/List Audio Files Info")]
         public static void ListAudioFilesInfo()
         {
             string[] audioGuids = AssetDatabase.FindAssets("t:AudioClip", new[] { "Assets/Sounds" });

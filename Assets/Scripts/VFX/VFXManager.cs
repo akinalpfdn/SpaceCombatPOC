@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // VFX SYSTEM - Visual Effects Management
 // Handles explosions, particles, and screen effects
 // ============================================
@@ -6,11 +6,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
-using SpaceCombat.Events;
-using SpaceCombat.Interfaces;
-using SpaceCombat.Utilities;
+using StarReapers.Events;
+using StarReapers.Interfaces;
+using StarReapers.Utilities;
 
-namespace SpaceCombat.VFX
+namespace StarReapers.VFX
 {
     /// <summary>
     /// Manages visual effects throughout the game.

@@ -1,12 +1,12 @@
-// ============================================
+﻿// ============================================
 // PLAYER STATUS DISPLAY - Text-based health/shield
 // Shows "HP: 100/100" and "SH: 50/50" as text
 // ============================================
 
 using UnityEngine;
-using SpaceCombat.Entities;
+using StarReapers.Entities;
 
-namespace SpaceCombat.UI
+namespace StarReapers.UI
 {
     /// <summary>
     /// Displays player health and shield as text

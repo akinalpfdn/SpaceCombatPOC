@@ -1,15 +1,15 @@
-// ============================================
+﻿// ============================================
 // PROJECTILE - Poolable high-performance projectile
 // Handles movement, collision, and damage dealing
 // Visual rendering delegated to IProjectileVisual
 // ============================================
 
 using UnityEngine;
-using SpaceCombat.Entities;
-using SpaceCombat.Interfaces;
-using SpaceCombat.Events;
+using StarReapers.Entities;
+using StarReapers.Interfaces;
+using StarReapers.Events;
 
-namespace SpaceCombat.Combat
+namespace StarReapers.Combat
 {
     /// <summary>
     /// Base projectile class - supports object pooling.

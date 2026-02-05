@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // SPAWN STRATEGY INTERFACE - Strategy Pattern
 // Defines contract for spawn position algorithms
 // Allows swapping spawn distribution methods at runtime
@@ -6,7 +6,7 @@
 
 using UnityEngine;
 
-namespace SpaceCombat.Interfaces
+namespace StarReapers.Interfaces
 {
     /// <summary>
     /// Strategy Pattern interface for spawn position calculation.

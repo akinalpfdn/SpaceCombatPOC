@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // ShieldVisualController.cs
 // DarkOrbit-style shield visual effects controller
 // Manages hit ripples, hexagon pattern, and health-based colors
@@ -6,12 +6,12 @@
 
 using System.Collections;
 using UnityEngine;
-using SpaceCombat.Entities;
-using SpaceCombat.Events;
-using SpaceCombat.Interfaces;
-using SpaceCombat.ScriptableObjects;
+using StarReapers.Entities;
+using StarReapers.Events;
+using StarReapers.Interfaces;
+using StarReapers.ScriptableObjects;
 
-namespace SpaceCombat.VFX.Shield
+namespace StarReapers.VFX.Shield
 {
     /// <summary>
     /// Controls DarkOrbit-style shield visual effects.

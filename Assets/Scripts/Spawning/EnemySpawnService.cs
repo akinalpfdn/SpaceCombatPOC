@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // ENEMY SPAWN SERVICE - Service Layer Pattern
 // Manages all enemy spawning operations
 // Follows Single Responsibility Principle
@@ -10,12 +10,12 @@ using System.Linq;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
-using SpaceCombat.Interfaces;
-using SpaceCombat.Utilities;
-using SpaceCombat.Core;
+using StarReapers.Interfaces;
+using StarReapers.Utilities;
+using StarReapers.Core;
 using Debug = UnityEngine.Debug;
 
-namespace SpaceCombat.Spawning
+namespace StarReapers.Spawning
 {
     /// <summary>
     /// Service responsible for managing enemy spawning.

@@ -1,9 +1,9 @@
-using UnityEngine;
-using SpaceCombat.AI.States;
-using SpaceCombat.Combat;
-using SpaceCombat.ScriptableObjects;
+﻿using UnityEngine;
+using StarReapers.AI.States;
+using StarReapers.Combat;
+using StarReapers.ScriptableObjects;
 
-namespace SpaceCombat.AI
+namespace StarReapers.AI
 {
     /// <summary>
     /// State machine controller component for enemy AI.

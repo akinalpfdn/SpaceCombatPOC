@@ -1,19 +1,19 @@
-// ============================================
+﻿// ============================================
 // PLAYER SHIP - Composes multiple systems
 // Uses composition over inheritance for flexibility
 // ============================================
 
 using UnityEngine;
 using VContainer;
-using SpaceCombat.Interfaces;
-using SpaceCombat.Events;
-using SpaceCombat.ScriptableObjects;
-using SpaceCombat.Combat;
-using SpaceCombat.Movement;
-using SpaceCombat.Core;
-using SpaceCombat.VFX.Shield;
+using StarReapers.Interfaces;
+using StarReapers.Events;
+using StarReapers.ScriptableObjects;
+using StarReapers.Combat;
+using StarReapers.Movement;
+using StarReapers.Core;
+using StarReapers.VFX.Shield;
 
-namespace SpaceCombat.Entities
+namespace StarReapers.Entities
 {
     /// <summary>
     /// Player-controlled ship

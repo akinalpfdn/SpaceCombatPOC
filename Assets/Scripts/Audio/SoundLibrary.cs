@@ -1,13 +1,13 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace SpaceCombat.Audio
+namespace StarReapers.Audio
 {
     /// <summary>
     /// Library of sound effects and music
     /// ScriptableObject for easy asset management
     /// </summary>
-    [CreateAssetMenu(fileName = "SoundLibrary", menuName = "SpaceCombat/Sound Library")]
+    [CreateAssetMenu(fileName = "SoundLibrary", menuName = "StarReapers/Sound Library")]
     public class SoundLibrary : ScriptableObject
     {
         [System.Serializable]

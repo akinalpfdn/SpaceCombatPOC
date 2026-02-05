@@ -1,11 +1,11 @@
-// ============================================
+﻿// ============================================
 // PARALLAX BACKGROUND - Depth layer system
 // Multiple layers move at different speeds
 // ============================================
 
 using UnityEngine;
 
-namespace SpaceCombat.Environment
+namespace StarReapers.Environment
 {
    
 

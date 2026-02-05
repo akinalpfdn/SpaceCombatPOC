@@ -1,4 +1,4 @@
-ADIM 1: WeaponSlotBar Ekle (Alt Orta - 4 Weapon Butonu)
+﻿ADIM 1: WeaponSlotBar Ekle (Alt Orta - 4 Weapon Butonu)
 1.1 Parent Container Oluştur
 Hierarchy'de MobileControlsCanvas'a sağ tık
 UI → Empty Object seç
@@ -26,7 +26,7 @@ Horizontal Layout Group:
 └── Child Force Expand Height: ☐ (kapalı)
 1.4 WeaponSlotBar Script Ekle
 WeaponSlotBar seçiliyken Add Component
-WeaponSlotBar ara ve ekle (SpaceCombat.UI.Mobile)
+WeaponSlotBar ara ve ekle (StarReapers.UI.Mobile)
 1.5 İlk Slot Butonunu Oluştur
 WeaponSlotBar'a sağ tık → UI → Button - TextMeshPro
 Adını Slot1 yap

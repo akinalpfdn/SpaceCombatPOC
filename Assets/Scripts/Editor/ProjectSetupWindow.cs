@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // EDITOR UTILITIES - Quick Setup Helpers
 // Place in Assets/Scripts/Editor folder
 // ============================================
@@ -7,14 +7,14 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace SpaceCombat.Editor
+namespace StarReapers.Editor
 {
     /// <summary>
     /// Editor window for quick project setup
     /// </summary>
     public class ProjectSetupWindow : EditorWindow
     {
-        [MenuItem("SpaceCombat/Project Setup")]
+        [MenuItem("StarReapers/Project Setup")]
         public static void ShowWindow()
         {
             GetWindow<ProjectSetupWindow>("Space Combat Setup");

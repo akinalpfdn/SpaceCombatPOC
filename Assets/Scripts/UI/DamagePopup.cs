@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // DamagePopup.cs
 // Individual floating damage number component
 // Animates text rising and fading out
@@ -6,10 +6,10 @@
 
 using UnityEngine;
 using TMPro;
-using SpaceCombat.Interfaces;
-using SpaceCombat.ScriptableObjects;
+using StarReapers.Interfaces;
+using StarReapers.ScriptableObjects;
 
-namespace SpaceCombat.UI
+namespace StarReapers.UI
 {
     /// <summary>
     /// Controls a single damage popup instance.

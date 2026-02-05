@@ -1,12 +1,12 @@
-// ============================================
+﻿// ============================================
 // POOLABLE EFFECT
 // Poolable visual effect for reuse
 // ============================================
 
 using UnityEngine;
-using SpaceCombat.Interfaces;
+using StarReapers.Interfaces;
 
-namespace SpaceCombat.VFX
+namespace StarReapers.VFX
 {
     /// <summary>
     /// Poolable visual effect for reuse.

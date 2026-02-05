@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // KEYBOARD INPUT PROVIDER
 // Mouse and keyboard input for desktop/testing
 // Uses new Input System (UnityEngine.InputSystem)
@@ -9,10 +9,10 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using VContainer;
-using SpaceCombat.Interfaces;
-using SpaceCombat.Core;
+using StarReapers.Interfaces;
+using StarReapers.Core;
 
-namespace SpaceCombat.Input
+namespace StarReapers.Input
 {
     /// <summary>
     /// Mouse and keyboard input provider for desktop/testing.

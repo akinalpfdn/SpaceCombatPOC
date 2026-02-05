@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // WEAPON SYSTEM - Strategy Pattern
 // Handles weapon firing, cooldowns, and projectile spawning
 // ============================================
@@ -7,13 +7,13 @@ using System;
 using System.Collections;
 using UnityEngine;
 using VContainer;
-using SpaceCombat.Interfaces;
-using SpaceCombat.Events;
-using SpaceCombat.ScriptableObjects;
-using SpaceCombat.Utilities;
-using SpaceCombat.VFX;
+using StarReapers.Interfaces;
+using StarReapers.Events;
+using StarReapers.ScriptableObjects;
+using StarReapers.Utilities;
+using StarReapers.VFX;
 
-namespace SpaceCombat.Combat
+namespace StarReapers.Combat
 {
     /// <summary>
     /// Controls weapon firing for a ship

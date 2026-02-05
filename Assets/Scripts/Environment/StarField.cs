@@ -1,11 +1,11 @@
-// ============================================
+﻿// ============================================
 // STAR FIELD - Dynamic star background
 // Creates twinkling star field effect
 // ============================================
 
 using UnityEngine;
 
-namespace SpaceCombat.Environment
+namespace StarReapers.Environment
 {
     /// <summary>
     /// Spawns and manages background stars

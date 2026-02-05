@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // IShieldVisual.cs
 // Strategy interface for shield visual effects
 // Allows different shield visual implementations
@@ -6,7 +6,7 @@
 
 using UnityEngine;
 
-namespace SpaceCombat.Interfaces
+namespace StarReapers.Interfaces
 {
     /// <summary>
     /// Interface for shield visual effects.

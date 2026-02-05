@@ -1,9 +1,9 @@
-
-SpaceCombatPOC - Tam Proje Özeti
+﻿
+StarReapersPOC - Tam Proje Özeti
 Faz 1-4: Temel Mimari (Önceki Chatler)
 Assembly Definitions
 Modüler kod organizasyonu için asmdef dosyaları oluşturuldu
-Namespace yapısı: SpaceCombat.*
+Namespace yapısı: StarReapers.*
 Object Pooling Sistemi
 IPoolable interface: OnSpawn(), OnDespawn(), ResetState()
 PoolManager - Merkezi pool yönetimi

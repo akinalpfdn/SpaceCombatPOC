@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // PROJECTILE VISUAL CONFIG - ScriptableObject
 // Data-driven configuration for projectile visuals
 // Supports mesh-based energy bolt rendering
@@ -6,16 +6,16 @@
 
 using UnityEngine;
 
-namespace SpaceCombat.ScriptableObjects
+namespace StarReapers.ScriptableObjects
 {
     /// <summary>
     /// Configuration asset for mesh-based projectile visuals.
     /// Defines mesh, materials, emission, and trail parameters.
     ///
-    /// Usage: Create via Assets > Create > SpaceCombat > Projectile Visual Config
+    /// Usage: Create via Assets > Create > StarReapers > Projectile Visual Config
     /// Assign to WeaponConfig.projectileVisualConfig for per-weapon visual customization.
     /// </summary>
-    [CreateAssetMenu(fileName = "NewProjectileVisual", menuName = "SpaceCombat/Projectile Visual Config")]
+    [CreateAssetMenu(fileName = "NewProjectileVisual", menuName = "StarReapers/Projectile Visual Config")]
     public class ProjectileVisualConfig : ScriptableObject
     {
         // ============================================

@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // AUDIO SYSTEM - Event-Driven
 // Centralized audio management with pooling
 // ============================================
@@ -6,10 +6,10 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using SpaceCombat.Interfaces;
-using SpaceCombat.Events;
+using StarReapers.Interfaces;
+using StarReapers.Events;
 
-namespace SpaceCombat.Audio
+namespace StarReapers.Audio
 {
     /// <summary>
     /// Central audio manager

@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // SPAWN CONFIG - ScriptableObject for spawn settings
 // Data-driven configuration for spawn system
 // Allows designers to tweak without code changes
@@ -6,7 +6,7 @@
 
 using UnityEngine;
 
-namespace SpaceCombat.Spawning
+namespace StarReapers.Spawning
 {
     /// <summary>
     /// ScriptableObject configuration for spawn system.
@@ -17,7 +17,7 @@ namespace SpaceCombat.Spawning
     /// - Multiple configs for different scenarios (waves, zones, difficulty)
     /// - No code changes needed for balance adjustments
     /// </summary>
-    [CreateAssetMenu(fileName = "SpawnConfig", menuName = "SpaceCombat/Spawning/Spawn Config")]
+    [CreateAssetMenu(fileName = "SpawnConfig", menuName = "StarReapers/Spawning/Spawn Config")]
     public class SpawnConfig : ScriptableObject
     {
         [Header("Distribution")]

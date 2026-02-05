@@ -1,4 +1,4 @@
-# SpaceCombat Project Rules
+﻿# StarReapers Project Rules
 
 Bu dosya Claude Code'un her konusmada otomatik okudugu kural setidir.
 **Bu projede "basit tut / over-engineering yapma" varsayilani GECERSIZDIR.**
@@ -59,11 +59,11 @@ Kod her zaman production-grade, scalable ve SOLID uyumlu olmalidir.
 
 ### Dosya ve Sinif Organizasyonu
 - **Bir dosya = bir sinif.** Dosya adi sinif adiyla ayni olmali.
-- **Namespace:** Klasor yapisiyla eslesen `SpaceCombat.*` namespace kullan.
+- **Namespace:** Klasor yapisiyla eslesen `StarReapers.*` namespace kullan.
   ```
-  Core/ → SpaceCombat.Core
-  AI/States/ → SpaceCombat.AI.States
-  Combat/ → SpaceCombat.Combat
+  Core/ → StarReapers.Core
+  AI/States/ → StarReapers.AI.States
+  Combat/ → StarReapers.Combat
   ```
 
 ### MonoBehaviour Yapisi (Siralama)
@@ -153,7 +153,7 @@ Buyuk siniflarda bolum ayiricilar kullan:
 ## Yeni Sistem Ekleme Checklist
 1. [ ] Interface tanimla (`Interfaces/` klasorunde)
 2. [ ] Concrete sinif olustur (uygun klasorde, tek dosya)
-3. [ ] Dogru namespace kullan (`SpaceCombat.*`)
+3. [ ] Dogru namespace kullan (`StarReapers.*`)
 4. [ ] Dependency'leri `[Inject] Construct(...)` ile al
 5. [ ] `GameLifetimeScope`'a register et
 6. [ ] Gerekli event'leri `GameEvents.cs`'e ekle

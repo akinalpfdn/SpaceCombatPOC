@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // SpeedBasedTrail.cs
 // Dynamically adjusts trail length based on ship speed
 // Uses Strategy pattern for different trail behaviors
@@ -7,7 +7,7 @@
 using UnityEngine;
 using VContainer;
 
-namespace SpaceCombat.Visual
+namespace StarReapers.Visual
 {
     /// <summary>
     /// Controls trail renderer properties based on ship movement speed.
@@ -100,7 +100,7 @@ namespace SpaceCombat.Visual
             _lastPosition = _shipTransform.position;
 
             // Try to get max speed from ShipMovement component
-            var shipMovement = _shipTransform.GetComponent<SpaceCombat.Movement.ShipMovement>();
+            var shipMovement = _shipTransform.GetComponent<StarReapers.Movement.ShipMovement>();
             if (shipMovement != null)
             {
                 _maxShipSpeed = shipMovement.MaxSpeed;

@@ -1,7 +1,7 @@
-using UnityEngine;
-using SpaceCombat.Interfaces;
+﻿using UnityEngine;
+using StarReapers.Interfaces;
 
-namespace SpaceCombat.VFX
+namespace StarReapers.VFX
 {
     /// <summary>
     /// Lightweight poolable VFX component.

@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // MOBILE INPUT MANAGER - Connects mobile UI to gameplay
 // Bridges virtual joystick to ship movement
 // Platform-aware: active on mobile, optional in editor
@@ -7,12 +7,12 @@
 
 using UnityEngine;
 using UnityEngine.InputSystem;
-using SpaceCombat.Combat;
-using SpaceCombat.Entities;
-using SpaceCombat.Movement;
-using SpaceCombat.UI.Mobile;
+using StarReapers.Combat;
+using StarReapers.Entities;
+using StarReapers.Movement;
+using StarReapers.UI.Mobile;
 
-namespace SpaceCombat.Input
+namespace StarReapers.Input
 {
     /// <summary>
     /// Mobile input manager that connects UI controls to gameplay systems.

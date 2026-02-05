@@ -1,6 +1,6 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace SpaceCombat.AI
+namespace StarReapers.AI
 {
     /// <summary>
     /// Handles all enemy movement operations.

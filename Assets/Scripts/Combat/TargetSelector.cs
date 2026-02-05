@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // TARGET SELECTION - Click to select enemies
 // Player auto-faces selected target, SPACE to toggle attack
 // DarkOrbit-style: mouse hold moves ship, click targets enemy
@@ -15,12 +15,12 @@
 
 using UnityEngine;
 using UnityEngine.InputSystem;
-using SpaceCombat.Entities;
-using SpaceCombat.Interfaces;
-using SpaceCombat.Movement;
-using SpaceCombat.UI;
+using StarReapers.Entities;
+using StarReapers.Interfaces;
+using StarReapers.Movement;
+using StarReapers.UI;
 
-namespace SpaceCombat.Combat
+namespace StarReapers.Combat
 {
     /// <summary>
     /// Attach this to the Player ship.

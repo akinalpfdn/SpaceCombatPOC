@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // SPAWN SERVICE INTERFACE - Interface Segregation
 // Defines contract for spawn management
 // Separates spawn logic from GameManager
@@ -7,7 +7,7 @@
 using System;
 using UnityEngine;
 
-namespace SpaceCombat.Interfaces
+namespace StarReapers.Interfaces
 {
     /// <summary>
     /// Service interface for managing entity spawning.

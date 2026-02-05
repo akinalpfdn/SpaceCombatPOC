@@ -1,14 +1,14 @@
-// ============================================
+﻿// ============================================
 // BASE ENTITY - Template Method Pattern
 // Common functionality for all damageable entities
 // ============================================
 
 using System;
 using UnityEngine;
-using SpaceCombat.Interfaces;
-using SpaceCombat.Events;
+using StarReapers.Interfaces;
+using StarReapers.Events;
 
-namespace SpaceCombat.Entities
+namespace StarReapers.Entities
 {
     /// <summary>
     /// Base class for all game entities (player, enemies)

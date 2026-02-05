@@ -1,14 +1,14 @@
-using VContainer;
+﻿using VContainer;
 using VContainer.Unity;
 using UnityEngine;
-using SpaceCombat.Interfaces;
-using SpaceCombat.Utilities;
-using SpaceCombat.Audio;
-using SpaceCombat.VFX;
-using SpaceCombat.Spawning;
-using SpaceCombat.Input;
+using StarReapers.Interfaces;
+using StarReapers.Utilities;
+using StarReapers.Audio;
+using StarReapers.VFX;
+using StarReapers.Spawning;
+using StarReapers.Input;
 
-namespace SpaceCombat.Core
+namespace StarReapers.Core
 {
     public class GameLifetimeScope : LifetimeScope
     {

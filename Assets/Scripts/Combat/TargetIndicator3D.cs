@@ -1,12 +1,12 @@
-// ============================================
+﻿// ============================================
 // TARGET INDICATOR 3D - DarkOrbit-style targeting reticle
 // Two segmented rings rotating in opposite directions
 // ============================================
 
 using UnityEngine;
-using SpaceCombat.Interfaces;
+using StarReapers.Interfaces;
 
-namespace SpaceCombat.Combat
+namespace StarReapers.Combat
 {
     /// <summary>
     /// DarkOrbit-style 3D target indicator with:

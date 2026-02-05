@@ -1,4 +1,4 @@
-namespace SpaceCombat.AI
+﻿namespace StarReapers.AI
 {
     /// <summary>
     /// Interface for enemy AI states.

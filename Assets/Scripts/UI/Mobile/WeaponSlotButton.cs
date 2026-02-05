@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // WEAPON SLOT BUTTON - Individual weapon slot UI
 // Mobile UI button for weapon switching (LA-1 to LA-4)
 // ============================================
@@ -7,9 +7,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
-using SpaceCombat.Entities;
+using StarReapers.Entities;
 
-namespace SpaceCombat.UI.Mobile
+namespace StarReapers.UI.Mobile
 {
     /// <summary>
     /// Individual weapon slot button for mobile HUD.

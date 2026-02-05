@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // PROJECTILE VISUAL - Strategy Pattern Interface
 // Abstracts visual representation of projectiles
 // Allows swapping between sprite/mesh/particle visuals
@@ -6,7 +6,7 @@
 
 using UnityEngine;
 
-namespace SpaceCombat.Interfaces
+namespace StarReapers.Interfaces
 {
     /// <summary>
     /// Strategy interface for projectile visual representation.

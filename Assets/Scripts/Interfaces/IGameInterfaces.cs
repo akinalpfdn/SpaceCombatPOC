@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // INTERFACES - Following Interface Segregation Principle
 // Each interface has a single, focused responsibility
 // ============================================
@@ -6,7 +6,7 @@
 using UnityEngine;
 using System;
 
-namespace SpaceCombat.Interfaces
+namespace StarReapers.Interfaces
 {
     /// <summary>
     /// For entities that can take damage.

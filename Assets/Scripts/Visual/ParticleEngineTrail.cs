@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // ParticleEngineTrail.cs
 // Smooth particle-based engine trail that responds to ship speed
 // Uses Particle System Trails for buttery smooth curves
@@ -6,7 +6,7 @@
 
 using UnityEngine;
 
-namespace SpaceCombat.Visual
+namespace StarReapers.Visual
 {
     /// <summary>
     /// Creates a smooth particle-based engine trail.
@@ -109,7 +109,7 @@ namespace SpaceCombat.Visual
             _lastPosition = _shipTransform.position;
 
             // Try to get max speed from ShipMovement component
-            var shipMovement = _shipTransform.GetComponent<SpaceCombat.Movement.ShipMovement>();
+            var shipMovement = _shipTransform.GetComponent<StarReapers.Movement.ShipMovement>();
             if (shipMovement != null)
             {
                 _maxShipSpeed = shipMovement.MaxSpeed;

@@ -1,4 +1,4 @@
-namespace SpaceCombat.AI.States
+﻿namespace StarReapers.AI.States
 {
     public class FleeState : IEnemyState
     {

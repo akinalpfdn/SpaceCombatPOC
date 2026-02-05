@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // MOBILE HUD MANAGER - Main mobile UI controller
 // Coordinates all mobile HUD elements
 // Uses new Input System for touch detection
@@ -6,12 +6,12 @@
 
 using UnityEngine;
 using UnityEngine.InputSystem;
-using SpaceCombat.Entities;
-using SpaceCombat.Combat;
-using SpaceCombat.Movement;
-using SpaceCombat.Input;
+using StarReapers.Entities;
+using StarReapers.Combat;
+using StarReapers.Movement;
+using StarReapers.Input;
 
-namespace SpaceCombat.UI.Mobile
+namespace StarReapers.UI.Mobile
 {
     /// <summary>
     /// Central manager for mobile HUD elements.
