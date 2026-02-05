@@ -88,6 +88,9 @@ namespace SpaceCombat.Entities
 
             // Publish initial health/shield values for UI
             PublishHealthAndShieldEvents();
+
+            // Publish initial weapon slot for UI (so WeaponSlotBar shows correct selection)
+            PublishInitialWeaponEvent();
         }
 
         /// <summary>
@@ -98,6 +101,19 @@ namespace SpaceCombat.Entities
         {
             EventBus.Publish(new PlayerHealthChangedEvent(_currentHealth, _maxHealth));
             EventBus.Publish(new PlayerShieldChangedEvent(_currentShield, _maxShield));
+        }
+
+        /// <summary>
+        /// Publishes initial weapon slot to EventBus for UI sync.
+        /// Called on Start so WeaponSlotBar shows correct selection from game start.
+        /// </summary>
+        private void PublishInitialWeaponEvent()
+        {
+            if (_config != null && _config.availableWeapons != null && _config.availableWeapons.Length > 0)
+            {
+                var currentWeapon = _config.availableWeapons[_currentWeaponSlot];
+                EventBus.Publish(new WeaponSwitchedEvent(_currentWeaponSlot, currentWeapon, null));
+            }
         }
 
         private void OnDestroy()

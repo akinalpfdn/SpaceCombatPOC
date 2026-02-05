@@ -54,6 +54,35 @@ namespace SpaceCombat.UI.Mobile
         {
             // Set default selection
             SetSelectedSlot(_defaultSlot);
+
+            // Try to find player immediately
+            TryFindPlayer();
+        }
+
+        private void Update()
+        {
+            // Auto-find player if not initialized yet
+            if (_playerShip == null)
+            {
+                TryFindPlayer();
+            }
+        }
+
+        /// <summary>
+        /// Attempts to find the player and initialize slot buttons.
+        /// Called automatically - no manual initialization needed.
+        /// </summary>
+        private void TryFindPlayer()
+        {
+            var player = GameObject.FindWithTag("Player");
+            if (player != null)
+            {
+                var playerShip = player.GetComponent<PlayerShip>();
+                if (playerShip != null && _playerShip == null)
+                {
+                    Initialize(playerShip);
+                }
+            }
         }
 
         // ============================================
