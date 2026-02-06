@@ -286,6 +286,15 @@ namespace StarReapers.UI
         }
         
         /// <summary>
+        /// Set the size of the health bar.
+        /// </summary>
+        public void SetSize(Vector2 size)
+        {
+            _config.Size = size;
+            ApplySizes(_lastHealthPercent >= 0f ? _lastHealthPercent : 1f);
+        }
+
+        /// <summary>
         /// Set whether the health bar is always visible.
         /// </summary>
         public void SetAlwaysShow(bool alwaysShow)

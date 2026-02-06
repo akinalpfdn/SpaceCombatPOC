@@ -61,6 +61,8 @@ namespace StarReapers.Entities
         public Transform Target => _stateMachine?.Context?.Target;
         public bool IsActive => gameObject.activeInHierarchy;
         public float TargetIndicatorScale => _config?.targetIndicatorScale ?? 1f;
+        public Vector2 HealthBarSize => _config?.healthBarSize ?? new Vector2(2f, 0.3f);
+        public Vector3 HealthBarOffset => _config?.healthBarOffset ?? new Vector3(0f, 0f, -1f);
 
         protected override void Awake()
         {

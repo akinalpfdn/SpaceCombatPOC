@@ -534,6 +534,13 @@ namespace StarReapers.Combat
 
             if (_targetHealthBar != null)
             {
+                // Apply per-enemy health bar settings from config
+                if (enemy != null)
+                {
+                    _targetHealthBar.SetSize(enemy.HealthBarSize);
+                    _targetHealthBar.SetOffset(enemy.HealthBarOffset);
+                }
+
                 _targetHealthBar.SetAlwaysShow(true);
 
                 var targetEntity = target.GetComponent<BaseEntity>();

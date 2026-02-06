@@ -34,7 +34,14 @@ namespace StarReapers.ScriptableObjects
         public int scoreValue = 100;
 
         [Header("UI")]
+        [Tooltip("Scale of the target indicator ring (bigger enemies need bigger rings)")]
         public float targetIndicatorScale = 1f;
+
+        [Tooltip("Health bar width and height")]
+        public Vector2 healthBarSize = new Vector2(2f, 0.3f);
+
+        [Tooltip("Health bar offset from entity center (3D: X=left/right, Y=up/down, Z=forward/back)")]
+        public Vector3 healthBarOffset = new Vector3(0f, 0f, -1f);
 
         [Header("Audio")]
         public string deathSoundId = "explosion_small";
