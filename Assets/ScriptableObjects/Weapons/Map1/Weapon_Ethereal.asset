@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a195a186b32a0540ada2e5871d1811d, type: 3}
+  m_Name: Weapon_Ethereal
+  m_EditorClassIdentifier: SpaceCombat::SpaceCombat.ScriptableObjects.WeaponConfig
+  weaponName: Ethereal Beam
+  damageType: 1
+  damage: 30
+  fireRate: 0.5
+  projectileSpeed: 55
+  range: 22
+  accuracy: 0.92
+  burstCount: 2
+  burstDelay: 0.05
+  projectilePrefab: {fileID: 587130082223421870, guid: 237e92e04ff2cf64eb658f8436cbaffc, type: 3}
+  projectilesPerShot: 1
+  spreadAngle: 0
+  muzzleFlashPrefab: {fileID: 0}
+  projectileColor: {r: 0.7, g: 0.2, b: 1, a: 1}
+  projectileScale: 1.2
+  projectileVisualConfig: {fileID: 11400000, guid: 6b6b3ebc08a15e14eb99400121dcdb82, type: 2}
+  fireSoundId: enemy_laser
+  hitSoundId: laser_hit
