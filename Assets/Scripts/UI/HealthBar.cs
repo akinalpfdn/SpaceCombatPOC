@@ -33,10 +33,18 @@ namespace StarReapers.UI
         public Color WarningColor = new Color(0.9f, 0.7f, 0.1f, 1f);
         public Color CriticalColor = new Color(0.9f, 0.1f, 0.1f, 1f);
         
+        [Header("Shield Colors")]
+        public Color ShieldColor = new Color(0.2f, 0.6f, 1f, 1f);
+        public Color ShieldLowColor = new Color(0.1f, 0.3f, 0.7f, 1f);
+
+        [Header("Shield Layout")]
+        [Tooltip("Gap between health and shield bars")]
+        public float ShieldGap = 0.05f;
+
         [Header("Thresholds")]
         [Range(0f, 1f)] public float WarningThreshold = 0.5f;
         [Range(0f, 1f)] public float CriticalThreshold = 0.25f;
-        
+
         [Header("Sorting")]
         public int BaseSortingOrder = 100;
         public string SortingLayerName = "UI";
@@ -63,16 +71,23 @@ namespace StarReapers.UI
         [Header("Target (optional - auto-detects if not set)")]
         [SerializeField] private BaseEntity _externalTarget;
         
-        // Visual components
+        // Visual components - Health
         private Transform _barContainer;
         private SpriteRenderer _border;
         private SpriteRenderer _background;
         private SpriteRenderer _fill;
-        
+
+        // Visual components - Shield
+        private SpriteRenderer _shieldBorder;
+        private SpriteRenderer _shieldBackground;
+        private SpriteRenderer _shieldFill;
+
         // Cached references
         private BaseEntity _entity;
         private Sprite _sharedSprite;
         private float _lastHealthPercent = -1f;
+        private float _lastShieldPercent = -1f;
+        private bool _hasShield;
         
         #region Unity Lifecycle
         
@@ -106,12 +121,17 @@ namespace StarReapers.UI
             _barContainer.position = new Vector3(pos.x + _config.Offset.x, pos.y + _config.Offset.y, pos.z + _config.Offset.z);
             _barContainer.rotation = Quaternion.identity;
 
-            // Only update visuals if health changed (optimization)
+            // Only update visuals if health or shield changed (optimization)
             float currentPercent = _entity.CurrentHealth / _entity.MaxHealth;
-            if (!Mathf.Approximately(currentPercent, _lastHealthPercent))
+            float currentShield = _hasShield ? _entity.CurrentShield / _entity.MaxShield : -1f;
+            bool healthChanged = !Mathf.Approximately(currentPercent, _lastHealthPercent);
+            bool shieldChanged = _hasShield && !Mathf.Approximately(currentShield, _lastShieldPercent);
+
+            if (healthChanged || shieldChanged)
             {
                 UpdateHealthVisuals(currentPercent);
                 _lastHealthPercent = currentPercent;
+                _lastShieldPercent = currentShield;
             }
         }
         
@@ -166,6 +186,19 @@ namespace StarReapers.UI
             _fill = CreateBarLayer("Fill", _barContainer, _config.BaseSortingOrder + 2);
             _fill.color = _config.HealthyColor;
             
+            // Layer 4-6: Shield bar (created but hidden until entity is assigned)
+            _shieldBorder = CreateBarLayer("ShieldBorder", _barContainer, _config.BaseSortingOrder + 3);
+            _shieldBorder.color = _config.BorderColor;
+
+            _shieldBackground = CreateBarLayer("ShieldBackground", _barContainer, _config.BaseSortingOrder + 4);
+            _shieldBackground.color = _config.BackgroundColor;
+
+            _shieldFill = CreateBarLayer("ShieldFill", _barContainer, _config.BaseSortingOrder + 5);
+            _shieldFill.color = _config.ShieldColor;
+
+            // Hide shield by default
+            SetShieldVisible(false);
+
             // Set initial sizes
             ApplySizes(1f);
         }
@@ -220,27 +253,49 @@ namespace StarReapers.UI
             float width = _config.Size.x;
             float height = _config.Size.y;
             float padding = _config.BorderPadding;
-            
-            // Border: Full size (centered at origin)
-            _border.transform.localScale = new Vector3(width, height, 1f);
-            _border.transform.localPosition = Vector3.zero;
-            
-            // Background: Slightly smaller (inside border, centered)
             float bgWidth = width - (padding * 2f);
             float bgHeight = height - (padding * 2f);
-            _background.transform.localScale = new Vector3(bgWidth, bgHeight, 1f);
+
+            // If shield exists, each bar gets half the total height
+            float barHeight = _hasShield ? height * 0.5f : height;
+            float barBgHeight = barHeight - (padding * 2f);
+            float shieldOffsetZ = _hasShield ? -(barHeight + _config.ShieldGap) : 0f;
+
+            // ============================================
+            // HEALTH BAR (top)
+            // ============================================
+            _border.transform.localScale = new Vector3(width, barHeight, 1f);
+            _border.transform.localPosition = Vector3.zero;
+
+            _background.transform.localScale = new Vector3(bgWidth, barBgHeight, 1f);
             _background.transform.localPosition = Vector3.zero;
-            
-            // Fill: Width based on health percent
-            // All sprites use CENTER pivot, so we calculate position from left edge
+
             float fillWidth = bgWidth * fillPercent;
-            _fill.transform.localScale = new Vector3(fillWidth, bgHeight, 1f);
-            
-            // Position fill so it grows from left edge
-            // Left edge of background (centered) is at -bgWidth/2
-            // Center of fill should be at: leftEdge + fillWidth/2
+            _fill.transform.localScale = new Vector3(fillWidth, barBgHeight, 1f);
             float fillCenterX = (-bgWidth / 2f) + (fillWidth / 2f);
             _fill.transform.localPosition = new Vector3(fillCenterX, 0f, 0f);
+
+            // ============================================
+            // SHIELD BAR (below health, further from entity)
+            // ============================================
+            if (_hasShield)
+            {
+                float shieldPercent = (_entity != null && _entity.MaxShield > 0f)
+                    ? _entity.CurrentShield / _entity.MaxShield : 1f;
+
+                _shieldBorder.transform.localScale = new Vector3(width, barHeight, 1f);
+                _shieldBorder.transform.localPosition = new Vector3(0f, 0f, shieldOffsetZ);
+
+                _shieldBackground.transform.localScale = new Vector3(bgWidth, barBgHeight, 1f);
+                _shieldBackground.transform.localPosition = new Vector3(0f, 0f, shieldOffsetZ);
+
+                float shieldFillWidth = bgWidth * shieldPercent;
+                float shieldCenterX = (-bgWidth / 2f) + (shieldFillWidth / 2f);
+                _shieldFill.transform.localScale = new Vector3(shieldFillWidth, barBgHeight, 1f);
+                _shieldFill.transform.localPosition = new Vector3(shieldCenterX, 0f, shieldOffsetZ);
+
+                _shieldFill.color = Color.Lerp(_config.ShieldLowColor, _config.ShieldColor, shieldPercent);
+            }
         }
         
         private Color GetHealthColor(float healthPercent)
@@ -270,6 +325,15 @@ namespace StarReapers.UI
             if (_border != null) _border.enabled = visible;
             if (_background != null) _background.enabled = visible;
             if (_fill != null) _fill.enabled = visible;
+
+            if (_hasShield) SetShieldVisible(visible);
+        }
+
+        private void SetShieldVisible(bool visible)
+        {
+            if (_shieldBorder != null) _shieldBorder.enabled = visible;
+            if (_shieldBackground != null) _shieldBackground.enabled = visible;
+            if (_shieldFill != null) _shieldFill.enabled = visible;
         }
         
         #endregion
@@ -311,6 +375,13 @@ namespace StarReapers.UI
             _externalTarget = target;
             _entity = target;
             _lastHealthPercent = -1f; // Force update
+            _lastShieldPercent = -1f;
+
+            // Detect if entity has shield
+            _hasShield = target != null && target.HasShield;
+            SetShieldVisible(_hasShield);
+
+            if (_entity != null) ForceUpdate();
         }
         
         /// <summary>

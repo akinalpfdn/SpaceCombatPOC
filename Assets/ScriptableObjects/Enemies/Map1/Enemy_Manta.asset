@@ -29,4 +29,6 @@ MonoBehaviour:
   canFlee: 1
   scoreValue: 150
   targetIndicatorScale: 1.2
+  healthBarSize: {x: 4, y: 0.6}
+  healthBarOffset: {x: 0, y: -3, z: -1}
   deathSoundId: explosion_medium

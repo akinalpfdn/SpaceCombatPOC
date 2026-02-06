@@ -28,5 +28,7 @@ MonoBehaviour:
   fleeHealthThreshold: 0.25
   canFlee: 1
   scoreValue: 200
-  targetIndicatorScale: 1.1
+  targetIndicatorScale: 2.5
+  healthBarSize: {x: 4, y: 0.6}
+  healthBarOffset: {x: 0, y: -5, z: -1}
   deathSoundId: explosion_medium
