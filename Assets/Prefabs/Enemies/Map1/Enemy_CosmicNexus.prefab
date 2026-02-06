@@ -59,7 +59,7 @@ MonoBehaviour:
     m_Bits: 64
   _isPlayerWeapon: 0
   _fallbackConvergenceDistance: 15
-  _fireSoundId: enemy_laser
+  _fireSoundId: enemy_laser_nexus
   _lastFireTime: 0
   _aimDirection: {x: 0, y: 1}
 --- !u!114 &3000000000000000004

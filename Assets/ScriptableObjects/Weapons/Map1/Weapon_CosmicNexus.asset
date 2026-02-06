@@ -15,18 +15,18 @@ MonoBehaviour:
   weaponName: Nexus Devastator
   damageType: 1
   damage: 50
-  fireRate: 1
-  projectileSpeed: 660
+  fireRate: 0.2
+  projectileSpeed: 40
   range: 30
   accuracy: 1
   burstCount: 3
-  burstDelay: 0.05
+  burstDelay: 0.1006
   projectilePrefab: {fileID: 587130082223421870, guid: 237e92e04ff2cf64eb658f8436cbaffc, type: 3}
   projectilesPerShot: 1
   spreadAngle: 20
   muzzleFlashPrefab: {fileID: 0}
-  projectileColor: {r: 0.9622642, g: 0, b: 0, a: 1}
+  projectileColor: {r: 0.05660379, g: 0.05595723, b: 0.053132802, a: 1}
   projectileScale: 1.5
-  projectileVisualConfig: {fileID: 11400000, guid: 6b6b3ebc08a15e14eb99400121dcdb82, type: 2}
-  fireSoundId: enemy_laser
+  projectileVisualConfig: {fileID: 11400000, guid: 5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b, type: 2}
+  fireSoundId: enemy_laser_nexus
   hitSoundId: laser_hit

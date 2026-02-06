@@ -27,6 +27,6 @@ MonoBehaviour:
   muzzleFlashPrefab: {fileID: 0}
   projectileColor: {r: 1, g: 0.4, b: 0.1, a: 1}
   projectileScale: 1
-  projectileVisualConfig: {fileID: 11400000, guid: 6b6b3ebc08a15e14eb99400121dcdb82, type: 2}
+  projectileVisualConfig: {fileID: 11400000, guid: 1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d, type: 2}
   fireSoundId: enemy_laser
   hitSoundId: laser_hit

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8050aaa986d61f146ae8ac0028fe56c8, type: 3}
+  m_Name: LaserVisual_CosmicNexus
+  m_EditorClassIdentifier: SpaceCombat::SpaceCombat.ScriptableObjects.ProjectileVisualConfig
+  _bodyMesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+  _bodyMaterial: {fileID: 2100000, guid: be913106a78511f4abf9701b44f0d10b, type: 2}
+  _meshScale: {x: 0.1, y: 0.1, z: 0.5}
+  _emissionColor: {r: 0, g: 0, b: 0, a: 1}
+  _emissionIntensity: 2.02
+  _trailMaterial: {fileID: 2100000, guid: c8b5c7b0853435c4b8786fb04e2683db, type: 2}
+  _trailStartWidth: 0.13
+  _trailEndWidth: 0.043
+  _trailTime: 0.093
+  _trailCornerVertices: 2
+  _trailMinVertexDistance: 0.1

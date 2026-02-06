@@ -16,10 +16,10 @@ MonoBehaviour:
   damageType: 1
   damage: 18
   fireRate: 0.35
-  projectileSpeed: 60
+  projectileSpeed: 40
   range: 20
   accuracy: 0.9
-  burstCount: 2
+  burstCount: 1
   burstDelay: 0.08
   projectilePrefab: {fileID: 587130082223421870, guid: 237e92e04ff2cf64eb658f8436cbaffc, type: 3}
   projectilesPerShot: 1
@@ -27,6 +27,6 @@ MonoBehaviour:
   muzzleFlashPrefab: {fileID: 0}
   projectileColor: {r: 1, g: 0.85, b: 0.2, a: 1}
   projectileScale: 1
-  projectileVisualConfig: {fileID: 11400000, guid: 6b6b3ebc08a15e14eb99400121dcdb82, type: 2}
-  fireSoundId: enemy_laser
+  projectileVisualConfig: {fileID: 11400000, guid: 3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f, type: 2}
+  fireSoundId: enemy_laser_star
   hitSoundId: laser_hit
